@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:key="pc_server"
+        android:title="@string/uri_server">
+
+        <EditTextPreference
+            android:key="etp_uri1"
+            android:title="@string/uri1"
+            android:dialogTitle="@string/uri1"
+            android:inputType="textUri"/>
+
+        <EditTextPreference
+            android:key="etp_uri2"
+            android:title="@string/uri2"
+            android:dialogTitle="@string/uri2"
+            android:inputType="textUri"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="pc_auto_execute"
+        android:title="@string/server_execute">
+
+        <CheckBoxPreference
+            android:key="cbp_auto_execute"
+            android:title="@string/auto_execute"
+            android:checked="true"/>
+
+        <EditTextPreference
+            android:key="etp_inverval"
+            android:title="@string/interval"
+            android:inputType="number"
+            android:text="30"/>
+
+    </PreferenceCategory>
+
+
+
+</PreferenceScreen>

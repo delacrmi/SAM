@@ -1,0 +1,63 @@
+<resources>
+    <string name="app_name">SAM</string>
+    <string name="app_description_name">Sistema de Alce Manual</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="accion_buscar">Search</string>
+    <string name="accion_nuevo">Add</string>
+
+    <string name="name">Nombre</string>
+    <string name="date">Fecha</string>
+    <string name="period">Período</string>
+    <string name="map_number">No. Map</string>
+    <string name="map_number_before">NMP</string>
+
+    <string name="farm">Finca</string>
+    <string name="cane">Cañial</string>
+    <string name="batch">Lote</string>
+    <string name="line">Linea</string>
+
+    <!-- ======================== Drawer Menu ============================ -->
+    <string name="raise">Uñadas</string>
+    <string name="weight">Peso</string>
+    <!-- ================================================================= -->
+
+    <string name="openDrawer">opening drawer component</string>
+    <string name="closeDrawer">closing drawer component</string>
+
+    <string name="syncSuccess">Sincronizado</string>
+    <string name="sync_name">Sincronizar Tablas</string>
+
+    <!-- ======================== Drawer Menu ============================ -->
+    <string name="work_title">Mapa de Corte</string>
+    <string name="work">Digitación</string>
+
+    <string name="reports">Reportes</string>
+    <string name="cutter">Cortador</string>
+    <string name="place">Lugar Corte</string>
+
+    <string name="settings">Configuraciones</string>
+
+    <string name="sync_title">Sincronizar</string>
+    <string name="client">Cliente</string>
+    <string name="server">Servidor</string>
+    <!-- ================================================================= -->
+
+    <!-- ========================= Data Base ============================= -->
+    <string name="db_name">production</string>
+    <string name="db_version">1</string>
+    <!-- ================================================================= -->
+
+    <!-- ========================== Setting ============================== -->
+    <string name="uri_server">Dirección Del Servidor</string>
+    <string name="uri1">Servidor 1</string>
+    <string name="uri2">Servidor 2</string>
+
+    <string name="server_execute">Sincronizar Servidor</string>
+    <string name="auto_execute">Ejecutar Automaticamente</string>
+    <string name="interval">Tiempo de sincronización</string>
+    <!-- ================================================================= -->
+
+</resources>

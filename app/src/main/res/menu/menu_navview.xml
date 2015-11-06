@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/menu_seccion_1"
+            android:icon="@drawable/add"
+            android:title="seccion_1"/>
+        <item
+            android:id="@+id/menu_seccion_2"
+            android:icon="@drawable/ic_launcher"
+            android:title="seccion_2"/>
+        <item
+            android:id="@+id/menu_seccion_3"
+            android:icon="@drawable/ic_launcher"
+            android:title="seccion_3"/>
+    </group> -->
+
+    <!--Home Categories-->
+    <item
+        android:id="@+id/nav_home"
+        android:icon="@drawable/home"
+        android:title="@string/app_name"/>
+
+    <!--Works Categories-->
+    <item
+        android:id="@+id/nav_work_item"
+        android:title= "@string/work_title"
+        android:menuCategory="container">
+        <menu>
+            <item
+                android:id="@+id/work_digitacion"
+                android:icon="@drawable/ic_launcher"
+                android:title="@string/work"/>
+        </menu>
+    </item>
+
+    <!--Reports Categories-->
+    <item
+        android:id="@+id/nav_reports"
+        android:title= "@string/reports"
+        android:menuCategory="container">
+        <menu>
+            <item
+                android:id="@+id/cutter_report"
+                android:icon="@drawable/ic_launcher"
+                android:title="@string/cutter"/>
+            <item
+                android:id="@+id/place_report"
+                android:icon="@drawable/ic_launcher"
+                android:title="@string/place"/>
+        </menu>
+    </item>
+
+    <!--Sync Categories-->
+    <item
+        android:id="@+id/nav_sync"
+        android:icon="@drawable/search"
+        android:menuCategory="container"
+        android:title="@string/sync_title">
+        <menu>
+            <item
+                android:id="@+id/client_sync"
+                android:title="@string/client"
+                android:icon="@drawable/add"/>
+            <item
+                android:id="@+id/server_sync"
+                android:title="@string/server"
+                android:icon="@drawable/add"/>
+        </menu>
+    </item>
+
+    <!--Settings Categories-->
+    <item
+        android:id="@+id/nav_categories"
+        android:icon="@drawable/search"
+        android:title="@string/settings">
+        <menu>
+            <item
+                android:id="@+id/setting"
+                android:icon="@drawable/add"
+                android:title="@string/server"/>
+        </menu>
+    </item>
+
+</menu>
