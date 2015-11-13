@@ -8,11 +8,18 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.cac.sam.R;
+import com.cac.entities.Transaccion;
 import com.delacrmi.connection.SocketConnect;
+import com.delacrmi.controller.Entity;
 import com.delacrmi.controller.EntityManager;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.List;
+
+import io.socket.client.IO;
 
 public class SyncServerService extends Service {
 
@@ -24,6 +31,7 @@ public class SyncServerService extends Service {
     private Boolean threadRunning;
 
     private EntityManager entityManager;
+    IO.Options opts;
     private SocketConnect connect;
     private String URI;
     private SharedPreferences sharedPreferences;
@@ -42,9 +50,15 @@ public class SyncServerService extends Service {
         Log.d(TAG, "Servicio creado...");
         threadRunning = true;
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        getEntityManager();
 
-        URI = sharedPreferences.getString("etp_uri1","");
+        getEntityManager()
+                .addTable(Transaccion.class)
+                .init();
+
+        URI = sharedPreferences.getString("etp_uri1", "");
+        opts = new IO.Options();
+        opts.forceNew = true;
+        opts.reconnection = false;
         socketInit(URI);
         connect.init();
     }
@@ -57,13 +71,29 @@ public class SyncServerService extends Service {
             @Override
             public void run() {
                 while (threadRunning){
-                    Log.i("Test", "Intent Service Test "+connect.getSocket().connected());
-                    Intent iSend = new Intent();
-                    iSend.setAction(OBJECT_SYNCHRONIZED);
-                    iSend.putExtra("inserted",2);
-                    sendBroadcast(iSend);
+                    try{
+                        Log.d("connected ",connect.getSocket().connected()+"");
+                        if(!connect.getSocket().connected()){
+
+                            if (URI.equals(sharedPreferences.getString("etp_uri1", ""))) {
+                                URI = sharedPreferences.getString("etp_uri2", "");
+                            } else {
+                                URI = sharedPreferences.getString("etp_uri1", "");
+                            }
+
+                            connect.setURI(URI);
+                            connect.init();
+                        }else{
+                            JSONArray rowArray;
+                            JSONObject row;
+                            String columns = new Transaccion().entityConfig().getColumnsNameAsString(false);
+                            Log.i("columns", columns);
+
+                        }
+                    }catch (NullPointerException e){}
+
                     try {
-                        Thread.sleep(60000);
+                        Thread.sleep(10000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -93,11 +123,14 @@ public class SyncServerService extends Service {
 
     private void socketInit(String uri){
         if(connect == null)
-            connect = new SocketConnect(uri){
+            connect = new SocketConnect(uri,opts){
 
                 @Override
                 public void onSynchronizeServer(Object... args) {
-
+                    Intent iSend = new Intent();
+                    iSend.setAction(OBJECT_SYNCHRONIZED);
+                    iSend.putExtra("inserted",2);
+                    sendBroadcast(iSend);
                 }
 
                 @Override
@@ -108,27 +141,6 @@ public class SyncServerService extends Service {
                     }catch (JSONException e){
                         e.printStackTrace();
                     }
-                }
-
-                @Override
-                public void onErrorConnection() {
-                    super.onErrorConnection();
-                    if(URI.equals(sharedPreferences.getString("etp_uri1",""))){
-                        URI = sharedPreferences.getString("etp_uri2","");
-                        connect.setURI(URI);
-                    }else{
-                        URI = sharedPreferences.getString("etp_uri1","");
-                        connect.setURI(URI);
-                    }
-
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-
-                    connect.init();
-
                 }
             };
     }

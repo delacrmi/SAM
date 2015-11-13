@@ -35,6 +35,21 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory
+        android:key="data_base_parameter"
+        android:title="@string/data_base_parameter_title">
 
+        <ListPreference android:title="Empresa"
+            android:key="EMPRESA"
+            android:defaultValue="30"
+            android:entries="@array/empresas"
+            android:entryValues="@array/empresas_valor"/>
 
+        <ListPreference android:title="Periodo"
+            android:key="PERIODO"
+            android:defaultValue="20"
+            android:entries="@array/periodos"
+            android:entryValues="@array/periodo_valor"/>
+
+    </PreferenceCategory>
 </PreferenceScreen>

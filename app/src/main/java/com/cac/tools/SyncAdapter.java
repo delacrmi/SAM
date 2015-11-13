@@ -16,10 +16,10 @@ import java.util.Vector;
  * Created by miguel on 28/10/15.
  */
 public class SyncAdapter extends RecyclerView.Adapter<ViewSyncHolder> {
-    private List<Vector<String>> dataList;
+    private List<Vector<Object>> dataList;
     private Map<String,View> viewMap = new HashMap<String,View>();
 
-    public SyncAdapter(List<Vector<String>> dataList) {
+    public SyncAdapter(List<Vector<Object>> dataList) {
         this.dataList = dataList;
     }
 
@@ -36,8 +36,8 @@ public class SyncAdapter extends RecyclerView.Adapter<ViewSyncHolder> {
 
     @Override
     public void onBindViewHolder(ViewSyncHolder holder, int position) {
-        Vector<String> data = dataList.get(position);
-        viewMap.put(data.get(1), holder.getView());
+        Vector<Object> data = dataList.get(position);
+        viewMap.put((String)data.get(1), holder.getView());
         holder.bindTableSync(data);
     }
 

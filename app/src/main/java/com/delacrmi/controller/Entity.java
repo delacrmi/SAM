@@ -1,6 +1,7 @@
 package com.delacrmi.controller;
 
 import android.content.ContentValues;
+import android.content.Context;
 
 import org.json.JSONArray;
 
@@ -21,6 +22,8 @@ public abstract class Entity implements Serializable{
     private ContentValues constraintDetails;
     private ContentValues columnList = new ContentValues();
     private ContentValues columnValueList = new ContentValues();
+    private boolean synchronizable = false;
+    private EntityFilter entityFilter;
 
     public abstract Entity entityConfig();
 
@@ -31,6 +34,24 @@ public abstract class Entity implements Serializable{
     public void setNickName(String nickName) {
         this.nickName = nickName;
     }
+
+    public boolean isSynchronizable() {
+        return synchronizable;
+    }
+
+    public void setSynchronizable(boolean synchronizable) {
+        this.synchronizable = synchronizable;
+    }
+
+    public EntityFilter getEntityFilter() {
+        return entityFilter;
+    }
+
+    public void setEntityFilter(EntityFilter entityFilter) {
+        this.entityFilter = entityFilter;
+    }
+
+    public void configureEntityFilter(Context context){}
 
     public void setPrimaryKey(String columnName){
         if(!columnName.equals("") || !columnName.equals(" ")) {
@@ -76,6 +97,41 @@ public abstract class Entity implements Serializable{
         return columnList;
     }
 
+    public String getColumnsNameAsString(boolean primaryKey){
+        int count = 1;
+        Map.Entry me;
+        String columns = "";
+
+        //getting the iterator columns to get the key values
+        Iterator iteratorColumns = iterator();
+        while (iteratorColumns.hasNext()){
+            me = (Map.Entry)iteratorColumns.next();
+
+            if(!getPrimaryKey().equals(me.getKey().toString())) {
+
+                columns += me.getKey();
+
+                if(count < getColumnsCount()-1){
+                    columns += ",";
+                    count++;
+                }
+
+            }else if(primaryKey) {
+
+                columns += getPrimaryKey();
+
+                if(count < getColumnsCount()-1){
+                    columns += ",";
+                    count++;
+                }
+
+            }
+
+        }
+
+        return columns;
+    }
+
     public JSONArray getColumnstoJSONArray(){
         JSONArray array = new JSONArray();
 
@@ -104,8 +160,10 @@ public abstract class Entity implements Serializable{
 
     public Entity setName(String entityName){
         this.entityName = entityName;
-        this.pk = entityName+"_id";
-        columnList.put(pk,"integer");
+        if(pk.equals("")){
+            this.pk = entityName+"_id";
+            columnList.put(pk,"integer");
+        }
         return this;
     }
 

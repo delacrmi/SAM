@@ -62,11 +62,12 @@ public class EntityManager  {
         this.dbVersion = dbVersion;
     }
 
-    public void init(){
+    public EntityManager init(){
         ConnectSQLite.tablesCreater = createList();
         ConnectSQLite.tablesNames = tablesNames;
         conn = new ConnectSQLite(context,dbName,factory,dbVersion);
         read();
+        return this;
     }
 
     protected SQLiteDatabase write(){
@@ -83,10 +84,11 @@ public class EntityManager  {
         return conn.getReadableDatabase();
     }
 
-    public void addTable(Class entity){
+    public EntityManager addTable(Class entity){
         if(tables == null)
             tables = new ArrayList<Class>();
         tables.add(entity);
+        return this;
     }
 
     //Setting the tablesCreater Data Bases

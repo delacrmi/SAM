@@ -20,20 +20,36 @@ public abstract class SocketConnect {
     private Socket socket;
     private AppCompatActivity context;
     private String URI;
+    private boolean CONNECTED = false;
+    private IO.Options opts;
 
     public SocketConnect(AppCompatActivity context,String URI){
         this.context = context;
         initComponents(URI);
     }
 
+    public SocketConnect(AppCompatActivity context,String URI,IO.Options opts){
+        this.context = context;
+        this.opts = opts;
+        initComponents(URI);
+    }
+
     public SocketConnect(String URI){
+        initComponents(URI);
+    }
+    public SocketConnect(String URI,IO.Options opts){
+        this.opts = opts;
         initComponents(URI);
     }
 
     private void initComponents(String URI){
         this.URI = URI;
         try {
-            socket = IO.socket(URI);
+            if(opts == null)
+                socket = IO.socket(URI);
+            else
+                socket = IO.socket(URI,opts);
+
             socket.on("synchronizeClient", onSynchronizeClient);
             socket.on("synchronizeServer", onSynchronizeServer);
             socket.on("syncReject",onSynchronizeReject);
@@ -45,7 +61,11 @@ public abstract class SocketConnect {
     }
 
     public void setURI(String URI){
-        socket.disconnect();
+        if(!socket.connected()){
+            socket.disconnect();
+        }
+
+        socket = null;
         initComponents(URI);
     }
 
@@ -57,11 +77,20 @@ public abstract class SocketConnect {
         return socket;
     }
 
+    public void stopSocket() {
+        try {
+            socket = socket.disconnect();
+        }catch (NullPointerException npe){}
+    }
+
     public void onSynchronizeClient(final Object ... args){}
     public void onSynchronizeServer(final Object ... args){}
-    public abstract void onSyncSuccess(final Object ... args);
+    public void onSyncSuccess(final Object ... args){
+        CONNECTED = true;
+    }
 
     public void onErrorConnection(){
+        CONNECTED = false;
         Log.e("Connection", "The socket.io isn't connected to "+URI);
     }
 
@@ -145,4 +174,8 @@ public abstract class SocketConnect {
                 onSyncSuccess(args);
         }
     };
+
+    public boolean isConnected() {
+        return CONNECTED;
+    }
 }

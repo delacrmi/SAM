@@ -1,9 +1,9 @@
 package com.cac.viewer;
 
 import android.app.Fragment;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,25 +15,37 @@ import com.cac.sam.R;
 /**
  * Created by miguel on 02/11/15.
  */
-public class MainFragment extends Fragment implements MainComponentEdit {
+public class MainFragment extends Fragment implements MainComponentEdit<FloatingActionButton[]> {
     //instance variables
-    private static MainFragment outInstance;
+    private static MainFragment ourInstance;
     private AppCompatActivity context;
     private View view;
 
     public static MainFragment init(AppCompatActivity context){
-        if(outInstance == null){
-            outInstance = new MainFragment();
-            outInstance.context = context;
+        if(ourInstance == null){
+            ourInstance = new MainFragment();
+            ourInstance.context = context;
         }
-        return outInstance;
+        return ourInstance;
     }
 
     public static MainFragment getInstance(){
-        if(outInstance == null)
-            throw new NullPointerException("the "+outInstance.getClass().getSimpleName()+" isn't created, " +
+        if(ourInstance == null)
+            throw new NullPointerException("the "+ ourInstance.getClass().getSimpleName()+" isn't created, " +
                     "call the init method first to try use this instance");
-        return outInstance;
+        return ourInstance;
+    }
+
+    @Override
+    public void mainViewConfig(FloatingActionButton[] buttons) {
+        buttons[0].setVisibility(view.INVISIBLE);
+        buttons[1].setVisibility(view.INVISIBLE);
+
+    }
+
+    @Override
+    public void setContext(Context context) {
+        ourInstance.context = (AppCompatActivity)context;
     }
 
     public String getTAG(){
@@ -55,14 +67,5 @@ public class MainFragment extends Fragment implements MainComponentEdit {
         return view;
     }
 
-    @Override
-    public void onClickFloating() {
-        Snackbar.make(view,"Prueba del SnackBar",Snackbar.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void FloatingButtonConfig(FloatingActionButton floatingActionButton) {
-        floatingActionButton.setVisibility(view.INVISIBLE);
-    }
     //</editor-fold>
 }

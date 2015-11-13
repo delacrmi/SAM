@@ -125,14 +125,26 @@
         </RelativeLayout>
 
         <android.support.design.widget.FloatingActionButton
-         android:id="@+id/btn_fab"
+         android:id="@+id/btn_fab_right"
          android:layout_width="wrap_content"
          android:layout_height="wrap_content"
          android:layout_margin="16dp"
          android:layout_gravity="bottom|end"
          android:src="@drawable/add"
-         app:rippleColor="@color/color_primary"
+         app:backgroundTint="@color/color_primary"
+         app:fabSize="mini"
          app:borderWidth="0dp"/>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/btn_fab_left"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:layout_gravity="bottom|start"
+            app:backgroundTint="@color/color_primary"
+            app:fabSize="mini"
+            android:src="@drawable/add"
+            app:borderWidth="0dp"/>
 
     </android.support.design.widget.CoordinatorLayout>
 
