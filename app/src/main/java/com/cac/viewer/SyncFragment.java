@@ -267,8 +267,6 @@ public class SyncFragment extends Fragment implements MainComponentEdit<Floating
                 @Override
                 public void onErrorConnection() {
                     super.onErrorConnection();
-                    //if(!ourInstance.connect.isConnected()){
-
                     if (ourInstance.URI.equals(ourInstance.sharedPreferences.getString("etp_uri1", ""))) {
                         ourInstance.URI = ourInstance.sharedPreferences.getString("etp_uri2", "");
                     } else {
@@ -277,8 +275,6 @@ public class SyncFragment extends Fragment implements MainComponentEdit<Floating
 
                     ourInstance.connect.setURI(ourInstance.URI);
                     ourInstance.connect.init();
-                    //}else
-                      //  ourInstance.connected = false;
                 }
             };
         else

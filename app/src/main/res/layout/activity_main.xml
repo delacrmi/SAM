@@ -74,10 +74,10 @@
             android:layout_height="match_parent"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:layout_below="@+id/appbar"
-            android:layout_alignParentBottom="true">
+            android:layout_below="@+id/appbar">
 
         </RelativeLayout>
+
 
         <!-- <GridLayout
              android:id="@+id/footer_layout"
@@ -130,9 +130,8 @@
          android:layout_height="wrap_content"
          android:layout_margin="16dp"
          android:layout_gravity="bottom|end"
-         android:src="@drawable/add"
          app:backgroundTint="@color/color_primary"
-         app:fabSize="mini"
+         app:fabSize="normal"
          app:borderWidth="0dp"/>
 
         <android.support.design.widget.FloatingActionButton
@@ -142,8 +141,7 @@
             android:layout_margin="16dp"
             android:layout_gravity="bottom|start"
             app:backgroundTint="@color/color_primary"
-            app:fabSize="mini"
-            android:src="@drawable/add"
+            app:fabSize="normal"
             app:borderWidth="0dp"/>
 
     </android.support.design.widget.CoordinatorLayout>

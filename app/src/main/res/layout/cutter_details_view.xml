@@ -25,7 +25,7 @@
                 android:layout_alignParentRight="true"/>
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="30dp"
+                android:layout_height="wrap_content"
                 android:layout_marginBottom="3dp"
                 android:orientation="horizontal"
                 android:layout_below="@+id/iv_cutter_details_delete">
@@ -37,12 +37,13 @@
                     android:textSize="20sp"
                     android:textStyle="bold"
                     android:textColor="@color/color_Black_Dark"
+                    android:layout_marginTop="7dp"
                     android:layout_marginLeft="5dp"/>
                 <EditText
                     android:id="@+id/et_cutter_details_raise"
                     android:layout_width="85dp"
-                    android:layout_height="20dp"
-                    android:layout_marginTop="13dp"
+                    android:textColor="@color/color_accent"
+                    android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"/>
 
                 <TextView
@@ -53,12 +54,13 @@
                     android:textSize="20sp"
                     android:textStyle="bold"
                     android:textColor="@color/color_Black_Dark"
+                    android:layout_marginTop="7dp"
                     android:layout_marginLeft="5dp"/>
                 <EditText
                     android:id="@+id/et_cutter_details_weight"
                     android:layout_width="85dp"
-                    android:layout_height="20dp"
-                    android:layout_marginTop="13dp"
+                    android:textColor="@color/color_accent"
+                    android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"/>
 
             </LinearLayout>

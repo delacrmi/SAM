@@ -142,6 +142,19 @@ public class SyncServerService extends Service {
                         e.printStackTrace();
                     }
                 }
+
+                @Override
+                public void onErrorConnection() {
+                    super.onErrorConnection();
+                    if (URI.equals(sharedPreferences.getString("etp_uri1", ""))) {
+                        URI = sharedPreferences.getString("etp_uri2", "");
+                    } else {
+                        URI = sharedPreferences.getString("etp_uri1", "");
+                    }
+
+                    connect.setURI(URI);
+                    connect.init();
+                }
             };
     }
 }
