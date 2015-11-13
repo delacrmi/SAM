@@ -6,8 +6,10 @@ import android.content.Context;
 import org.json.JSONArray;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -21,6 +23,7 @@ public abstract class Entity implements Serializable{
     private HashMap<String,ContentValues> constraint = new HashMap<String,ContentValues>();
     private ContentValues constraintDetails;
     private ContentValues columnList = new ContentValues();
+    private List<EntityColumn> columns = new ArrayList<EntityColumn>();
     private ContentValues columnValueList = new ContentValues();
     private boolean synchronizable = false;
     private EntityFilter entityFilter;
@@ -87,6 +90,11 @@ public abstract class Entity implements Serializable{
 
     public void addColumn(String name,String type){
         columnList.put(name,type);
+    }
+
+    public void addColumn(EntityColumn column){
+        columnList.put(column.getName(),column.getType());
+        columns.add(column);
     }
 
     public void addColumns(ContentValues columns){

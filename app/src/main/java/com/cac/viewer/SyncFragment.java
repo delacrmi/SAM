@@ -265,22 +265,32 @@ public class SyncFragment extends Fragment implements MainComponentEdit<Floating
                 }
 
                 @Override
+                public void onDisconnected() {
+                    super.onDisconnected();
+                    connectSocket();
+                }
+
+                @Override
                 public void onErrorConnection() {
                     super.onErrorConnection();
-                    if (ourInstance.URI.equals(ourInstance.sharedPreferences.getString("etp_uri1", ""))) {
-                        ourInstance.URI = ourInstance.sharedPreferences.getString("etp_uri2", "");
-                    } else {
-                        ourInstance.URI = ourInstance.sharedPreferences.getString("etp_uri1", "");
-                    }
-
-                    ourInstance.connect.setURI(ourInstance.URI);
-                    ourInstance.connect.init();
+                    connectSocket();
                 }
             };
         else
             ourInstance.connect.getSocket().connect();
 
         return ourInstance.connect != null;
+    }
+
+    public void connectSocket(){
+        if (ourInstance.URI.equals(ourInstance.sharedPreferences.getString("etp_uri1", ""))) {
+            ourInstance.URI = ourInstance.sharedPreferences.getString("etp_uri2", "");
+        } else {
+            ourInstance.URI = ourInstance.sharedPreferences.getString("etp_uri1", "");
+        }
+
+        ourInstance.connect.setURI(ourInstance.URI);
+        ourInstance.connect.init();
     }
 
     public AppCompatActivity getContext(){

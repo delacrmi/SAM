@@ -43,12 +43,14 @@ import com.cac.viewer.SyncFragment;
 import com.delacrmi.controller.EntityManager;
 
 public class MainActivity extends AppCompatActivity {
-    public static MainActivity mainActivity;
+
     private FragmentManager frm;
     private boolean returningWithResult = false;
     private Fragment actualFragment;
     private String ACTUALFRAGMENT = "MainFragment";
     private ServerStarter serverStarter;
+
+    public static String intelWeight = "se.oioi.intelweigh";
 
     //App Menu
     private Toolbar toolbar;
@@ -84,13 +86,13 @@ public class MainActivity extends AppCompatActivity {
         initComponent();
 
         //Working with the services class
-        //startService(new Intent(this, SyncServerService.class));
+        startService(new Intent(this, SyncServerService.class));
 
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(SyncServerService.SYNCHRONIZE_STARTED);
         intentFilter.addAction(SyncServerService.OBJECT_SYNCHRONIZED);
         intentFilter.addAction(SyncServerService.SYNCHRONIZE_END);
-        intentFilter.addAction("se.oioi.intelweigh");
+        intentFilter.addAction(intelWeight);
         serverStarter = new ServerStarter();
 
         try {

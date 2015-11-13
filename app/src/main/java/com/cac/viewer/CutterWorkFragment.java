@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -72,12 +73,12 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Fl
             ourInstance.etLine = (EditText)ourInstance.view.findViewById(R.id.et_line_insert);
             ourInstance.etCutter = (EditText)ourInstance.view.findViewById(R.id.atv_cutter_insert);
 
+            ourInstance.transactionDetailsList = new ArrayList<TransactionDetails>();
+            ourInstance.workDetailsAdapter = new WorkDetailsAdapter(ourInstance.transactionDetailsList);
+
             ourInstance.recyclerView = (RecyclerView)ourInstance.view.findViewById(R.id.recycle_cutter_insert);
             ourInstance.recyclerView.setLayoutManager(
                     new LinearLayoutManager(ourInstance.context, LinearLayoutManager.VERTICAL, false));
-
-            ourInstance.transactionDetailsList = new ArrayList<TransactionDetails>();
-            ourInstance.workDetailsAdapter = new WorkDetailsAdapter(ourInstance.transactionDetailsList);
             ourInstance.recyclerView.setAdapter(workDetailsAdapter);
 
 
@@ -110,6 +111,7 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Fl
                         Toast.makeText(ourInstance.context,
                                 ((MainActivity) context).getCuttingParametersFragment().getTAG(),
                                 Toast.LENGTH_SHORT).show();
+                        workDetailsAdapter.add(new TransactionDetails());
                         break;
                     case R.id.btn_fab_left:
                         ((MainActivity)ourInstance.context).startTransactionByTagFragment(

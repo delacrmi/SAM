@@ -54,6 +54,7 @@ public abstract class SocketConnect {
             socket.on("synchronizeServer", onSynchronizeServer);
             socket.on("syncReject",onSynchronizeReject);
             socket.on(Socket.EVENT_CONNECT_ERROR, onConnectError);
+            socket.on(Socket.EVENT_DISCONNECT,onDisconnect);
             socket.on(Socket.EVENT_CONNECT,onConnectSuccess);
         } catch (URISyntaxException e) {
             e.printStackTrace();
@@ -94,6 +95,11 @@ public abstract class SocketConnect {
         Log.e("Connection", "The socket.io isn't connected to "+URI);
     }
 
+    public void onDisconnected(){
+        CONNECTED = false;
+        Log.e("Connection", "The socket.io is disconnected to "+URI);
+    }
+
     public void onSyncReject(Object... args) {
         JSONObject obj = (JSONObject) args[0];
         try {
@@ -120,6 +126,22 @@ public abstract class SocketConnect {
                 });
             else
                 onErrorConnection();
+        }
+    };
+
+    private Emitter.Listener onDisconnect = new Emitter.Listener(){
+
+        @Override
+        public void call(Object... args) {
+            if (context != null)
+                context.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        onDisconnected();
+                    }
+                });
+            else
+                onDisconnected();
         }
     };
 

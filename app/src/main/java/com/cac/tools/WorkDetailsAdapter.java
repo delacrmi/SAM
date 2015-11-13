@@ -20,6 +20,16 @@ public class WorkDetailsAdapter extends RecyclerView.Adapter<ViewWorkHolder> {
         this.transactionDetailsList = transactionDetailsList;
     }
 
+    public void add(TransactionDetails transactionDetails,int position){
+        transactionDetailsList.add(position,transactionDetails);
+        notifyItemInserted(position);
+    }
+
+    public void add(TransactionDetails transactionDetails){
+        transactionDetailsList.add(transactionDetails);
+        notifyItemInserted((transactionDetailsList.size()-1));
+    }
+
     @Override
     public ViewWorkHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.cutter_details_view,null);

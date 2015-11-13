@@ -73,22 +73,11 @@ public class SyncServerService extends Service {
                 while (threadRunning){
                     try{
                         Log.d("connected ",connect.getSocket().connected()+"");
-                        if(!connect.getSocket().connected()){
-
-                            if (URI.equals(sharedPreferences.getString("etp_uri1", ""))) {
-                                URI = sharedPreferences.getString("etp_uri2", "");
-                            } else {
-                                URI = sharedPreferences.getString("etp_uri1", "");
-                            }
-
-                            connect.setURI(URI);
-                            connect.init();
-                        }else{
+                        if(connect.getSocket().connected()){
                             JSONArray rowArray;
                             JSONObject row;
                             String columns = new Transaccion().entityConfig().getColumnsNameAsString(false);
                             Log.i("columns", columns);
-
                         }
                     }catch (NullPointerException e){}
 
@@ -144,17 +133,33 @@ public class SyncServerService extends Service {
                 }
 
                 @Override
+                public void onDisconnected() {
+                    super.onDisconnected();
+                    connectSocket();
+                }
+
+                @Override
                 public void onErrorConnection() {
                     super.onErrorConnection();
-                    if (URI.equals(sharedPreferences.getString("etp_uri1", ""))) {
-                        URI = sharedPreferences.getString("etp_uri2", "");
-                    } else {
-                        URI = sharedPreferences.getString("etp_uri1", "");
-                    }
-
-                    connect.setURI(URI);
-                    connect.init();
+                    connectSocket();
                 }
             };
+    }
+
+    public void connectSocket(){
+        if (URI.equals(sharedPreferences.getString("etp_uri1", ""))) {
+            URI = sharedPreferences.getString("etp_uri2", "");
+        } else {
+            URI = sharedPreferences.getString("etp_uri1", "");
+        }
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        connect.setURI(URI);
+        connect.init();
     }
 }
