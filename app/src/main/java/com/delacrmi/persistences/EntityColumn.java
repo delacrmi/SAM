@@ -145,6 +145,6 @@ public class EntityColumn<valueType> {
     }
 
     public enum ColumnType{
-        TEXT,INTEGER,REAL,LONG,DATE,NUMERIC
+        TEXT,INTEGER,REAL,DATE,NUMERIC
     }
 }

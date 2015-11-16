@@ -30,6 +30,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -81,7 +82,10 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Fl
             ourInstance.etLine = (EditText)ourInstance.view.findViewById(R.id.et_line_insert);
             ourInstance.etCutter = (EditText)ourInstance.view.findViewById(R.id.atv_cutter_insert);
 
-            ourInstance.transactionDetailsList = new ArrayList<TransactionDetails>();
+            ourInstance.etTotalRaise = (EditText)ourInstance.view.findViewById(R.id.et_cutter_sum_raise);
+            ourInstance.etTotalWeight = (EditText)ourInstance.view.findViewById(R.id.et_cutter_sum_weight);
+
+            ourInstance.transactionDetailsList = new LinkedList<TransactionDetails>();
             ourInstance.workDetailsAdapter = new WorkDetailsAdapter(ourInstance.transactionDetailsList);
 
             ourInstance.recyclerView = (RecyclerView)ourInstance.view.findViewById(R.id.recycle_cutter_insert);
@@ -145,7 +149,9 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Fl
                         Toast.makeText(ourInstance.context,
                                 ((MainActivity) context).getCuttingParametersFragment().getTAG(),
                                 Toast.LENGTH_SHORT).show();
-                        workDetailsAdapter.add(new TransactionDetails());
+                        TransactionDetails t = (TransactionDetails)new TransactionDetails().entityConfig();
+                        t.getColumn("peso").setValue(300);
+                        workDetailsAdapter.add(t);
                         break;
                     case R.id.btn_fab_left:
                         ((MainActivity)ourInstance.context).startTransactionByTagFragment(
@@ -174,5 +180,27 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Fl
 
     public void removeViewWorkHolder(int position) {
         ourInstance.workDetailsAdapter.remove(position);
+        ((LinearLayoutManager)ourInstance.recyclerView.getLayoutManager()).scrollToPositionWithOffset(0,0);
+
+    }
+
+    public RecyclerView getRecycle(){
+        return ourInstance.recyclerView;
+    }
+
+    public EditText getTotalRaise() {
+        return etTotalRaise;
+    }
+
+    public void setEtTotalRaise(EditText etTotalRaise) {
+        this.etTotalRaise = etTotalRaise;
+    }
+
+    public EditText getTotalWeight() {
+        return etTotalWeight;
+    }
+
+    public void setEtTotalWeight(EditText etTotalWeight) {
+        this.etTotalWeight = etTotalWeight;
     }
 }

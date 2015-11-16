@@ -15,6 +15,9 @@ public class TransactionDetails extends Entity {
         addColumn(new EntityColumn<Integer>("id_transaccion", true));
         addColumn(new EntityColumn<Integer>("correlativo",EntityColumn.ColumnType.INTEGER).setNotNullable());
         addColumn(new EntityColumn<Double>("peso",EntityColumn.ColumnType.REAL).setNotNullable());
+        addColumn(new EntityColumn<Integer>("index", EntityColumn.ColumnType.INTEGER)
+                .setNotNullable()
+                .setOutServerColumn());
         return this;
     }
 }

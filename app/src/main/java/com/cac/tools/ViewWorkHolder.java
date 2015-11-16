@@ -16,8 +16,8 @@ import com.cac.viewer.CutterWorkFragment;
  */
 public class ViewWorkHolder extends RecyclerView.ViewHolder {
 
-    private EditText etRaise;
-    private EditText etWeight;
+    public EditText etRaise;
+    public EditText etWeight;
     private ImageView ivDelete;
 
     public ViewWorkHolder(View itemView) {
@@ -29,8 +29,8 @@ public class ViewWorkHolder extends RecyclerView.ViewHolder {
         events();
     }
 
-    public void bindTableWork(TransactionDetails details,int position){
-        etRaise.setText(position+"");
+    public void bindTableWork(TransactionDetails details){
+        etRaise.setText(details.getColumn("index").getValue()+"");
         etWeight.setText(details.getColumnValueList()
                  .getAsString("peso"));
         ivDelete.setTag(details.getColumnValueList()

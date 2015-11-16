@@ -108,13 +108,13 @@ public abstract class Entity implements Serializable{
 
     public void addColumn(String name,EntityColumn.ColumnType type){
         columnList.put(name, type.toString().toLowerCase());
-        columns.add(new EntityColumn(name,type));
+        columns.add(createColumn(name,type));
     }
 
     public void addColumn(EntityColumn column){
         columnList.put(column.getName(),column.getType().toString().toLowerCase());
         columns.add(column);
-        hashcolumns.put(column.getName(),columns.size()-1);
+        hashcolumns.put(column.getName(), columns.size() - 1);
     }
 
     public void addColumns(ContentValues columns){
@@ -316,5 +316,23 @@ public abstract class Entity implements Serializable{
         }
     }
 
+    public EntityColumn getColumn(String index) {
+        if(hashcolumns.containsKey(index))
+            return columns.get(hashcolumns.get(index));
+        return null;
+    }
 
+    private EntityColumn createColumn(String name, EntityColumn.ColumnType type){
+
+        if(type == EntityColumn.ColumnType.INTEGER)
+            return new EntityColumn<Integer>(name,type);
+        else if(type == EntityColumn.ColumnType.TEXT)
+            return new EntityColumn<String>(name,type);
+        else if(type == EntityColumn.ColumnType.NUMERIC)
+            return new EntityColumn<Long>(name,type);
+        else if(type == EntityColumn.ColumnType.REAL)
+            return new EntityColumn<Double>(name,type);
+        else
+            return new EntityColumn<java.util.Date>(name,type);
+    }
 }
