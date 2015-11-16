@@ -1,7 +1,9 @@
 package com.cac.viewer;
 
 import android.app.Fragment;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -20,7 +22,12 @@ import com.cac.entities.TransactionDetails;
 import com.cac.sam.MainActivity;
 import com.cac.sam.R;
 import com.cac.tools.MainComponentEdit;
+import com.cac.tools.ViewWorkHolder;
 import com.cac.tools.WorkDetailsAdapter;
+import com.delacrmi.persistences.Entity;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +53,7 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Fl
     private RecyclerView recyclerView;
     private List<TransactionDetails> transactionDetailsList;
     private WorkDetailsAdapter workDetailsAdapter;
+    private BroadcastReceiver receiver;
 
 
     public static CutterWorkFragment init(AppCompatActivity context){
@@ -86,6 +94,32 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Fl
 
         ourInstance.writing = true;
         return ourInstance.view;
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if(intent.getAction().equals(MainActivity.intelWeight)){
+                    Toast.makeText(context,intent.getStringExtra("json"),Toast.LENGTH_SHORT);
+                    JSONObject obj;
+
+                    try {
+                        obj = new JSONObject(intent.getStringExtra("json"));
+                        Entity transactionDetails = new TransactionDetails().entityConfig();
+                        transactionDetails.setValue("peso",Double.parseDouble(obj.getString("weight")));
+                        workDetailsAdapter.add((TransactionDetails)transactionDetails);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+
+                }
+            }
+        };
     }
 
     @Override
@@ -135,5 +169,10 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Fl
     @Override
     public void setContext(Context context) {
         ourInstance.context = (AppCompatActivity)context;
+    }
+
+
+    public void removeViewWorkHolder(int position) {
+        ourInstance.workDetailsAdapter.remove(position);
     }
 }

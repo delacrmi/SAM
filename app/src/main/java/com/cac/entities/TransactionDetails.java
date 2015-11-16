@@ -1,7 +1,7 @@
 package com.cac.entities;
 
-import com.delacrmi.controller.Entity;
-import com.delacrmi.controller.EntityColumn;
+import com.delacrmi.persistences.Entity;
+import com.delacrmi.persistences.EntityColumn;
 
 /**
  * Created by miguel on 11/11/15.
@@ -14,7 +14,7 @@ public class TransactionDetails extends Entity {
         setNickName("Detalle Transaccion");
         addColumn(new EntityColumn<Integer>("id_transaccion", true));
         addColumn(new EntityColumn<Integer>("correlativo",EntityColumn.ColumnType.INTEGER).setNotNullable());
-        addColumn(new EntityColumn<Integer>("peso",EntityColumn.ColumnType.INTEGER).setNotNullable());
+        addColumn(new EntityColumn<Double>("peso",EntityColumn.ColumnType.REAL).setNotNullable());
         return this;
     }
 }

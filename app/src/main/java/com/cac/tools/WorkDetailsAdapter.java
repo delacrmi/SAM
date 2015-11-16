@@ -30,6 +30,11 @@ public class WorkDetailsAdapter extends RecyclerView.Adapter<ViewWorkHolder> {
         notifyItemInserted((transactionDetailsList.size()-1));
     }
 
+    public void remove(int position){
+        transactionDetailsList.remove(position);
+        notifyItemRemoved(position);
+    }
+
     @Override
     public ViewWorkHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.cutter_details_view,null);
@@ -40,7 +45,7 @@ public class WorkDetailsAdapter extends RecyclerView.Adapter<ViewWorkHolder> {
     @Override
     public void onBindViewHolder(ViewWorkHolder holder, int position) {
         TransactionDetails transactionDetails = transactionDetailsList.get(position);
-        holder.bindTableWork(transactionDetails);
+        holder.bindTableWork(transactionDetails,position+1);
     }
 
     @Override

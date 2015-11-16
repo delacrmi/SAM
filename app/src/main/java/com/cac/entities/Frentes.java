@@ -1,7 +1,8 @@
 package com.cac.entities;
 
 import android.content.Context;
-import com.delacrmi.controller.Entity;
+import com.delacrmi.persistences.Entity;
+import com.delacrmi.persistences.EntityColumn;
 
 /**
  * Created by miguel on 10/10/15.
@@ -18,9 +19,9 @@ public class Frentes extends Entity {
     public Frentes entityConfig() {
         setName(TABLE_NAME);
         setNickName("Frente");
-        addColumn(ID_FRENTE, "integer");
-        addColumn(DESCRIPCION,"text");
-        addColumn(TIPO_CANIA,"text");
+        addColumn(ID_FRENTE, EntityColumn.ColumnType.INTEGER);
+        addColumn(DESCRIPCION, EntityColumn.ColumnType.TEXT);
+        addColumn(TIPO_CANIA, EntityColumn.ColumnType.TEXT);
         setSynchronizable(true);
         return this;
     }

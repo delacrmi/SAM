@@ -5,8 +5,8 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.delacrmi.controller.Entity;
-import com.delacrmi.controller.EntityManager;
+import com.delacrmi.persistences.Entity;
+import com.delacrmi.persistences.EntityManager;
 
 /**
  * Created by Legal on 13/10/2015.

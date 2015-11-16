@@ -4,8 +4,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-import com.delacrmi.controller.Entity;
-import com.delacrmi.controller.EntityFilter;
+import com.delacrmi.persistences.Entity;
+import com.delacrmi.persistences.EntityColumn;
+import com.delacrmi.persistences.EntityFilter;
 
 /**
  * Created by miguel on 10/10/15.
@@ -24,11 +25,11 @@ public class Periodos extends Entity {
     public Periodos entityConfig() {
         setName(TABLE_NAME);
         setNickName("Periodos");
-        addColumn(ID_PERIODO,"integer");
-        addColumn(ID_EMPRESA, "integer");
-        addColumn(FECHA_INI, "date");
-        addColumn(FECHA_FIN, "date");
-        addColumn(DESCRIPCION,"text");
+        addColumn(ID_PERIODO, EntityColumn.ColumnType.INTEGER);
+        addColumn(ID_EMPRESA, EntityColumn.ColumnType.INTEGER);
+        addColumn(FECHA_INI, EntityColumn.ColumnType.INTEGER);
+        addColumn(FECHA_FIN, EntityColumn.ColumnType.DATE);
+        addColumn(DESCRIPCION, EntityColumn.ColumnType.INTEGER);
         setSynchronizable(true);
         return this;
     }

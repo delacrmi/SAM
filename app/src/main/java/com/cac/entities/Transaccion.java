@@ -2,7 +2,8 @@ package com.cac.entities;
 
 import android.content.Context;
 
-import com.delacrmi.controller.Entity;
+import com.delacrmi.persistences.Entity;
+import com.delacrmi.persistences.EntityColumn;
 
 /**
  * Created by Legal on 15/10/2015.
@@ -37,27 +38,27 @@ public class Transaccion extends Entity {
     public Transaccion entityConfig() {
         setName(Transaccion.TABLE_NAME);
         setPrimaryKey(Transaccion.CORRELATIVO);
-        addColumn(Transaccion.PERIODO, "text");
-        addColumn(Transaccion.EMPRESA,"integer");
-        addColumn(Transaccion.NO_ENVIO, "integer");
-        addColumn(Transaccion.FRENTE_CORTE, "integer");
-        addColumn(Transaccion.FRENTE_ALCE, "integer");
-        addColumn(Transaccion.ORDEN_QUEMA, "integer");
-        addColumn(Transaccion.ID_FINCA, "integer");
-        addColumn(Transaccion.ID_CANIAL, "integer");
-        addColumn(Transaccion.ID_LOTE, "integer");
-        addColumn(Transaccion.FECHA_CORTE,"date");
-        addColumn(Transaccion.CLAVE_CORTE, "text");
-        addColumn(Transaccion.CODIGO_CABEZAL,"text");
-        addColumn(Transaccion.CONDUCTOR_CABEZAL, "integer");
-        addColumn(Transaccion.CODIGO_CARRETA,"text");
-        addColumn(Transaccion.CODIGO_COSECHADORA,"text");
-        addColumn(Transaccion.OPERADOR_COSECHADORA, "integer");
-        addColumn(Transaccion.CODIGO_TRACTOR,"text");
-        addColumn(Transaccion.OPERADOR_TRACTOR, "integer");
-        addColumn(Transaccion.CODIGO_APUNTADOR, "integer");
-        addColumn(Transaccion.CODIGO_VAGON,"text");
-        addColumn(Transaccion.INDICADOR,"text");
+        addColumn(Transaccion.PERIODO, EntityColumn.ColumnType.TEXT);
+        addColumn(Transaccion.EMPRESA, EntityColumn.ColumnType.INTEGER);
+        addColumn(Transaccion.NO_ENVIO, EntityColumn.ColumnType.INTEGER);
+        addColumn(Transaccion.FRENTE_CORTE, EntityColumn.ColumnType.INTEGER);
+        addColumn(Transaccion.FRENTE_ALCE, EntityColumn.ColumnType.INTEGER);
+        addColumn(Transaccion.ORDEN_QUEMA, EntityColumn.ColumnType.INTEGER);
+        addColumn(Transaccion.ID_FINCA, EntityColumn.ColumnType.INTEGER);
+        addColumn(Transaccion.ID_CANIAL, EntityColumn.ColumnType.INTEGER);
+        addColumn(Transaccion.ID_LOTE, EntityColumn.ColumnType.INTEGER);
+        addColumn(Transaccion.FECHA_CORTE, EntityColumn.ColumnType.DATE);
+        addColumn(Transaccion.CLAVE_CORTE, EntityColumn.ColumnType.INTEGER);
+        addColumn(Transaccion.CODIGO_CABEZAL, EntityColumn.ColumnType.TEXT);
+        addColumn(Transaccion.CONDUCTOR_CABEZAL, EntityColumn.ColumnType.INTEGER);
+        addColumn(Transaccion.CODIGO_CARRETA, EntityColumn.ColumnType.TEXT);
+        addColumn(Transaccion.CODIGO_COSECHADORA, EntityColumn.ColumnType.TEXT);
+        addColumn(Transaccion.OPERADOR_COSECHADORA, EntityColumn.ColumnType.INTEGER);
+        addColumn(Transaccion.CODIGO_TRACTOR, EntityColumn.ColumnType.TEXT);
+        addColumn(Transaccion.OPERADOR_TRACTOR, EntityColumn.ColumnType.INTEGER);
+        addColumn(Transaccion.CODIGO_APUNTADOR, EntityColumn.ColumnType.INTEGER);
+        addColumn(Transaccion.CODIGO_VAGON, EntityColumn.ColumnType.TEXT);
+        addColumn(Transaccion.INDICADOR, EntityColumn.ColumnType.TEXT);
         setSynchronizable(false);
         return this;
     }

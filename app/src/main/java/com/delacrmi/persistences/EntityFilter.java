@@ -1,4 +1,4 @@
-package com.delacrmi.controller;
+package com.delacrmi.persistences;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -11,12 +11,14 @@ public class EntityFilter {
     private String[] whereCondition;
     private String[] whereValues;
 
+    public EntityFilter(){}
+
     public EntityFilter(String[] whereConditions, String[] whereValues){
         this.whereCondition = whereConditions;
         this.whereValues = whereValues;
     }
 
-    public String getCoditions(EntityFilter.ParamType paramType){
+    public String getConditions(EntityFilter.ParamType paramType){
         String conditions = "";
 
         if ( whereCondition != null && whereCondition.length > 0 ) {
@@ -51,6 +53,22 @@ public class EntityFilter {
         }
 
         return array;
+    }
+
+    public String[] getWhereCondition() {
+        return whereCondition;
+    }
+
+    public void setWhereCondition(String[] whereCondition) {
+        this.whereCondition = whereCondition;
+    }
+
+    public String[] getWhereValues() {
+        return whereValues;
+    }
+
+    public void setWhereValues(String[] whereValues) {
+        this.whereValues = whereValues;
     }
 
     public enum ParamType {

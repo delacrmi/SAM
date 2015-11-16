@@ -4,8 +4,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-import com.delacrmi.controller.Entity;
-import com.delacrmi.controller.EntityFilter;
+import com.delacrmi.persistences.Entity;
+import com.delacrmi.persistences.EntityColumn;
+import com.delacrmi.persistences.EntityFilter;
 
 /**
  * Created by Legal on 19/10/2015.
@@ -30,16 +31,16 @@ public class Rangos extends Entity {
         setName(Rangos.TABLE_NAME);
         setNickName("Rango");
         setPrimaryKey(Rangos.CORRELATIVO);
-        addColumn(Rangos.EMPRESA, "integer");
-        addColumn(Rangos.PERIODO,"integer");
-        addColumn(Rangos.DISPOSITIVO, "text");
-        addColumn(Rangos.ENVIO_DESDE, "integer");
-        addColumn(Rangos.ENVIO_HASTA, "integer");
-        addColumn(Rangos.ENVIO_ACTUAL,"integer");
-        addColumn(Rangos.TICKET_DESDE,"integer");
-        addColumn(Rangos.TICKET_HASTA,"integer");
-        addColumn(Rangos.TICKET_ACTUAL,"integer");
-        addColumn(Rangos.STATUS,"text");
+        addColumn(Rangos.EMPRESA, EntityColumn.ColumnType.INTEGER);
+        addColumn(Rangos.PERIODO,EntityColumn.ColumnType.INTEGER);
+        addColumn(Rangos.DISPOSITIVO, EntityColumn.ColumnType.TEXT);
+        addColumn(Rangos.ENVIO_DESDE, EntityColumn.ColumnType.INTEGER);
+        addColumn(Rangos.ENVIO_HASTA, EntityColumn.ColumnType.INTEGER);
+        addColumn(Rangos.ENVIO_ACTUAL, EntityColumn.ColumnType.INTEGER);
+        addColumn(Rangos.TICKET_DESDE, EntityColumn.ColumnType.INTEGER);
+        addColumn(Rangos.TICKET_HASTA, EntityColumn.ColumnType.INTEGER);
+        addColumn(Rangos.TICKET_ACTUAL, EntityColumn.ColumnType.INTEGER);
+        addColumn(Rangos.STATUS, EntityColumn.ColumnType.TEXT);
         setSynchronizable(true);
         return this;
     }

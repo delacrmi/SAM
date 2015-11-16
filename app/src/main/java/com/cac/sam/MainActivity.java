@@ -40,7 +40,7 @@ import com.cac.viewer.CuttingParametersFragment;
 import com.cac.viewer.MainFragment;
 import com.cac.viewer.SettingFragment;
 import com.cac.viewer.SyncFragment;
-import com.delacrmi.controller.EntityManager;
+import com.delacrmi.persistences.EntityManager;
 
 public class MainActivity extends AppCompatActivity {
 

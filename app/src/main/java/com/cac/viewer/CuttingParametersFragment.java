@@ -4,7 +4,6 @@ import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatEditText;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,10 +21,8 @@ import com.cac.sam.MainActivity;
 import com.cac.sam.R;
 import com.cac.tools.MainComponentEdit;
 import com.cac.tools.MyOnFocusListenerFactory;
-import com.delacrmi.controller.Entity;
-import com.delacrmi.controller.EntityManager;
-
-import java.util.List;
+import com.delacrmi.persistences.Entity;
+import com.delacrmi.persistences.EntityManager;
 
 
 /**

@@ -1,17 +1,20 @@
-package com.delacrmi.controller;
+package com.delacrmi.persistences;
+
+import java.util.Date;
 
 /**
  * Created by miguel on 13/11/15.
  */
-public class EntityColumn<valueDefault> {
+public class EntityColumn<valueType> {
 
     private String name;
     private ColumnType type;
     private boolean isNullable = true;
     private boolean isPrimaryKey = false;
     private boolean autoIncrement = false;
-    private valueDefault defaultValue;
-    private boolean dbColumn = true;
+    private boolean serverColumn = true;
+    private valueType defaultValue;
+    private valueType value;
 
     public EntityColumn(){}
 
@@ -20,7 +23,7 @@ public class EntityColumn<valueDefault> {
         type = columnType;
     }
 
-    public EntityColumn(String name,ColumnType columnType, valueDefault defaultValue){
+    public EntityColumn(String name,ColumnType columnType, valueType defaultValue){
         this.name = name;
         type = columnType;
         this.defaultValue = defaultValue;
@@ -39,7 +42,7 @@ public class EntityColumn<valueDefault> {
     }
 
     public EntityColumn(String name,ColumnType columnType,boolean isPrimaryKey,
-                        boolean autoIncrement, valueDefault defaultValue){
+                        boolean autoIncrement, valueType defaultValue){
         this.name = name;
         type = columnType;
         this.isPrimaryKey = isPrimaryKey;
@@ -82,16 +85,16 @@ public class EntityColumn<valueDefault> {
         return this;
     }
 
-    public valueDefault getDefaultValue(){
+    public valueType getDefaultValue(){
         return defaultValue;
     }
-    public EntityColumn setDefaultValue(valueDefault defaultValue){
+    public EntityColumn setDefaultValue(valueType defaultValue){
         this.defaultValue = defaultValue;
         return this;
     }
 
-    public String getType() {
-        return type.toString();
+    public ColumnType getType() {
+        return type;
     }
     public EntityColumn setType(ColumnType type){
         this.type = type;
@@ -106,15 +109,42 @@ public class EntityColumn<valueDefault> {
         return this;
     }
 
-    public boolean isDbColumn() {
-        return dbColumn;
+    public boolean isServerColumn() {
+        return serverColumn;
     }
-    public EntityColumn setOutDbColumn() {
-        this.dbColumn = true;
+    public EntityColumn setOutServerColumn() {
+        this.serverColumn = true;
         return this;
     }
 
+    public valueType getValue(){
+        return value;
+    }
+    public void setValue(valueType value){
+        this.value = value;
+    }
+
+    public String getCreateString(){
+        String create = getName()+" ";
+
+        if(type == ColumnType.DATE)
+            create += ColumnType.NUMERIC+" ";
+        else
+            create += type;
+
+        if(isPrimaryKey())
+            create += "PRIMARY KEY ";
+
+        if(autoIncrement)
+            create += "AUTOINCREMENT ";
+
+        if(!isNullable)
+            create += " NOT NULL";
+
+        return create;
+    }
+
     public enum ColumnType{
-        TEXT,INTEGER,REAL,LONG,DATE
+        TEXT,INTEGER,REAL,LONG,DATE,NUMERIC
     }
 }

@@ -1,6 +1,7 @@
 package com.cac.entities;
 
-import com.delacrmi.controller.Entity;
+import com.delacrmi.persistences.Entity;
+import com.delacrmi.persistences.EntityColumn;
 
 /**
  * Created by miguel on 10/10/15.
@@ -21,8 +22,8 @@ public class Empresas extends Entity {
     public Empresas entityConfig() {
         setName(Empresas.TABLE_NAME);
         setNickName("Empresa");
-        addColumn(ID_EMPRESA,"integer");
-        addColumn(DIRECCION_COMERCIAL,"text");
+        addColumn(ID_EMPRESA, EntityColumn.ColumnType.INTEGER);
+        addColumn(DIRECCION_COMERCIAL, EntityColumn.ColumnType.TEXT);
         setSynchronizable(true);
         return this;
     }

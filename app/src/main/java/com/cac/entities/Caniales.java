@@ -4,8 +4,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-import com.delacrmi.controller.Entity;
-import com.delacrmi.controller.EntityFilter;
+import com.delacrmi.persistences.Entity;
+import com.delacrmi.persistences.EntityColumn;
+import com.delacrmi.persistences.EntityFilter;
 
 /**
  * Created by miguel on 10/10/15.
@@ -23,10 +24,10 @@ public class Caniales extends Entity {
     public Caniales entityConfig() {
         setName(Caniales.TABLE_NAME);
         setNickName("Cañial");
-        addColumn(Caniales.ID_EMPRESA, "integer");
-        addColumn(Caniales.ID_FINCA, "integer");
-        addColumn(Caniales.ID_CANIAL, "integer");
-        addColumn(Caniales.DESCRIPCION, "text");
+        addColumn(Caniales.ID_EMPRESA, EntityColumn.ColumnType.INTEGER);
+        addColumn(Caniales.ID_FINCA, EntityColumn.ColumnType.INTEGER);
+        addColumn(Caniales.ID_CANIAL, EntityColumn.ColumnType.INTEGER);
+        addColumn(Caniales.DESCRIPCION, EntityColumn.ColumnType.TEXT);
         setSynchronizable(true);
         return this;
     }

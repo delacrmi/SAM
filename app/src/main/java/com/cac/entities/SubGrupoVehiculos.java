@@ -3,7 +3,8 @@ package com.cac.entities;
 
 
 import android.content.Context;
-import com.delacrmi.controller.Entity;
+import com.delacrmi.persistences.Entity;
+import com.delacrmi.persistences.EntityColumn;
 
 /**
  * Created by miguel on 10/10/15.
@@ -20,10 +21,10 @@ public class SubGrupoVehiculos extends Entity {
     @Override
     public SubGrupoVehiculos entityConfig() {
         setName(TABLE_NAME);
-        addColumn(ID_EMPRESA, "integer");
-        addColumn(CODIGO_GRUPO, "text");
-        addColumn(CODIGO_SUBGRUPO,"integer");
-        addColumn(DESCRIPCION,"text");
+        addColumn(ID_EMPRESA, EntityColumn.ColumnType.INTEGER);
+        addColumn(CODIGO_GRUPO, EntityColumn.ColumnType.TEXT);
+        addColumn(CODIGO_SUBGRUPO, EntityColumn.ColumnType.INTEGER);
+        addColumn(DESCRIPCION, EntityColumn.ColumnType.TEXT);
         setSynchronizable(false);
         return this;
     }

@@ -1,4 +1,4 @@
-package com.delacrmi.controller;
+package com.delacrmi.persistences;
 
 import android.content.ContentValues;
 import android.content.Context;

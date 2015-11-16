@@ -22,9 +22,9 @@ import com.cac.tools.MainComponentEdit;
 import com.cac.tools.SyncAdapter;
 import com.cac.tools.ViewSyncHolder;
 import com.delacrmi.connection.SocketConnect;
-import com.delacrmi.controller.Entity;
-import com.delacrmi.controller.EntityFilter;
-import com.delacrmi.controller.EntityManager;
+import com.delacrmi.persistences.Entity;
+import com.delacrmi.persistences.EntityFilter;
+import com.delacrmi.persistences.EntityManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -193,7 +193,7 @@ public class SyncFragment extends Fragment implements MainComponentEdit<Floating
                         values.add(1, name);
                         values.add(2, String.valueOf(0));
                         if ( entity.getEntityFilter() != null ) {
-                            values.add(3, entity.getEntityFilter().getCoditions(EntityFilter.ParamType.TWO_POINT));
+                            values.add(3, entity.getEntityFilter().getConditions(EntityFilter.ParamType.TWO_POINT));
                             values.add(4, entity.getEntityFilter().getValues());
                         }
 

@@ -3,9 +3,11 @@ package com.cac.entities;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.view.accessibility.AccessibilityManager;
 
-import com.delacrmi.controller.Entity;
-import com.delacrmi.controller.EntityFilter;
+import com.delacrmi.persistences.Entity;
+import com.delacrmi.persistences.EntityColumn;
+import com.delacrmi.persistences.EntityFilter;
 
 /**
  * Created by miguel on 10/10/15.
@@ -25,12 +27,12 @@ public class Lotes extends Entity {
     public Lotes entityConfig() {
         setName(TABLE_NAME);
         setNickName("Lote");
-        addColumn(ID_LOTE, "integer");
-        addColumn(ID_EMPRESA, "integer");
-        addColumn(ID_FINCA, "integer");
-        addColumn(ID_CANIAL, "integer");
-        addColumn(DESCRIPCION, "text");
-        addColumn(ID_PERIODO,"integer");
+        addColumn(ID_LOTE, EntityColumn.ColumnType.INTEGER);
+        addColumn(ID_EMPRESA, EntityColumn.ColumnType.INTEGER);
+        addColumn(ID_FINCA, EntityColumn.ColumnType.INTEGER);
+        addColumn(ID_CANIAL, EntityColumn.ColumnType.INTEGER);
+        addColumn(DESCRIPCION, EntityColumn.ColumnType.TEXT);
+        addColumn(ID_PERIODO, EntityColumn.ColumnType.INTEGER);
         setSynchronizable(true);
         return this;
     }

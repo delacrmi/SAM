@@ -4,8 +4,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-import com.delacrmi.controller.Entity;
-import com.delacrmi.controller.EntityFilter;
+import com.delacrmi.persistences.Entity;
+import com.delacrmi.persistences.EntityColumn;
+import com.delacrmi.persistences.EntityFilter;
 
 /**
  * Created by miguel on 10/10/15.
@@ -25,12 +26,12 @@ public class Vehiculos extends Entity {
     public Vehiculos entityConfig() {
         setName(TABLE_NAME);
         setNickName("Vehiculo");
-        addColumn(ID_EMPRESA, "integer");
-        addColumn(ID_AREA, "integer");
-        addColumn(CODIGO_GRUPO, "text");
-        addColumn(CODIGO_SUBGRUPO,"integer");
-        addColumn(CODIGO_VEHICULO,"integer");
-        addColumn(STATUS,"integer");
+        addColumn(ID_EMPRESA, EntityColumn.ColumnType.INTEGER);
+        addColumn(ID_AREA, EntityColumn.ColumnType.INTEGER);
+        addColumn(CODIGO_GRUPO, EntityColumn.ColumnType.TEXT);
+        addColumn(CODIGO_SUBGRUPO, EntityColumn.ColumnType.INTEGER);
+        addColumn(CODIGO_VEHICULO, EntityColumn.ColumnType.INTEGER);
+        addColumn(STATUS, EntityColumn.ColumnType.INTEGER);
         setSynchronizable(true);
         return this;
     }

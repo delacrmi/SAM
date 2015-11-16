@@ -4,8 +4,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-import com.delacrmi.controller.Entity;
-import com.delacrmi.controller.EntityFilter;
+import com.delacrmi.persistences.Entity;
+import com.delacrmi.persistences.EntityColumn;
+import com.delacrmi.persistences.EntityFilter;
 
 /**
  * Created by miguel on 10/10/15.
@@ -15,7 +16,6 @@ public class Empleados extends Entity{
 
     public static String ID_EMPLEADO = "id_empleado";
     public static String ID_EMPRESA = "id_empresa";
-    public static String ID_PUESTO  = "id_puesto";
     public static String NOMBRE = "nombre";
     public static String ESTADO_EMPLEADO = "estado_empleado";
     public static String TABLE_NAME = "rh_empleado";
@@ -24,11 +24,10 @@ public class Empleados extends Entity{
     public Empleados entityConfig() {
         setName(Empleados.TABLE_NAME);
         setNickName("Empleado");
-        addColumn(Empleados.ID_EMPLEADO, "integer");
-        addColumn(Empleados.ID_EMPRESA, "integer");
-        addColumn(Empleados.ID_PUESTO, "text");
-        addColumn(Empleados.NOMBRE, "text");
-        addColumn(Empleados.ESTADO_EMPLEADO,"text");
+        addColumn(Empleados.ID_EMPLEADO, EntityColumn.ColumnType.INTEGER);
+        addColumn(Empleados.ID_EMPRESA, EntityColumn.ColumnType.INTEGER);
+        addColumn(Empleados.NOMBRE, EntityColumn.ColumnType.TEXT);
+        addColumn(Empleados.ESTADO_EMPLEADO, EntityColumn.ColumnType.TEXT);
         setSynchronizable(true);
         return this;
     }

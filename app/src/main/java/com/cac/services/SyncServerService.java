@@ -10,14 +10,11 @@ import android.util.Log;
 import com.cac.sam.R;
 import com.cac.entities.Transaccion;
 import com.delacrmi.connection.SocketConnect;
-import com.delacrmi.controller.Entity;
-import com.delacrmi.controller.EntityManager;
+import com.delacrmi.persistences.EntityManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.List;
 
 import io.socket.client.IO;
 
