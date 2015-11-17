@@ -10,7 +10,7 @@
         android:id="@+id/card_cutter_insert"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        card_view:cardBackgroundColor="#505680"
+        card_view:cardBackgroundColor="#9ca0c2"
         card_view:cardUseCompatPadding="true"
         card_view:cardCornerRadius="5dp">
         <RelativeLayout

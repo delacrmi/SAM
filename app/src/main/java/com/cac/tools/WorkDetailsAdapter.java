@@ -22,8 +22,13 @@ public class WorkDetailsAdapter extends RecyclerView.Adapter<ViewWorkHolder> {
     private List<TransactionDetails> transactionDetailsList;
     private int index = 0;
 
+    private TextView tvRise;
+    private TextView tvWeight;
+
     public WorkDetailsAdapter(List<TransactionDetails> transactionDetailsList){
         this.transactionDetailsList = transactionDetailsList;
+        tvRise = CutterWorkFragment.getInstance().getTotalRaise();
+        tvWeight = CutterWorkFragment.getInstance().getTotalWeight();
     }
 
     public void add(TransactionDetails transactionDetails){
@@ -35,21 +40,28 @@ public class WorkDetailsAdapter extends RecyclerView.Adapter<ViewWorkHolder> {
         }
 
         ((LinkedList)transactionDetailsList).addFirst(transactionDetails);
+
+        tvRise.setText((Integer.parseInt(tvRise.getText() + "") + 1) + "");
+
+        Double newWeight = (double)transactionDetails.getColumn("peso").getValue();
+        tvWeight.setText((Double.parseDouble(tvWeight.getText() + "") + newWeight) + "");
+
         notifyItemInserted(0);
         ((LinearLayoutManager)CutterWorkFragment.getInstance()
                 .getRecycle().getLayoutManager()).scrollToPositionWithOffset(0, 0);
-
-        TextView tvRise = CutterWorkFragment.getInstance().getTotalRaise();
-        TextView tvWeight = CutterWorkFragment.getInstance().getTotalWeight();
-
-        tvRise.setText((Integer.parseInt(tvRise.getText()+"")+1)+"");
-        tvWeight.setText((Double.parseDouble(tvWeight.getText()+"")+
-                ((double)transactionDetails.getColumn("peso").getValue()))+"");
     }
 
     public void remove(int position){
+
+        tvRise.setText((Integer.parseInt(tvRise.getText() + "")-1)+"");
+        tvWeight.setText((Double.parseDouble(tvWeight.getText() + "") -
+                ((double) transactionDetailsList.get(position).getColumn("peso").getValue())) + "");
+
         transactionDetailsList.remove(position);
         notifyItemRemoved(position);
+        ((LinearLayoutManager)CutterWorkFragment.getInstance()
+                .getRecycle().getLayoutManager()).scrollToPositionWithOffset(0, 0);
+
     }
 
     @Override

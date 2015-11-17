@@ -27,6 +27,7 @@ public abstract class Entity implements Serializable{
     private ContentValues columnList = new ContentValues();
     private List<EntityColumn> columns = new ArrayList<EntityColumn>();
     private Map<String,Integer> hashcolumns = new HashMap<String,Integer>();
+    private ContentValues newColumnsOnSelected = new ContentValues();
     private ContentValues columnValueList = new ContentValues();
     private boolean synchronizable = false;
     private EntityFilter entityFilter;
@@ -259,8 +260,6 @@ public abstract class Entity implements Serializable{
         }
     }
 
-
-
     @Deprecated
     public void setValue(String columnName,String value){
         if(columnList.containsKey(columnName))
@@ -270,10 +269,20 @@ public abstract class Entity implements Serializable{
     public void setValue(String column,Object value){
         if(hashcolumns.containsKey(column))
             columns.get(hashcolumns.get(column)).setValue(value);
+        else
+            addValuesByType(newColumnsOnSelected,column,value,value.getClass().getSimpleName().toLowerCase());
+    }
+
+    public ContentValues getColumnsFromSelected(){
+        return newColumnsOnSelected;
     }
 
 
     private void addValuesByType(ContentValues content,String name,Object value,String type) {
+
+        if(type.equals("string"))
+            type = "text";
+
         if ( value == null )
             content.putNull(name);
         else if (type.equals("integer")) {
@@ -290,7 +299,7 @@ public abstract class Entity implements Serializable{
                 content.put(name,(Float)value);
         }else if (type.equals("date")) {
             if(!value.getClass().getSimpleName().equals(type))
-                content.put(name,Long.parseLong((String)value));
+                content.put(name, Long.parseLong((String)value));
             else
                 content.put(name,(Long)value);
         }

@@ -30,7 +30,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -229,7 +232,7 @@ public class SyncFragment extends Fragment implements MainComponentEdit<Floating
                         String tableName = obj.getString("tableName");
 
                         ProgressUpdate progressUpdate = new ProgressUpdate(tableName,
-                                ourInstance.entityManager,obj.getJSONArray("result"));
+                                ourInstance.entityManager,obj.getJSONArray("result"), obj.has("dates") ? obj.getJSONArray("dates") : null );
                         ourInstance.syncCount += ourInstance.SYNCHRONIZING;
                         progressUpdate.execute();
 
@@ -310,14 +313,19 @@ public class SyncFragment extends Fragment implements MainComponentEdit<Floating
     public JSONObject getJSONSelect(String tableName,String where, JSONArray whereValues){
         JSONArray array = new JSONArray();
         JSONObject obj  = new JSONObject();
+        JSONArray dates = new JSONArray();
 
         Iterator iterator = ourInstance.entityManager.
                 initInstance(ourInstance.entityManager.getClassByName(tableName)).iterator();
 
         while (iterator.hasNext()){
             String columnName = ((Map.Entry)iterator.next()).getKey().toString();
+
             if(!columnName.equals(tableName + "_id"))
                 array.put(columnName);
+
+            if ( columnName.toLowerCase().contains("fecha") )
+                dates.put(columnName);
         }
 
         try {
@@ -329,6 +337,9 @@ public class SyncFragment extends Fragment implements MainComponentEdit<Floating
 
             if(whereValues != null && !whereValues.equals("") && !whereValues.equals(" "))
                 obj.put("whereValue",whereValues);
+
+            if (dates != null && !dates.equals("") && !dates.equals(" "))
+                obj.put("dates",dates);
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -397,14 +408,15 @@ public class SyncFragment extends Fragment implements MainComponentEdit<Floating
         Vector<Object> persistenceItem;
         EntityManager entityManager;
         JSONArray rows;
+        JSONArray dates;
         String tableName;
         int position;
 
-        public ProgressUpdate(String tableName, EntityManager entityManager,JSONArray rows){
+        public ProgressUpdate(String tableName, EntityManager entityManager,JSONArray rows, JSONArray dates){
             this.tableName = tableName;
             this.entityManager = entityManager;
             this.rows = rows;
-
+            this.dates = dates;
             position = ourInstance.mapListPosition.get(tableName);
         }
 
@@ -431,8 +443,17 @@ public class SyncFragment extends Fragment implements MainComponentEdit<Floating
                         String key = iteratorKeys.next().toString();
                         String value = row.getString(key);
 
-                        if (value != null && !value.equals("") && !value.equals(" "))
+                        if (value != null && !value.equals("") && !value.equals(" ")) {
+                            if ( dates != null ){
+                                for (int i = 0; i < dates.length(); i++) {
+                                    String fecha = dates.getString(i);
+                                    if (fecha.toLowerCase().equals(key.toLowerCase())){
+                                        value = fromStringToLongToString(value);
+                                    }
+                                }
+                            }
                             columns.put(key.toLowerCase(), value);
+                        }
                     }
 
                     Entity ent = entityManager.save(className, columns);
@@ -460,7 +481,7 @@ public class SyncFragment extends Fragment implements MainComponentEdit<Floating
                         ourInstance.syncAdapter.getViewOfTable(tableName).getTag();
                 if(vsh.tableName.equals(tableName))
                     vsh.pgb_sync.setProgress(progress);
-                    vsh.tvProgress.setText(progress+"%");
+                    vsh.tvProgress.setText(progress + "%");
             }catch (NullPointerException e){}
 
             if(ourInstance.syncCount == ourInstance.SYNCHRONIZED)
@@ -472,6 +493,19 @@ public class SyncFragment extends Fragment implements MainComponentEdit<Floating
 
             persistenceItem = ourInstance.list.get(position);
             persistenceItem.add(2, String.valueOf(0));
+        }
+
+        private String fromStringToLongToString(String fecha) {
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+            try {
+                Date date = formatter.parse(fecha);
+                Long fechaLong = date.getTime();
+                return Long.toString(fechaLong);
+            } catch (ParseException e) {
+                Log.e("Formato","Formato de fecha: "+fecha);
+                e.printStackTrace();
+            }
+            return null;
         }
     }
 }

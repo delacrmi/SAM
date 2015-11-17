@@ -31,17 +31,14 @@ public class ViewWorkHolder extends RecyclerView.ViewHolder {
 
     public void bindTableWork(TransactionDetails details){
         etRaise.setText(details.getColumn("index").getValue()+"");
-        etWeight.setText(details.getColumnValueList()
-                 .getAsString("peso"));
-        ivDelete.setTag(details.getColumnValueList()
-                .getAsString(details.getPrimaryKey()));
+        etWeight.setText(details.getColumn("peso").getValue()+"");
     }
 
     private void events(){
         ivDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Snackbar.make(v,""+getPosition(),Snackbar.LENGTH_SHORT).show();
+                //Snackbar.make(v,""+getPosition()+" "+((int)v.getTag()),Snackbar.LENGTH_SHORT).show();
                 CutterWorkFragment.getInstance().removeViewWorkHolder(getPosition());
             }
         });

@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -78,12 +79,14 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Fl
             ourInstance.view = inflater.inflate(R.layout.cutter_work_view, container, false);
 
             ourInstance.tvCode = (TextView)ourInstance.view.findViewById(R.id.tv_code_master_row);
-            ourInstance.ivDeleteAll = (ImageView)ourInstance.view.findViewById(R.id.iv_cutter_delete_all);
             ourInstance.etLine = (EditText)ourInstance.view.findViewById(R.id.et_line_insert);
             ourInstance.etCutter = (EditText)ourInstance.view.findViewById(R.id.atv_cutter_insert);
 
             ourInstance.etTotalRaise = (EditText)ourInstance.view.findViewById(R.id.et_cutter_sum_raise);
             ourInstance.etTotalWeight = (EditText)ourInstance.view.findViewById(R.id.et_cutter_sum_weight);
+
+            ourInstance.ivDeleteAll = (ImageView)ourInstance.view.findViewById(R.id.iv_cutter_delete_all);
+            ourInstance.ivDeleteAll.setOnClickListener(onClickListener);
 
             ourInstance.transactionDetailsList = new LinkedList<TransactionDetails>();
             ourInstance.workDetailsAdapter = new WorkDetailsAdapter(ourInstance.transactionDetailsList);
@@ -120,7 +123,6 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Fl
                         e.printStackTrace();
                     }
 
-
                 }
             }
         };
@@ -150,12 +152,18 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Fl
                                 ((MainActivity) context).getCuttingParametersFragment().getTAG(),
                                 Toast.LENGTH_SHORT).show();
                         TransactionDetails t = (TransactionDetails)new TransactionDetails().entityConfig();
-                        t.getColumn("peso").setValue(300);
+                        t.getColumn("peso").setValue(300.0D);
                         workDetailsAdapter.add(t);
                         break;
                     case R.id.btn_fab_left:
                         ((MainActivity)ourInstance.context).startTransactionByTagFragment(
                                 ((MainActivity) ourInstance.context).getCuttingParametersFragment().getTAG());
+                        break;
+                    case R.id.iv_cutter_delete_all:
+                        etLine.setText("");
+                        etCutter.setText("");
+                        while (ourInstance.transactionDetailsList.size()>0)
+                            ourInstance.workDetailsAdapter.remove(0);
                         break;
                 }
             }
@@ -180,8 +188,6 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Fl
 
     public void removeViewWorkHolder(int position) {
         ourInstance.workDetailsAdapter.remove(position);
-        ((LinearLayoutManager)ourInstance.recyclerView.getLayoutManager()).scrollToPositionWithOffset(0,0);
-
     }
 
     public RecyclerView getRecycle(){
