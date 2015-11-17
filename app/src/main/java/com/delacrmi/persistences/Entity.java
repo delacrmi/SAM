@@ -109,7 +109,7 @@ public abstract class Entity implements Serializable{
 
     public void addColumn(String name,EntityColumn.ColumnType type){
         columnList.put(name, type.toString().toLowerCase());
-        columns.add(createColumn(name,type));
+        columns.add(createColumn(name, type));
     }
 
     public void addColumn(EntityColumn column){
@@ -159,7 +159,13 @@ public abstract class Entity implements Serializable{
         }*/
 
         for (EntityColumn column: this.columns){
-            if(column.isPrimaryKey() == primaryKey){
+            if(!column.isPrimaryKey()){
+                columns += column.getName();
+                if(count < this.columns.size()-1){
+                    columns += ",";
+                    count++;
+                }
+            }else if(primaryKey){
                 columns += column.getName();
                 if(count < this.columns.size()-1){
                     columns += ",";
