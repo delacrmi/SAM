@@ -90,7 +90,7 @@ public class CuttingParametersFragment extends Fragment implements MainComponent
         buttons[0].setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(validateForm())
+                //if(validateForm())
                     ourInstance.context.startTransactionByTagFragment(
                             ourInstance.context.getCutterWorkFragment().getTAG()
                 );

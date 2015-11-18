@@ -73,6 +73,7 @@
                 android:id="@+id/et_line_insert"
                 android:layout_width="100dp"
                 android:layout_height="wrap_content"
+                android:inputType="number"
                 android:ems="10"
                 android:textColor="@color/color_accent"
                 android:layout_marginLeft="5dp"

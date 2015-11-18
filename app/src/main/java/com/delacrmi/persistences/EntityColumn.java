@@ -51,8 +51,9 @@ public class EntityColumn<valueType> {
         isNullable = false;
     }
 
-    public EntityColumn(String name,boolean isPrimaryKey,boolean autoIncrement){
+    public EntityColumn(String name,ColumnType columnType,boolean isPrimaryKey,boolean autoIncrement){
         this.name = name;
+        type = columnType;
         this.isPrimaryKey = isPrimaryKey;
         this.autoIncrement = autoIncrement;
         isNullable = false;

@@ -130,10 +130,25 @@ public class EntityManager  {
         }
         return null;
     }
-
+    @Deprecated
     public synchronized Entity save(Entity entity){
         if(entity != null){
             long insert = write().insert(entity.getName(), null, entity.getColumnValueList());
+            write().close();
+            //Log.e("Save", "" + insert);
+            if(insert > 0) {
+                entity.getColumnValueList().put(entity.getPrimaryKey(),insert);
+                return entity;
+            }else
+                return null;
+        }
+        return null;
+    }
+
+    //TODO: change the Deprecated Method
+    public synchronized Entity save(Entity entity,boolean commit){
+        if(entity != null){
+            long insert = write().insert(entity.getName(), null, entity.getContentValues());
             write().close();
             //Log.e("Save", "" + insert);
             if(insert > 0) {
@@ -293,6 +308,7 @@ public class EntityManager  {
                 String columnName = cursor.getColumnName(index);
                 int col = cursor.getColumnIndex(columnName);
                 entity.setValue(columnName,cursor.getString(col));
+                entity.setColumnValue(columnName,cursor.getString(col));
             }
         }
     }

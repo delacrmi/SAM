@@ -27,9 +27,9 @@ public class Periodos extends Entity {
         setNickName("Periodos");
         addColumn(ID_PERIODO, EntityColumn.ColumnType.INTEGER);
         addColumn(ID_EMPRESA, EntityColumn.ColumnType.INTEGER);
-        addColumn(FECHA_INI, EntityColumn.ColumnType.INTEGER);
+        addColumn(FECHA_INI, EntityColumn.ColumnType.DATE);
         addColumn(FECHA_FIN, EntityColumn.ColumnType.DATE);
-        addColumn(DESCRIPCION, EntityColumn.ColumnType.INTEGER);
+        addColumn(DESCRIPCION, EntityColumn.ColumnType.TEXT);
         setSynchronizable(true);
         return this;
     }

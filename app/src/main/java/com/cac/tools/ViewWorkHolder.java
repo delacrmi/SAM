@@ -30,8 +30,8 @@ public class ViewWorkHolder extends RecyclerView.ViewHolder {
     }
 
     public void bindTableWork(TransactionDetails details){
-        etRaise.setText(details.getColumn("index").getValue()+"");
-        etWeight.setText(details.getColumn("peso").getValue()+"");
+        etRaise.setText(details.getColumn(TransactionDetails.UNADA).getValue()+"");
+        etWeight.setText(details.getColumn(TransactionDetails.PESO).getValue()+"");
     }
 
     private void events(){

@@ -25,7 +25,6 @@ import com.delacrmi.connection.SocketConnect;
 import com.delacrmi.persistences.Entity;
 import com.delacrmi.persistences.EntityFilter;
 import com.delacrmi.persistences.EntityManager;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -47,13 +46,12 @@ import io.socket.client.IO;
  */
 public class SyncFragment extends Fragment implements MainComponentEdit<FloatingActionButton[]> {
 
-    private static  SyncFragment ourInstance = null;
-    private String uri;
+    public static final String TAG = "SyncFragment";
+    private static SyncFragment ourInstance = null;
+    private String URI;
     private SocketConnect connect;
-    private boolean connected = false;
     private AppCompatActivity context;
     private EntityManager entityManager;
-    private String URI;
     private IO.Options opts;
     private SharedPreferences sharedPreferences;
 
@@ -83,7 +81,7 @@ public class SyncFragment extends Fragment implements MainComponentEdit<Floating
             ourInstance = new SyncFragment();
             ourInstance.context = context;
             ourInstance.entityManager = entityManager;
-            ourInstance.uri = uri;
+            ourInstance.URI = uri;
         }
         return ourInstance;
     }
@@ -111,13 +109,14 @@ public class SyncFragment extends Fragment implements MainComponentEdit<Floating
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        if(ourInstance.view == null)
-            ourInstance.view = inflater.inflate(R.layout.sync_fragment_layout,container,false);
+        super.onCreateView(inflater, container, savedInstanceState);
+        if(view == null)
+            view = inflater.inflate(R.layout.sync_fragment_layout,container,false);
 
         initComponents();
         ourInstance.connect.init();
 
-        return ourInstance.view;
+        return view;
     }
 
     @Override
@@ -154,7 +153,9 @@ public class SyncFragment extends Fragment implements MainComponentEdit<Floating
     */
     private void initComponents() {
 
-        ourInstance.recyclerView = (RecyclerView)ourInstance.view.findViewById(R.id.recycleSync);
+        ourInstance.socketInit();
+
+        ourInstance.recyclerView = (RecyclerView)view.findViewById(R.id.recycleSync);
 
         //The recycleView Size not change
         ourInstance.recyclerView.setHasFixedSize(true);
@@ -168,7 +169,6 @@ public class SyncFragment extends Fragment implements MainComponentEdit<Floating
                 new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
 
         ourInstance.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(ourInstance.context);
-        ourInstance.URI = ourInstance.sharedPreferences.getString("etp_uri1", "");
 
         ourInstance.opts = new IO.Options();
         ourInstance.opts.forceNew = true;
@@ -177,7 +177,7 @@ public class SyncFragment extends Fragment implements MainComponentEdit<Floating
 
     }
 
-    private void fillList(){
+    private void fillList() {
         ourInstance.list = new ArrayList<Vector<Object>>();
 
         int count = 0;
@@ -198,7 +198,11 @@ public class SyncFragment extends Fragment implements MainComponentEdit<Floating
                         if ( entity.getEntityFilter() != null ) {
                             values.add(3, entity.getEntityFilter().getConditions(EntityFilter.ParamType.TWO_POINT));
                             values.add(4, entity.getEntityFilter().getValues());
+                        }/*else{
+                            values.add(3,null);
+                            values.add(4,null);
                         }
+                        values.add(5,0);*/
 
                         ourInstance.list.add(values);
 
@@ -223,7 +227,7 @@ public class SyncFragment extends Fragment implements MainComponentEdit<Floating
     */
     private boolean socketInit(){
         if(ourInstance.connect == null)
-            ourInstance.connect = new SocketConnect(ourInstance.context, ourInstance.uri,opts){
+            ourInstance.connect = new SocketConnect(ourInstance.context, ourInstance.URI, opts){
 
                 @Override
                 public void onSynchronizeClient(Object... args) {
@@ -243,11 +247,9 @@ public class SyncFragment extends Fragment implements MainComponentEdit<Floating
 
                 @Override
                 public void onSyncSuccess(Object... args) {
-                    super.onSyncSuccess(args);
-                    //ourInstance.connected = true;
                     JSONObject obj = new JSONObject();
                     try{
-                        obj.put("login","sync");
+                        obj.put("login", "sync");
                     }catch (JSONException e){
                         e.printStackTrace();
                     }
@@ -255,6 +257,7 @@ public class SyncFragment extends Fragment implements MainComponentEdit<Floating
 
                 @Override
                 public void onSyncReject(Object... args) {
+
                     super.onSyncReject(args);
 
                     JSONObject obj = (JSONObject) args[0];
@@ -264,19 +267,19 @@ public class SyncFragment extends Fragment implements MainComponentEdit<Floating
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-
-                }
-
-                @Override
-                public void onDisconnected() {
-                    super.onDisconnected();
-                    connectSocket();
                 }
 
                 @Override
                 public void onErrorConnection() {
                     super.onErrorConnection();
-                    connectSocket();
+                    if (ourInstance.URI.equals(ourInstance.sharedPreferences.getString("etp_uri1", ""))) {
+                        ourInstance.URI = ourInstance.sharedPreferences.getString("etp_uri2", "");
+                    } else {
+                        ourInstance.URI = ourInstance.sharedPreferences.getString("etp_uri1", "");
+                    }
+
+                    ourInstance.connect.setURI(ourInstance.URI);
+                    ourInstance.connect.init();
                 }
             };
         else
@@ -285,31 +288,20 @@ public class SyncFragment extends Fragment implements MainComponentEdit<Floating
         return ourInstance.connect != null;
     }
 
-    public void connectSocket(){
-        if (ourInstance.URI.equals(ourInstance.sharedPreferences.getString("etp_uri1", ""))) {
-            ourInstance.URI = ourInstance.sharedPreferences.getString("etp_uri2", "");
-        } else {
-            ourInstance.URI = ourInstance.sharedPreferences.getString("etp_uri1", "");
-        }
-
-        ourInstance.connect.setURI(ourInstance.URI);
-        ourInstance.connect.init();
-    }
-
     public AppCompatActivity getContext(){
         return ourInstance.context;
     }
 
     /**
-    *==============================================================================================
-    * @args: String tableName
-    *        String where
-    *        JSONArray whereValues
-    *
-    * This method return a json object with the attribute table
-    * information to sync the client tables information
-    * =============================================================================================
-    */
+     *==============================================================================================
+     * @args: String tableName
+     *        String where
+     *        JSONArray whereValues
+     *
+     * This method return a json object with the attribute table
+     * information to sync the client tables information
+     * =============================================================================================
+     */
     public JSONObject getJSONSelect(String tableName,String where, JSONArray whereValues){
         JSONArray array = new JSONArray();
         JSONObject obj  = new JSONObject();
@@ -320,12 +312,10 @@ public class SyncFragment extends Fragment implements MainComponentEdit<Floating
 
         while (iterator.hasNext()){
             String columnName = ((Map.Entry)iterator.next()).getKey().toString();
-
-            if(!columnName.equals(tableName + "_id"))
-                array.put(columnName);
-
             if ( columnName.toLowerCase().contains("fecha") )
                 dates.put(columnName);
+            if(!columnName.equals(tableName + "_id"))
+                array.put(columnName);
         }
 
         try {
@@ -349,17 +339,18 @@ public class SyncFragment extends Fragment implements MainComponentEdit<Floating
     }
 
     /**
-    * =============================================================================================
-    * @args JSONObject
-    * This method send the client information if the application is connected
-    * with the synchronizer server
-    * =============================================================================================
-    */
+     * =============================================================================================
+     * @args JSONObject
+     * This method send the client information if the application is connected
+     * with the synchronizer server
+     * =============================================================================================
+     */
     public void syncTable(JSONObject tableJSONObject){
         if(ourInstance.socketInit())
             ourInstance.connect.sendMessage("synchronizerClient",tableJSONObject);
         else
             Log.e("Socket","is null ourInstance.connect ");
+
     }
 
     /*
@@ -373,6 +364,7 @@ public class SyncFragment extends Fragment implements MainComponentEdit<Floating
                 threadSynchronizer((String)vector.get(1), (String)vector.get(3), (JSONArray)vector.get(4));
             } else
                 threadSynchronizer((String)vector.get(1), null, null);
+
         }
     }
 
@@ -382,33 +374,37 @@ public class SyncFragment extends Fragment implements MainComponentEdit<Floating
             ourInstance.list.set(ind-1, ourInstance.list.get(ind));
 
         ourInstance.list.set(7, obj);
-        ourInstance.syncAdapter.notifyItemMoved(0,7);
+        ourInstance.syncAdapter.notifyItemMoved(0, 7);
 
         ((LinearLayoutManager) ourInstance.recyclerView.getLayoutManager())
                 .scrollToPositionWithOffset(0, 0);
     }
 
     public void threadSynchronizer(String tableName, String whereCondition, JSONArray whereValues){
-        ourInstance.syncTable(ourInstance.getJSONSelect(tableName, whereCondition, whereValues));
+        Vector<Object> v = ourInstance.list.get(ourInstance.mapListPosition.get(tableName));
+       // if(((int)v.get(5)) == 0) {
+            ourInstance.syncTable(ourInstance.getJSONSelect(tableName, whereCondition, whereValues));
+           // v.add(5,1);
+       /* }else
+            Snackbar.make(ourInstance.view, tableName+" pendiente de actualizacion",Snackbar.LENGTH_SHORT).show();*/
     }
 
     /**
-    * =============================================================================================
-    * Class ProgressUpdate
-    * In this class we change the progress status of our progressBar view
-    * if the progressUpdate table name is equals to view table name.
-    *
-    * @args: String TableName
-    *        EntityManager entityManager
-    *        JSONArray rows
-    * =============================================================================================
-    */
+     * =============================================================================================
+     * Class ProgressUpdate
+     * In this class we change the progress status of our progressBar view
+     * if the progressUpdate table name is equals to view table name.
+     *
+     * @args: String TableName
+     *        EntityManager entityManager
+     *        JSONArray rows
+     * =============================================================================================
+     */
     public class ProgressUpdate extends AsyncTask<Void,Integer,Boolean>{
 
         Vector<Object> persistenceItem;
         EntityManager entityManager;
-        JSONArray rows;
-        JSONArray dates;
+        JSONArray rows, dates;
         String tableName;
         int position;
 
@@ -428,6 +424,7 @@ public class SyncFragment extends Fragment implements MainComponentEdit<Floating
 
             entityManager.delete(className, null, null);
 
+            //int parts = (int)Math.round(100 / rows.length());
             try {
                 for (int index = 0; index < rows.length(); index++) {
                     try {
@@ -458,41 +455,17 @@ public class SyncFragment extends Fragment implements MainComponentEdit<Floating
 
                     Entity ent = entityManager.save(className, columns);
                     if(ent.getColumnValueList().getAsInteger(ent.getPrimaryKey()) > 0)
-                        publishProgress(((int)((double)100/rows.length()*index)));
+                        publishProgress(((int)((double)index/rows.length()*100)));
                 }
 
                 ourInstance.syncCount -= ourInstance.SYNCHRONIZING;
                 publishProgress(100);
+                persistenceItem.add(5,0);
 
             }catch (JSONException e){
                 e.printStackTrace();
             }
             return true;
-        }
-
-        @Override
-        protected void onProgressUpdate(Integer... values) {
-
-            int progress = values[0];
-            persistenceItem.set(2, String.valueOf(progress));
-
-            try {
-                ViewSyncHolder vsh = (ViewSyncHolder)
-                        ourInstance.syncAdapter.getViewOfTable(tableName).getTag();
-                if(vsh.tableName.equals(tableName))
-                    vsh.pgb_sync.setProgress(progress);
-                    vsh.tvProgress.setText(progress + "%");
-            }catch (NullPointerException e){}
-
-            if(ourInstance.syncCount == ourInstance.SYNCHRONIZED)
-                Snackbar.make(ourInstance.view, R.string.syncSuccess, Snackbar.LENGTH_SHORT).show();
-        }
-
-        @Override
-        protected void onPreExecute() {
-
-            persistenceItem = ourInstance.list.get(position);
-            persistenceItem.add(2, String.valueOf(0));
         }
 
         private String fromStringToLongToString(String fecha) {
@@ -507,5 +480,32 @@ public class SyncFragment extends Fragment implements MainComponentEdit<Floating
             }
             return null;
         }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+
+            int progress = values[0];
+            persistenceItem.set(2, String.valueOf(progress));
+
+            try {
+                ViewSyncHolder vsh = (ViewSyncHolder)
+                        ourInstance.syncAdapter.getViewOfTable(tableName).getTag();
+                if(vsh.tableName.equals(tableName))
+                    vsh.pgb_sync.setProgress(progress);
+                vsh.tvProgress.setText(progress+"%");
+            }catch (NullPointerException e){}
+
+            if(ourInstance.syncCount == ourInstance.SYNCHRONIZED)
+                Snackbar.make(ourInstance.view, R.string.syncSuccess, Snackbar.LENGTH_SHORT).show();
+        }
+
+        @Override
+        protected void onPreExecute() {
+
+            persistenceItem = ourInstance.list.get(position);
+            persistenceItem.add(2, String.valueOf(0));
+        }
     }
 }
+
+

@@ -33,6 +33,7 @@ public class Transaccion extends Entity {
     public static String PERIODO     = "id_periodo";
     public static String EMPRESA     = "id_empresa";
     public static String INDICADOR   = "estado";
+    public static String APLICACION  = "aplicaicon";
 
     @Override
     public Transaccion entityConfig() {
@@ -59,6 +60,8 @@ public class Transaccion extends Entity {
         addColumn(Transaccion.CODIGO_APUNTADOR, EntityColumn.ColumnType.INTEGER);
         addColumn(Transaccion.CODIGO_VAGON, EntityColumn.ColumnType.TEXT);
         addColumn(Transaccion.INDICADOR, EntityColumn.ColumnType.TEXT);
+        /*addColumn(new EntityColumn<Integer>(Transaccion.APLICACION, EntityColumn.ColumnType.INTEGER)
+                .setDefaultValue(1));*/
         setSynchronizable(false);
         return this;
     }

@@ -15,6 +15,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -40,7 +41,10 @@ import com.cac.viewer.CuttingParametersFragment;
 import com.cac.viewer.MainFragment;
 import com.cac.viewer.SettingFragment;
 import com.cac.viewer.SyncFragment;
+import com.delacrmi.persistences.Entity;
 import com.delacrmi.persistences.EntityManager;
+
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -49,8 +53,6 @@ public class MainActivity extends AppCompatActivity {
     private Fragment actualFragment;
     private String ACTUALFRAGMENT = "MainFragment";
     private ServerStarter serverStarter;
-
-    public static String intelWeight = "se.oioi.intelweigh";
 
     //App Menu
     private Toolbar toolbar;
@@ -92,7 +94,6 @@ public class MainActivity extends AppCompatActivity {
         intentFilter.addAction(SyncServerService.SYNCHRONIZE_STARTED);
         intentFilter.addAction(SyncServerService.OBJECT_SYNCHRONIZED);
         intentFilter.addAction(SyncServerService.SYNCHRONIZE_END);
-        intentFilter.addAction(intelWeight);
         serverStarter = new ServerStarter();
 
         try {
@@ -148,6 +149,8 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setSubtitle(R.string.app_description_name);
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        getEntityManager();
 
         drawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle actionBarDrawerToggle =
@@ -264,7 +267,7 @@ public class MainActivity extends AppCompatActivity {
 
     public CutterWorkFragment getCutterWorkFragment(){
         if(cutterWorkFragment == null)
-            cutterWorkFragment = CutterWorkFragment.init(this);
+            cutterWorkFragment = CutterWorkFragment.init(this,entityManager);
         return cutterWorkFragment;
     }
 

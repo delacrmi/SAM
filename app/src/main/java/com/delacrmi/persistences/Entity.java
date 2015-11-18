@@ -2,6 +2,7 @@ package com.delacrmi.persistences;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -9,6 +10,7 @@ import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -79,7 +81,8 @@ public abstract class Entity implements Serializable{
         if(!columnName.equals("") || !columnName.equals(" ")) {
             pk = columnName;
             columnList.remove(getName()+"_id");
-            columnList.put(pk,"integer");
+            columnList.put(pk, "integer");
+            addColumn(new EntityColumn<Integer>(columnName, EntityColumn.ColumnType.INTEGER,true,true));
         }
     }
 
@@ -110,6 +113,7 @@ public abstract class Entity implements Serializable{
     public void addColumn(String name,EntityColumn.ColumnType type){
         columnList.put(name, type.toString().toLowerCase());
         columns.add(createColumn(name, type));
+        hashcolumns.put(name,columns.size()-1);
     }
 
     public void addColumn(EntityColumn column){
@@ -197,9 +201,8 @@ public abstract class Entity implements Serializable{
         for(EntityColumn column : columns)
             if(column.getValue() == null)
                 cv.putNull(column.getName());
-            else if(column.getType().equals(
-                    EntityColumn.ColumnType.DATE.toString().toLowerCase())){
-                cv.put(column.getName(),((java.util.Date)column.getValue()).getTime());
+            else if(column.getType() == EntityColumn.ColumnType.DATE){
+                cv.put(column.getName(),((Date)column.getValue()).getTime());
             }else
                 addValuesByType(cv,column.getName(),column.getValue(),column.getType().toString().toLowerCase());
 
@@ -272,9 +275,11 @@ public abstract class Entity implements Serializable{
             addValuesByType(columnValueList,columnName,value,columnList.getAsString(columnName));
     }
 
-    public void setValue(String column,Object value){
-        if(hashcolumns.containsKey(column))
-            columns.get(hashcolumns.get(column)).setValue(value);
+    public void setColumnValue(String column, Object value){
+        Log.d("Names",column+" "+hashcolumns.containsKey(column));
+        if(hashcolumns.containsKey(column)){
+            addValuesByType(columns.get(hashcolumns.get(column)), value);
+        }
         else
             addValuesByType(newColumnsOnSelected,column,value,value.getClass().getSimpleName().toLowerCase());
     }
@@ -282,7 +287,6 @@ public abstract class Entity implements Serializable{
     public ContentValues getColumnsFromSelected(){
         return newColumnsOnSelected;
     }
-
 
     private void addValuesByType(ContentValues content,String name,Object value,String type) {
 
@@ -293,19 +297,31 @@ public abstract class Entity implements Serializable{
             content.putNull(name);
         else if (type.equals("integer")) {
             if(!value.getClass().getSimpleName().equals(type))
-                content.put(name,Integer.parseInt((String)value));
+                try {
+                    content.put(name,Integer.parseInt((String)value));
+                }catch (ClassCastException e){
+                    content.put(name,(Integer)value);
+                }
             else
                 content.put(name,(Integer)value);
         }else if (type.equals("text")) {
             content.put(name,value.toString());
         }else if (type.equals("real")) {
             if(!value.getClass().getSimpleName().equals(type))
-                content.put(name,Float.parseFloat((String)value));
+                try{
+                    content.put(name,Double.parseDouble((String) value));
+                }catch (ClassCastException e){
+                    content.put(name,(Double)value);
+                }
             else
-                content.put(name,(Float)value);
+                content.put(name,(Double)value);
         }else if (type.equals("date")) {
             if(!value.getClass().getSimpleName().equals(type))
-                content.put(name, Long.parseLong((String)value));
+                try{
+                    content.put(name, Long.parseLong((String)value));
+                }catch (ClassCastException e){
+                    content.put(name,(Long)value);
+                }
             else
                 content.put(name,(Long)value);
         }
@@ -314,20 +330,29 @@ public abstract class Entity implements Serializable{
     private void addValuesByType(EntityColumn content,Object value){
         if ( value == null ){
 
-        }else if (content.getType().equals("integer")) {
-            if(!value.getClass().getSimpleName().equals(content.getType()))
+        }else if (content.getType() == EntityColumn.ColumnType.INTEGER) {
+
+            if(!value.getClass().getSimpleName().toLowerCase()
+                    .equals(content.getType().toString().toLowerCase()))
                 content.setValue(Integer.parseInt((String) value));
             else
                 content.setValue((Integer) value);
-        }else if (content.getType().equals("text")) {
+
+        }else if (content.getType() == EntityColumn.ColumnType.TEXT) {
+
             content.setValue(value.toString());
-        }else if (content.getType().equals("real")) {
-            if(!value.getClass().getSimpleName().equals(content.getType()))
+
+        }else if (content.getType() == EntityColumn.ColumnType.REAL) {
+
+            if(!value.getClass().getSimpleName().toLowerCase()
+                    .equals(content.getType().toString().toLowerCase()))
                 content.setValue(Float.parseFloat((String) value));
             else
                 content.setValue((Float) value);
-        }else if (content.getType().equals("date")) {
-            content.setValue((java.util.Date)value);
+
+        }else if (content.getType() == EntityColumn.ColumnType.DATE) {
+            Date d = new Date(Long.parseLong(value+""));
+            content.setValue(d);
         }
     }
 
@@ -348,6 +373,6 @@ public abstract class Entity implements Serializable{
         else if(type == EntityColumn.ColumnType.REAL)
             return new EntityColumn<Double>(name,type);
         else
-            return new EntityColumn<java.util.Date>(name,type);
+            return new EntityColumn<Date>(name,type);
     }
 }

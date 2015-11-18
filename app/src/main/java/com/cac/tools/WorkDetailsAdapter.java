@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.cac.entities.Transaccion;
 import com.cac.entities.TransactionDetails;
 import com.cac.sam.R;
 import com.cac.viewer.CutterWorkFragment;
@@ -34,7 +35,7 @@ public class WorkDetailsAdapter extends RecyclerView.Adapter<ViewWorkHolder> {
     public void add(TransactionDetails transactionDetails){
         try {
             index = (int) ((TransactionDetails) ((LinkedList) transactionDetailsList)
-                    .getFirst()).getColumn("index").getValue()+1;
+                    .getFirst()).getColumn(TransactionDetails.UNADA).getValue()+1;
         }catch(NoSuchElementException e){
             index = 1;
         }
@@ -43,7 +44,7 @@ public class WorkDetailsAdapter extends RecyclerView.Adapter<ViewWorkHolder> {
 
         tvRise.setText((Integer.parseInt(tvRise.getText() + "") + 1) + "");
 
-        Double newWeight = (double)transactionDetails.getColumn("peso").getValue();
+        Double newWeight = (double)transactionDetails.getColumn(TransactionDetails.PESO).getValue();
         tvWeight.setText((Double.parseDouble(tvWeight.getText() + "") + newWeight) + "");
 
         notifyItemInserted(0);
@@ -55,7 +56,7 @@ public class WorkDetailsAdapter extends RecyclerView.Adapter<ViewWorkHolder> {
 
         tvRise.setText((Integer.parseInt(tvRise.getText() + "")-1)+"");
         tvWeight.setText((Double.parseDouble(tvWeight.getText() + "") -
-                ((double) transactionDetailsList.get(position).getColumn("peso").getValue())) + "");
+                ((double) transactionDetailsList.get(position).getColumn(TransactionDetails.PESO).getValue())) + "");
 
         transactionDetailsList.remove(position);
         notifyItemRemoved(position);
@@ -75,8 +76,8 @@ public class WorkDetailsAdapter extends RecyclerView.Adapter<ViewWorkHolder> {
     public void onBindViewHolder(ViewWorkHolder holder, int position) {
         TransactionDetails transactionDetails = transactionDetailsList.get(position);
 
-        if(transactionDetails.getColumn("index").getValue() == null)
-            transactionDetails.getColumn("index").setValue(index);
+        if(transactionDetails.getColumn(TransactionDetails.UNADA).getValue() == null)
+            transactionDetails.getColumn(TransactionDetails.UNADA).setValue(index);
 
         holder.bindTableWork(transactionDetails);
     }
