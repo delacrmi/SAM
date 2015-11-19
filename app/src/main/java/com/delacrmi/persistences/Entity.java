@@ -276,7 +276,6 @@ public abstract class Entity implements Serializable{
     }
 
     public void setColumnValue(String column, Object value){
-        Log.d("Names",column+" "+hashcolumns.containsKey(column));
         if(hashcolumns.containsKey(column)){
             addValuesByType(columns.get(hashcolumns.get(column)), value);
         }

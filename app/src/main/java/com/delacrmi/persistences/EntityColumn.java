@@ -1,6 +1,8 @@
 package com.delacrmi.persistences;
 
-import java.util.Date;
+import android.util.Log;
+
+import java.util.UnknownFormatConversionException;
 
 /**
  * Created by miguel on 13/11/15.
@@ -13,10 +15,14 @@ public class EntityColumn<valueType> {
     private boolean isPrimaryKey = false;
     private boolean autoIncrement = false;
     private boolean serverColumn = true;
-    private valueType defaultValue;
-    private valueType value;
+    private valueType defaultValue = null;
+    private valueType value = null;
 
     public EntityColumn(){}
+
+    public EntityColumn(String name){
+        this.name = name;
+    }
 
     public EntityColumn(String name,ColumnType columnType){
         this.name = name;

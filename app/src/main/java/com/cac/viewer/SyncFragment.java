@@ -110,13 +110,13 @@ public class SyncFragment extends Fragment implements MainComponentEdit<Floating
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        if(view == null)
-            view = inflater.inflate(R.layout.sync_fragment_layout,container,false);
+        if(ourInstance.view == null)
+            ourInstance.view = inflater.inflate(R.layout.sync_fragment_layout,container,false);
 
         initComponents();
         ourInstance.connect.init();
 
-        return view;
+        return ourInstance.view;
     }
 
     @Override
@@ -152,8 +152,6 @@ public class SyncFragment extends Fragment implements MainComponentEdit<Floating
     * =============================================================================================
     */
     private void initComponents() {
-
-        ourInstance.socketInit();
 
         ourInstance.recyclerView = (RecyclerView)view.findViewById(R.id.recycleSync);
 
@@ -198,11 +196,7 @@ public class SyncFragment extends Fragment implements MainComponentEdit<Floating
                         if ( entity.getEntityFilter() != null ) {
                             values.add(3, entity.getEntityFilter().getConditions(EntityFilter.ParamType.TWO_POINT));
                             values.add(4, entity.getEntityFilter().getValues());
-                        }/*else{
-                            values.add(3,null);
-                            values.add(4,null);
                         }
-                        values.add(5,0);*/
 
                         ourInstance.list.add(values);
 
@@ -227,7 +221,7 @@ public class SyncFragment extends Fragment implements MainComponentEdit<Floating
     */
     private boolean socketInit(){
         if(ourInstance.connect == null)
-            ourInstance.connect = new SocketConnect(ourInstance.context, ourInstance.URI, opts){
+            ourInstance.connect = new SocketConnect(/*ourInstance.context, */ourInstance.URI, ourInstance.opts){
 
                 @Override
                 public void onSynchronizeClient(Object... args) {
@@ -270,22 +264,55 @@ public class SyncFragment extends Fragment implements MainComponentEdit<Floating
                 }
 
                 @Override
+                public void onDisconnected() {
+                    super.onDisconnected();
+                    Log.e("onErrorConnection", "BUMMMMMMMM en mi cara");
+                    connectSocket();
+                }
+
+                @Override
                 public void onErrorConnection() {
                     super.onErrorConnection();
-                    if (ourInstance.URI.equals(ourInstance.sharedPreferences.getString("etp_uri1", ""))) {
+                    Log.e("onErrorConnection", "BUMMMMMMMM en tu cara");
+                    connectSocket();
+                    /*if (ourInstance.URI.equals(ourInstance.sharedPreferences.getString("etp_uri1", ""))) {
                         ourInstance.URI = ourInstance.sharedPreferences.getString("etp_uri2", "");
                     } else {
                         ourInstance.URI = ourInstance.sharedPreferences.getString("etp_uri1", "");
                     }
 
-                    ourInstance.connect.setURI(ourInstance.URI);
-                    ourInstance.connect.init();
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                    ourInstance.connect.setURI(URI);
+                    ourInstance.connect.init();*/
+
                 }
             };
         else
             ourInstance.connect.getSocket().connect();
 
         return ourInstance.connect != null;
+    }
+
+    public void connectSocket(){
+        if (URI.equals(sharedPreferences.getString("etp_uri1", ""))) {
+            URI = sharedPreferences.getString("etp_uri2", "");
+        } else {
+            URI = sharedPreferences.getString("etp_uri1", "");
+        }
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        connect.setURI(URI);
+        connect.init();
     }
 
     public AppCompatActivity getContext(){
@@ -360,7 +387,7 @@ public class SyncFragment extends Fragment implements MainComponentEdit<Floating
         Iterator iterator = ourInstance.list.iterator();
         while (iterator.hasNext()){
             Vector<Object> vector = (Vector<Object>)iterator.next();
-            if ( ((Vector<Object>)iterator.next()).size() == 5  ) {
+            if ( vector.size() == 5  ) {
                 threadSynchronizer((String)vector.get(1), (String)vector.get(3), (JSONArray)vector.get(4));
             } else
                 threadSynchronizer((String)vector.get(1), null, null);
@@ -460,7 +487,7 @@ public class SyncFragment extends Fragment implements MainComponentEdit<Floating
 
                 ourInstance.syncCount -= ourInstance.SYNCHRONIZING;
                 publishProgress(100);
-                persistenceItem.add(5,0);
+                //persistenceItem.add(5,0);
 
             }catch (JSONException e){
                 e.printStackTrace();

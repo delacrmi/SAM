@@ -6,6 +6,7 @@ import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -41,10 +42,7 @@ import com.cac.viewer.CuttingParametersFragment;
 import com.cac.viewer.MainFragment;
 import com.cac.viewer.SettingFragment;
 import com.cac.viewer.SyncFragment;
-import com.delacrmi.persistences.Entity;
 import com.delacrmi.persistences.EntityManager;
-
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -80,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
 
         if(savedInstanceState != null)
@@ -194,8 +193,8 @@ public class MainActivity extends AppCompatActivity {
             .addTable(Empleados.class).addTable(Empresas.class)
             .addTable(Fincas.class).addTable(Frentes.class)
             .addTable(Lotes.class).addTable(Periodos.class)
-            .addTable(Rangos.class).addTable(SubGrupoVehiculos.class)
-            .addTable(Transaccion.class).addTable(TransactionDetails.class)
+            .addTable(Rangos.class).addTable(Transaccion.class)
+            .addTable(TransactionDetails.class)
             .addTable(Vehiculos.class).init();
         }
         return entityManager;

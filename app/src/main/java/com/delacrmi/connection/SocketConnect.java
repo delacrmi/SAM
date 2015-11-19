@@ -45,10 +45,13 @@ public abstract class SocketConnect {
     private void initComponents(String URI){
         this.URI = URI;
         try {
-            if(opts == null)
+            if(opts == null) {
                 socket = IO.socket(URI);
-            else
-                socket = IO.socket(URI,opts);
+                Log.d("Opts", "is null");
+            }else {
+                Log.d("Opts", "not null");
+                socket = IO.socket(URI, opts);
+            }
 
             socket.on("synchronizeClient", onSynchronizeClient);
             socket.on("synchronizeServer", onSynchronizeServer);
@@ -62,7 +65,7 @@ public abstract class SocketConnect {
     }
 
     public void setURI(String URI){
-        if(!socket.connected()){
+        if(socket.connected()){
             socket.disconnect();
         }
 
@@ -117,14 +120,14 @@ public abstract class SocketConnect {
 
         @Override
         public void call(Object... args) {
-            if (context != null)
+            /*if (context != null)
                 context.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         onErrorConnection();
                     }
                 });
-            else
+            else*/
                 onErrorConnection();
         }
     };
@@ -133,14 +136,14 @@ public abstract class SocketConnect {
 
         @Override
         public void call(Object... args) {
-            if (context != null)
+            /*if (context != null)
                 context.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         onDisconnected();
                     }
                 });
-            else
+            else*/
                 onDisconnected();
         }
     };
@@ -156,7 +159,13 @@ public abstract class SocketConnect {
                     }
                 });
             else
-                onSynchronizeClient(args);
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        onSynchronizeClient(args);
+                    }
+                }).start();
+
         }
     };
 
@@ -193,7 +202,13 @@ public abstract class SocketConnect {
                     }
                 });
             else
-                onSyncSuccess(args);
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    onSyncSuccess(args);
+                }
+            }).start();
+
         }
     };
 

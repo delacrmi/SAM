@@ -229,6 +229,13 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Fl
                         transaccion.getColumn(Transaccion.FECHA_CORTE).setValue(new Date());
                         transaccion = (Transaccion)ourInstance.entityManager.save(transaccion,true);
 
+                        transaccion.getColumn(Transaccion.CORTADOR)
+                                .setValue(Integer.parseInt(ourInstance.autCutter.getText()+""));
+                        transaccion.getColumn(Transaccion.UNADA)
+                                .setValue(Integer.parseInt(ourInstance.etTotalRaise.getText() + ""));
+                        transaccion.getColumn(Transaccion.PESO)
+                                .setValue(Double.parseDouble(ourInstance.etTotalWeight.getText()+""));
+
                         int detailsindex = 1;
                         if(transaccion != null){
                             for(TransactionDetails details : ourInstance.transactionDetailsList) {
@@ -279,14 +286,14 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Fl
 
     private void setCutterInformation(){
         List<Entity> entities = ourInstance.entityManager.find(Empleados.class,
-                Empleados.ID_EMPLEADO+","+Empleados.NOMBRE,Empleados.ID_PLANILLA+" = ?",new String[]{"5"});
+                Empleados.ID_EMPLEADO+","+Empleados.NOMBRE,null,null);
 
         String[] values = new String[entities.size()];
         int index = 0;
 
         for(Entity entity: entities){
             hashCutter.put((Integer)entity.getColumn(Empleados.ID_EMPLEADO).getValue()
-                    ,(String)((Empleados)entity).getFullName());
+                    ,(String)entity.getColumn(Empleados.NOMBRE).getValue());
             values[index] = entity.getColumn(Empleados.ID_EMPLEADO).getValue()+"";
             index++;
         }
