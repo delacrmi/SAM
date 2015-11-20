@@ -21,6 +21,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.RelativeLayout;
 
 import com.cac.entities.Caniales;
 import com.cac.entities.Empleados;
@@ -56,6 +57,9 @@ public class MainActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
+
+    private RelativeLayout mainRelativeLayout;
+    public static int VISIBLE_ACTION = 180;
 
     private FloatingActionButton btn_fab_right;
     private FloatingActionButton btn_fab_left;
@@ -148,6 +152,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setSubtitle(R.string.app_description_name);
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        mainRelativeLayout = (RelativeLayout)findViewById(R.id.main_body_action_layout);
 
         getEntityManager();
 
@@ -207,11 +212,10 @@ public class MainActivity extends AppCompatActivity {
     private void startTransaction(Fragment fragment){
 
         FragmentTransaction frt = frm.beginTransaction();
-        frt.replace(R.id.body_layout, fragment, ACTUALFRAGMENT);
+        frt.replace(R.id.main_body_layout, fragment, ACTUALFRAGMENT);
         frt.commit();
-
         ((MainComponentEdit) fragment).
-                mainViewConfig(new FloatingActionButton[]{btn_fab_right, btn_fab_left});
+                mainViewConfig(new View[]{mainRelativeLayout,btn_fab_right, btn_fab_left});
         getSupportActionBar().setSubtitle(((MainComponentEdit) fragment).getSubTitle());
 
     }
@@ -260,7 +264,7 @@ public class MainActivity extends AppCompatActivity {
 
     public CuttingParametersFragment getCuttingParametersFragment() {
         if(cuttingParametersFragment == null)
-            cuttingParametersFragment = cuttingParametersFragment.init(this);
+            cuttingParametersFragment = cuttingParametersFragment.init(this,getEntityManager());
         return cuttingParametersFragment;
     }
 

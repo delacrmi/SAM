@@ -15,7 +15,7 @@ import com.cac.sam.R;
 /**
  * Created by miguel on 02/11/15.
  */
-public class MainFragment extends Fragment implements MainComponentEdit<FloatingActionButton[]> {
+public class MainFragment extends Fragment implements MainComponentEdit<View[]> {
     //instance variables
     private static MainFragment ourInstance;
     private AppCompatActivity context;
@@ -37,9 +37,10 @@ public class MainFragment extends Fragment implements MainComponentEdit<Floating
     }
 
     @Override
-    public void mainViewConfig(FloatingActionButton[] buttons) {
-        buttons[0].setVisibility(view.INVISIBLE);
-        buttons[1].setVisibility(view.INVISIBLE);
+    public void mainViewConfig(View[] views) {
+        views[0].getLayoutParams().height = 0;
+        views[1].setVisibility(view.INVISIBLE);
+        views[2].setVisibility(view.INVISIBLE);
 
     }
 

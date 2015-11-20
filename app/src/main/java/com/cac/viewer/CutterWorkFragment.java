@@ -23,6 +23,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,6 +33,7 @@ import com.cac.entities.TransactionDetails;
 import com.cac.sam.MainActivity;
 import com.cac.sam.R;
 import com.cac.tools.MainComponentEdit;
+import com.cac.tools.OnKeyListenerRefactory;
 import com.cac.tools.WorkDetailsAdapter;
 import com.delacrmi.persistences.Entity;
 import com.delacrmi.persistences.EntityManager;
@@ -49,9 +51,10 @@ import java.util.Map;
 /**
  * Created by miguel on 11/11/15.
  */
-public class CutterWorkFragment extends Fragment implements MainComponentEdit<FloatingActionButton[]> {
+public class CutterWorkFragment extends Fragment implements MainComponentEdit<View[]> {
 
     private static CutterWorkFragment ourInstance;
+    private RelativeLayout layout;
     public boolean writing = false;
     public AppCompatActivity context;
 
@@ -60,7 +63,7 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Fl
     private EditText etLine;
 
     private AutoCompleteTextView autCutter;
-    private Map<Integer,String> hashCutter = new HashMap<Integer,String>();
+    private Map<String,String> hashCutter = new HashMap<String,String>();
     private TextView tvCutter;
 
     private EditText etTotalRaise;
@@ -98,6 +101,7 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Fl
         if(ourInstance.view == null) {
 
             ourInstance.view = inflater.inflate(R.layout.cutter_work_view, container, false);
+            ourInstance.layout = (RelativeLayout)ourInstance.view.findViewById(R.id.cutter_head_layout);
 
             ourInstance.tvCode = (TextView)ourInstance.view.findViewById(R.id.tv_code_master_row);
             ourInstance.etLine = (EditText)ourInstance.view.findViewById(R.id.et_line_insert);
@@ -108,13 +112,14 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Fl
             ourInstance.autCutter.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    ourInstance.tvCutter.setText(hashCutter.get(Integer.parseInt(ourInstance.autCutter.getText() + "")));
+                    ourInstance.tvCutter.setText(hashCutter.get(ourInstance.autCutter.getText().toString()));
                     InputMethodManager inputMethodManager =
-                            (InputMethodManager)  ourInstance.context.getSystemService(ourInstance.context.INPUT_METHOD_SERVICE);
+                            (InputMethodManager) ourInstance.context.getSystemService(ourInstance.context.INPUT_METHOD_SERVICE);
                     inputMethodManager.hideSoftInputFromWindow(
                             ourInstance.context.getCurrentFocus().getWindowToken(), 0);
                 }
             });
+            ourInstance.autCutter.setOnKeyListener(new OnKeyListenerRefactory(hashCutter,ourInstance.tvCutter));
             setCutterInformation();
 
             ourInstance.etTotalRaise = (EditText)ourInstance.view.findViewById(R.id.et_cutter_sum_raise);
@@ -124,14 +129,14 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Fl
             ourInstance.ivDeleteAll.setOnClickListener(onClickListener);
 
             ourInstance.transactionDetailsList = new LinkedList<TransactionDetails>();
+            addValueTest();
+
             ourInstance.workDetailsAdapter = new WorkDetailsAdapter(ourInstance.transactionDetailsList);
 
             ourInstance.recyclerView = (RecyclerView)ourInstance.view.findViewById(R.id.recycle_cutter_insert);
             ourInstance.recyclerView.setLayoutManager(
                     new LinearLayoutManager(ourInstance.context, LinearLayoutManager.VERTICAL, false));
-            ourInstance.recyclerView.setAdapter(workDetailsAdapter);
-
-
+            ourInstance.recyclerView.setAdapter(ourInstance.workDetailsAdapter);
         }
 
         ourInstance.writing = true;
@@ -167,6 +172,7 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Fl
         try {
             ourInstance.context.registerReceiver(ourInstance.receiver, intentFilter);
         }catch (NullPointerException npe){}
+
     }
 
     @Override
@@ -187,16 +193,18 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Fl
     }
 
     @Override
-    public void mainViewConfig(FloatingActionButton[] buttons) {
+    public void mainViewConfig(View[] views) {
         events();
 
-        buttons[0].setImageResource(R.drawable.grabar);
-        buttons[0].setOnClickListener(onClickListener);
-        buttons[0].setVisibility(View.VISIBLE);
+        views[0].getLayoutParams().height = MainActivity.VISIBLE_ACTION;
 
-        buttons[1].setImageResource(R.drawable.anterior);
-        buttons[1].setOnClickListener(onClickListener);
-        buttons[1].setVisibility(View.VISIBLE);
+        ((FloatingActionButton)views[1]).setImageResource(R.drawable.grabar);
+        views[1].setOnClickListener(onClickListener);
+        views[1].setVisibility(View.VISIBLE);
+
+        ((FloatingActionButton)views[2]).setImageResource(R.drawable.anterior);
+        views[2].setOnClickListener(onClickListener);
+        views[2].setVisibility(View.VISIBLE);
 
     }
 
@@ -208,7 +216,7 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Fl
                     case R.id.btn_fab_right:
 
                         //TODO: Auto Increament the envio options
-                        int envio = 2;
+                        int envio = 1;
                         Transaccion transaccion = new Transaccion().entityConfig();
 
                         transaccion.getColumn(Transaccion.EMPRESA).setValue(sharedPreferences.getInt("empresa",30));
@@ -227,7 +235,7 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Fl
                                 .setValue(Integer.parseInt(parameters.getFinca().getText() + ""));
 
                         transaccion.getColumn(Transaccion.FECHA_CORTE).setValue(new Date());
-                        transaccion = (Transaccion)ourInstance.entityManager.save(transaccion,true);
+                        transaccion = (Transaccion)ourInstance.entityManager.save(transaccion);
 
                         transaccion.getColumn(Transaccion.CORTADOR)
                                 .setValue(Integer.parseInt(ourInstance.autCutter.getText()+""));
@@ -242,7 +250,7 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Fl
 
                                 details.getColumn(TransactionDetails.ID_TRANSACCION).setValue(envio);
                                 details.getColumn(TransactionDetails.CORRELATIVO).setValue(detailsindex);
-                                if(ourInstance.entityManager.save(details, true) != null)
+                                if(ourInstance.entityManager.save(details) != null)
                                     Log.i("inserted","uñada "+details.getColumn(TransactionDetails.UNADA).getValue()+
                                             " peso "+details.getColumn(TransactionDetails.PESO).getValue());
 
@@ -251,6 +259,7 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Fl
 
                             Snackbar.make(ourInstance.view,"Registro Guardado",Snackbar.LENGTH_SHORT).show();
                         }
+
                         break;
                     case R.id.btn_fab_left:
                         ((MainActivity)ourInstance.context).startTransactionByTagFragment(
@@ -292,7 +301,7 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Fl
         int index = 0;
 
         for(Entity entity: entities){
-            hashCutter.put((Integer)entity.getColumn(Empleados.ID_EMPLEADO).getValue()
+            hashCutter.put(((Integer)entity.getColumn(Empleados.ID_EMPLEADO).getValue())+""
                     ,(String)entity.getColumn(Empleados.NOMBRE).getValue());
             values[index] = entity.getColumn(Empleados.ID_EMPLEADO).getValue()+"";
             index++;
@@ -328,5 +337,36 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Fl
 
     public void setEtTotalWeight(EditText etTotalWeight) {
         this.etTotalWeight = etTotalWeight;
+    }
+
+    public boolean validateForm() {
+        if ( layout != null ){
+            for (View a : layout.getFocusables(RelativeLayout.FOCUS_BACKWARD)){
+                if ( a instanceof EditText) {
+                    EditText editText = (EditText) a;
+                    a.getOnFocusChangeListener().onFocusChange(editText,false);
+                    if ( editText.getError() != null ){
+                        Toast.makeText(ourInstance.context,"Debe indicar la informacion para el campo "+editText.getHint(), Toast.LENGTH_SHORT).show();
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    public void addValueTest(){
+        for(int a=0; a<3; a++){
+            TransactionDetails transactionDetails = (TransactionDetails)new TransactionDetails().entityConfig();
+            transactionDetails.getColumn(TransactionDetails.UNADA).setValue(a + 1);
+            transactionDetails.getColumn(TransactionDetails.PESO).setValue(300.0D);
+
+            ((LinkedList)ourInstance.transactionDetailsList).addFirst(transactionDetails);
+
+            ourInstance.getTotalRaise().setText((a+1)+"");
+            ourInstance.getTotalWeight().setText(
+                    Double.parseDouble(ourInstance.getTotalWeight().getText() + "")+300+""
+            );
+        }
     }
 }

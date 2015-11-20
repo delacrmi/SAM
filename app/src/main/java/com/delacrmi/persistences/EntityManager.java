@@ -113,11 +113,13 @@ public class EntityManager  {
     }
 
     //<editor-fold desc="Saving the Entities class">
-    public synchronized Entity save(Class entity,ContentValues args){
+    public Entity save(Class entity,ContentValues args){
         Entity ent= initInstance(entity);
-        ent.entityConfig();
+        ent.entityConfig().addColumns(args);
+        return save(ent);
 
-        if(args != null){
+
+        /*if(args != null){
             ent.setValues(args);
 
             long insert = write().insert(ent.getName(),null,ent.getColumnValueList());
@@ -125,34 +127,47 @@ public class EntityManager  {
 
             if(insert > 0) {
                 ent.getColumnValueList().put(ent.getPrimaryKey(),insert);
+                List<EntityColumn> pk = ent.getPrimariesKeys();
+                if(pk.size() == 1)
+                    pk.get(0).setValue(insert);
+
                 return ent;
             }
         }
-        return null;
+        return null;*/
     }
-    @Deprecated
+    /*@Deprecated
     public synchronized Entity save(Entity entity){
         if(entity != null){
-            long insert = write().insert(entity.getName(), null, entity.getColumnValueList());
-            write().close();
-            //Log.e("Save", "" + insert);
-            if(insert > 0) {
-                entity.getColumnValueList().put(entity.getPrimaryKey(),insert);
-                return entity;
-            }else
-                return null;
-        }
-        return null;
-    }
-
-    //TODO: change the Deprecated Method
-    public synchronized Entity save(Entity entity,boolean commit){
-        if(entity != null){
+            //long insert = write().insert(entity.getName(), null, entity.getColumnValueList());
             long insert = write().insert(entity.getName(), null, entity.getContentValues());
             write().close();
             //Log.e("Save", "" + insert);
             if(insert > 0) {
                 entity.getColumnValueList().put(entity.getPrimaryKey(),insert);
+
+                List<EntityColumn> pk = entity.getPrimariesKeys();
+                if(pk.size() == 1)
+                    pk.get(0).setValue(insert);
+
+                return entity;
+            }else
+                return null;
+        }
+        return null;
+    }*/
+
+    //TODO: change the Deprecated Method
+    public synchronized Entity save(Entity entity){
+        if(entity != null){
+            long insert = write().insert(entity.getName(), null, entity.getContentValues());
+            write().close();
+            //Log.e("Save", "" + insert);
+            if(insert > 0) {
+                //entity.getColumnValueList().put(entity.getPrimaryKey(),insert);
+                List<EntityColumn> pk = entity.getPrimariesKeys();
+                if(pk.size() == 1)
+                    pk.get(0).setValue(insert);
                 return entity;
             }else
                 return null;

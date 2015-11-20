@@ -21,20 +21,27 @@ import com.cac.sam.MainActivity;
 import com.cac.sam.R;
 import com.cac.tools.MainComponentEdit;
 import com.cac.tools.MyOnFocusListenerFactory;
+import com.cac.tools.OnKeyListenerRefactory;
 import com.delacrmi.persistences.Entity;
 import com.delacrmi.persistences.EntityManager;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
  * Created by Legal on 04/10/2015.
  */
-public class CuttingParametersFragment extends Fragment implements MainComponentEdit<FloatingActionButton[]>{
+public class CuttingParametersFragment extends Fragment implements MainComponentEdit<View[]>{
 
     private View view;
     private EditText fteCorte, fteAlce, finca, canial, lote, txtDescFteCorte, txtDescFteAlce, txtDescFinca, txtDescCanial, txtDescLote;
     private static CuttingParametersFragment ourInstance = null;
     private MainActivity context;
     private RelativeLayout layout;
+
+    private EntityManager entityManager;
 
     public CuttingParametersFragment() {}
 
@@ -58,11 +65,12 @@ public class CuttingParametersFragment extends Fragment implements MainComponent
         return lote;
     }
 
-    public static CuttingParametersFragment init(MainActivity context) {
+    public static CuttingParametersFragment init(MainActivity context,EntityManager entityManager) {
         try {
             if (ourInstance == null) {
                 ourInstance = new CuttingParametersFragment();
                 ourInstance.context = context;
+                ourInstance.entityManager = entityManager;
             }
             return ourInstance;
         } catch (Exception e) {
@@ -83,21 +91,23 @@ public class CuttingParametersFragment extends Fragment implements MainComponent
 
 
     @Override
-    public void mainViewConfig(FloatingActionButton[] buttons) {
+    public void mainViewConfig(View[] views) {
 
-        buttons[0].setImageResource(R.drawable.siguiente);
-        buttons[0].setVisibility(View.VISIBLE);
-        buttons[0].setOnClickListener(new View.OnClickListener() {
+        views[0].getLayoutParams().height = MainActivity.VISIBLE_ACTION;
+
+        ((FloatingActionButton)views[1]).setImageResource(R.drawable.siguiente);
+        views[1].setVisibility(View.VISIBLE);
+        views[1].setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //if(validateForm())
+                if (validateForm())
                     ourInstance.context.startTransactionByTagFragment(
                             ourInstance.context.getCutterWorkFragment().getTAG()
-                );
+                    );
             }
         });
 
-        buttons[1].setVisibility(View.INVISIBLE);
+        views[2].setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -130,8 +140,14 @@ public class CuttingParametersFragment extends Fragment implements MainComponent
     }
 
     private void initMetodos() {
+
         fteCorte.setOnFocusChangeListener((new MyOnFocusListenerFactory(txtDescFteCorte,
                 ourInstance.context.getEntityManager(), Frentes.class, Frentes.DESCRIPCION, Frentes.ID_FRENTE)).setTitle("Frente"));
+        fteCorte.setOnKeyListener(
+                new OnKeyListenerRefactory(
+                        getInformation(
+                                Frentes.class,Frentes.ID_FRENTE+" key, "+Frentes.DESCRIPCION+" value"),
+                        txtDescFteCorte));
 
         fteAlce.setOnFocusChangeListener((new MyOnFocusListenerFactory(txtDescFteAlce,
                 ourInstance.context.getEntityManager(), Frentes.class,Frentes.DESCRIPCION,Frentes.ID_FRENTE)).setTitle("Frente"));
@@ -186,6 +202,20 @@ public class CuttingParametersFragment extends Fragment implements MainComponent
                 }
             }
         });
+    }
+
+    private Map<String,String> getInformation(Class entityName,String columns){
+
+        Map<String,String> values = new HashMap<String,String>();
+
+        List<Entity> entities = ourInstance.entityManager.find(entityName,columns,null,null);
+        for(Entity entity: entities){
+           values.put(entity.getColumnsFromSelect().getAsString("key"),
+                   entity.getColumnsFromSelect().getAsString("value"));
+        }
+
+        return values;
+
     }
 
     public boolean validateForm() {

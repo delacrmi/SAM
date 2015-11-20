@@ -2,7 +2,6 @@ package com.delacrmi.persistences;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -15,6 +14,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by miguel on 09/10/15.
@@ -29,7 +29,7 @@ public abstract class Entity implements Serializable{
     private ContentValues columnList = new ContentValues();
     private List<EntityColumn> columns = new ArrayList<EntityColumn>();
     private Map<String,Integer> hashcolumns = new HashMap<String,Integer>();
-    private ContentValues newColumnsOnSelected = new ContentValues();
+    private ContentValues newColumnsOnSelect = new ContentValues();
     private ContentValues columnValueList = new ContentValues();
     private boolean synchronizable = false;
     private EntityFilter entityFilter;
@@ -79,15 +79,28 @@ public abstract class Entity implements Serializable{
 
     public void setPrimaryKey(String columnName){
         if(!columnName.equals("") || !columnName.equals(" ")) {
+
+            columnList.remove(getName() + "_id");
+            columns.remove(hashcolumns.get(pk));
             pk = columnName;
-            columnList.remove(getName()+"_id");
             columnList.put(pk, "integer");
-            addColumn(new EntityColumn<Integer>(columnName, EntityColumn.ColumnType.INTEGER,true,true));
+            addColumn(new EntityColumn<Long>(columnName, EntityColumn.ColumnType.NUMERIC,true,true));
+
         }
     }
-
+    @Deprecated
     public  String getPrimaryKey(){
         return pk;
+    }
+
+    public List<EntityColumn> getPrimariesKeys(){
+
+        List<EntityColumn> list = new ArrayList<EntityColumn>();
+        for(EntityColumn column : columns)
+            if(column.isPrimaryKey())
+                list.add(column);
+
+        return  list;
     }
 
     public void setDefault(String columnName,String value,String type){
@@ -122,8 +135,16 @@ public abstract class Entity implements Serializable{
         hashcolumns.put(column.getName(), columns.size() - 1);
     }
 
-    public void addColumns(ContentValues columns){
-        columnList = columns;
+    public void addColumns(ContentValues contentValues){
+        columnList = contentValues;
+
+        Map.Entry me;
+        Iterator i = contentValues.valueSet().iterator();
+        while (i.hasNext()){
+            me = (Map.Entry)i.next();
+            if(hashcolumns.containsKey(me.getKey().toString()))
+            getColumn(me.getKey().toString()).setValue(me.getValue());
+        }
     }
 
     public ContentValues getColumns(){
@@ -132,35 +153,7 @@ public abstract class Entity implements Serializable{
 
     public String getColumnsNameAsString(boolean primaryKey){
         int count = 1;
-        /*Map.Entry me;*/
         String columns = "";
-
-        //getting the iterator columns to get the key values
-        /*Iterator iteratorColumns = iterator();
-        while (iteratorColumns.hasNext()){
-            me = (Map.Entry)iteratorColumns.next();
-
-            if(!getPrimaryKey().equals(me.getKey().toString())) {
-
-                columns += me.getKey();
-
-                if(count < getColumnsCount()-1){
-                    columns += ",";
-                    count++;
-                }
-
-            }else if(primaryKey) {
-
-                columns += getPrimaryKey();
-
-                if(count < getColumnsCount()-1){
-                    columns += ",";
-                    count++;
-                }
-
-            }
-
-        }*/
 
         for (EntityColumn column: this.columns){
             if(!column.isPrimaryKey()){
@@ -212,10 +205,14 @@ public abstract class Entity implements Serializable{
     public JSONArray getColumnstoJSONArray(){
         JSONArray array = new JSONArray();
 
-        Iterator iterator = iterator();
+        Set<String> sets = hashcolumns.keySet();
+        for(String set: sets)
+            array.put(set);
+
+        /*Iterator iterator = iterator();
         while (iterator.hasNext()){
             array.put(((Map.Entry)iterator.next()).getKey());
-        }
+        }*/
 
         return array;
     }
@@ -238,8 +235,9 @@ public abstract class Entity implements Serializable{
     public Entity setName(String entityName){
         this.entityName = entityName;
         if(pk.equals("")){
-            this.pk = entityName+"_id";
+            pk = entityName+"_id";
             columnList.put(pk,"integer");
+            addColumn(new EntityColumn<Long>(pk, EntityColumn.ColumnType.NUMERIC, true, true));
         }
         return this;
     }
@@ -280,11 +278,11 @@ public abstract class Entity implements Serializable{
             addValuesByType(columns.get(hashcolumns.get(column)), value);
         }
         else
-            addValuesByType(newColumnsOnSelected,column,value,value.getClass().getSimpleName().toLowerCase());
+            addValuesByType(newColumnsOnSelect,column,value,value.getClass().getSimpleName().toLowerCase());
     }
 
-    public ContentValues getColumnsFromSelected(){
-        return newColumnsOnSelected;
+    public ContentValues getColumnsFromSelect(){
+        return newColumnsOnSelect;
     }
 
     private void addValuesByType(ContentValues content,String name,Object value,String type) {
@@ -323,6 +321,15 @@ public abstract class Entity implements Serializable{
                 }
             else
                 content.put(name,(Long)value);
+        }else if(type.equals("long")){
+            if(!value.getClass().getSimpleName().equals(type))
+                try{
+                    content.put(name,Long.parseLong((String) value));
+                }catch (ClassCastException e){
+                    content.put(name,(Long)value);
+                }
+            else
+                content.put(name,(Long)value);
         }
     }
 
@@ -352,7 +359,12 @@ public abstract class Entity implements Serializable{
         }else if (content.getType() == EntityColumn.ColumnType.DATE) {
             Date d = new Date(Long.parseLong(value+""));
             content.setValue(d);
-        }
+        }else
+            if(!value.getClass().getSimpleName().toLowerCase()
+                    .equals(content.getType().toString().toLowerCase()))
+                content.setValue(Double.parseDouble((String) value));
+            else
+                content.setValue((Integer) value);
     }
 
     public EntityColumn getColumn(String index) {

@@ -17,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.cac.sam.MainActivity;
 import com.cac.sam.R;
 import com.cac.tools.MainComponentEdit;
 import com.cac.tools.SyncAdapter;
@@ -44,7 +45,7 @@ import io.socket.client.IO;
 /**
  * Created by miguel on 19/10/15.
  */
-public class SyncFragment extends Fragment implements MainComponentEdit<FloatingActionButton[]> {
+public class SyncFragment extends Fragment implements MainComponentEdit<View[]> {
 
     public static final String TAG = "SyncFragment";
     private static SyncFragment ourInstance = null;
@@ -126,17 +127,20 @@ public class SyncFragment extends Fragment implements MainComponentEdit<Floating
     }
 
     @Override
-    public void mainViewConfig(FloatingActionButton[] buttons) {
-        buttons[0].setImageResource(R.drawable.actualizar);
-        buttons[0].setVisibility(View.VISIBLE);
-        buttons[0].setOnClickListener(new View.OnClickListener() {
+    public void mainViewConfig(View[] views) {
+
+        views[0].getLayoutParams().height = MainActivity.VISIBLE_ACTION;
+
+        ((FloatingActionButton)views[1]).setImageResource(R.drawable.actualizar);
+        views[1].setVisibility(View.VISIBLE);
+        views[1].setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ourInstance.syncAllTables();
             }
         });
 
-        buttons[1].setVisibility(View.INVISIBLE);
+        views[2].setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -481,7 +485,7 @@ public class SyncFragment extends Fragment implements MainComponentEdit<Floating
                     }
 
                     Entity ent = entityManager.save(className, columns);
-                    if(ent.getColumnValueList().getAsInteger(ent.getPrimaryKey()) > 0)
+                    if(((Long)ent.getPrimariesKeys().get(0).getValue()) > 0)
                         publishProgress(((int)((double)index/rows.length()*100)));
                 }
 
@@ -528,7 +532,6 @@ public class SyncFragment extends Fragment implements MainComponentEdit<Floating
 
         @Override
         protected void onPreExecute() {
-
             persistenceItem = ourInstance.list.get(position);
             persistenceItem.add(2, String.valueOf(0));
         }

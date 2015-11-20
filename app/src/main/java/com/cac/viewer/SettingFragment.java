@@ -3,8 +3,6 @@ package com.cac.viewer;
 import android.content.Context;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import com.cac.sam.R;
@@ -13,7 +11,7 @@ import com.cac.tools.MainComponentEdit;
 /**
  * Created by miguel on 03/11/15.
  */
-public class SettingFragment extends PreferenceFragment implements MainComponentEdit<FloatingActionButton[]> {
+public class SettingFragment extends PreferenceFragment implements MainComponentEdit<View[]> {
 
     private static SettingFragment ourInstance;
 
@@ -31,9 +29,10 @@ public class SettingFragment extends PreferenceFragment implements MainComponent
     }
 
     @Override
-    public void mainViewConfig(FloatingActionButton[] buttons) {
-        buttons[0].setVisibility(View.INVISIBLE);
-        buttons[1].setVisibility(View.INVISIBLE);
+    public void mainViewConfig(View[] views) {
+        views[0].getLayoutParams().height = 0;
+        views[1].setVisibility(View.INVISIBLE);
+        views[2].setVisibility(View.INVISIBLE);
     }
 
     @Override

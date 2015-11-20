@@ -2,6 +2,7 @@ package com.cac.tools;
 
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -67,6 +68,7 @@ public class WorkDetailsAdapter extends RecyclerView.Adapter<ViewWorkHolder> {
 
     @Override
     public ViewWorkHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        Log.d("view",""+viewType);
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.cutter_details_view,null);
         ViewWorkHolder vwh = new ViewWorkHolder(v);
         return vwh;
