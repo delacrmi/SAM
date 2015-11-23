@@ -11,14 +11,43 @@ import java.util.Map;
  * Created by miguel on 20/11/15.
  */
 public class OnKeyListenerRefactory implements View.OnKeyListener {
-    Map<String,String> values;
-    View target;
+
+    private boolean onKeyBoolean;
+    private String message = "Valor Incorrecto";
+    private Map<String,String> values;
+    private View target;
+
+    public OnKeyListenerRefactory(View target){
+        this.target = target;
+    }
+
     public OnKeyListenerRefactory(Map<String,String> values,View target){
         this.values = values;
         this.target = target;
     }
+
+    public OnKeyListenerRefactory(Map<String,String> values,View target,String message){
+        this.values = values;
+        this.target = target;
+        this.message = message;
+    }
+
+    public void setMapValues(Map<String,String> values){
+        this.values = values;
+    }
+
+    public boolean getOnkeyBoolean(){
+        return onKeyBoolean;
+    }
+
+    public void beforeOnkeyValidate(){}
+    public void afterOnKeyValidate(){}
+
     @Override
     public boolean onKey(View v, int keyCode, KeyEvent event) {
+        onKeyBoolean = false;
+        beforeOnkeyValidate();
+
         if(keyCode == 66){
             EditText view = (EditText)v;
 
@@ -27,11 +56,14 @@ public class OnKeyListenerRefactory implements View.OnKeyListener {
                     ((TextView)target).setText(values.get(view.getText().toString()));
             }else{
                 ((TextView)target).setText("");
-                view.setError("Valor Incorrecto");
-                return true;
+                view.setError(message);
+                onKeyBoolean = true;
             }
 
         }
-        return false;
+
+        afterOnKeyValidate();
+        return onKeyBoolean;
     }
+
 }

@@ -146,14 +146,26 @@ public class CuttingParametersFragment extends Fragment implements MainComponent
         fteCorte.setOnKeyListener(
                 new OnKeyListenerRefactory(
                         getInformation(
-                                Frentes.class,Frentes.ID_FRENTE+" key, "+Frentes.DESCRIPCION+" value"),
-                        txtDescFteCorte));
+                                Frentes.class, Frentes.ID_FRENTE + " key, " + Frentes.DESCRIPCION + " value",
+                                null, null), txtDescFteCorte));
 
         fteAlce.setOnFocusChangeListener((new MyOnFocusListenerFactory(txtDescFteAlce,
-                ourInstance.context.getEntityManager(), Frentes.class,Frentes.DESCRIPCION,Frentes.ID_FRENTE)).setTitle("Frente"));
+                ourInstance.context.getEntityManager(), Frentes.class, Frentes.DESCRIPCION, Frentes.ID_FRENTE)).setTitle("Frente"));
+        fteAlce.setOnKeyListener(
+                new OnKeyListenerRefactory(
+                        getInformation(
+                                Frentes.class, Frentes.ID_FRENTE + " key, " + Frentes.DESCRIPCION + " value",
+                                null, null), txtDescFteAlce));
+
 
         finca.setOnFocusChangeListener((new MyOnFocusListenerFactory(txtDescFinca,
-                ourInstance.context.getEntityManager(),Fincas.class,Fincas.DESCRIPCION,Fincas.ID_FINCA)).setTitle("Finca"));
+                ourInstance.context.getEntityManager(), Fincas.class, Fincas.DESCRIPCION, Fincas.ID_FINCA)).setTitle("Finca"));
+        finca.setOnKeyListener(
+                new OnKeyListenerRefactory(
+                        getInformation(
+                                Fincas.class, Fincas.ID_FINCA + " key, " + Fincas.DESCRIPCION + " value",
+                                null, null), txtDescFinca));
+
 
         canial.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -161,23 +173,32 @@ public class CuttingParametersFragment extends Fragment implements MainComponent
                 EditText field = (EditText) v;
                 EntityManager entityManager = ourInstance.context.getEntityManager();
                 if (!hasFocus) {
-                    if ( field.getText().toString().trim().equals("") || field.getText().toString().trim().length() == 0 || field.getText().toString().trim().isEmpty() ) {
-                        field.setError("El campo "+field.getHint()+" es Requerido.");
+                    if (field.getText().toString().trim().equals("") || field.getText().toString().trim().length() == 0 || field.getText().toString().trim().isEmpty()) {
+                        field.setError("El campo " + field.getHint() + " es Requerido.");
                     }
-                    if ( ourInstance.context.getEntityManager() != null ){
+                    if (ourInstance.context.getEntityManager() != null) {
                         Entity result = entityManager.findOnce(Caniales.class, "*",
-                                Caniales.ID_FINCA+" = ? and "+ Caniales.ID_CANIAL+" = ? ",
+                                Caniales.ID_FINCA + " = ? and " + Caniales.ID_CANIAL + " = ? ",
                                 new String[]{finca.getText().toString(), canial.getText().toString()});
-                        if ( result != null &&  result.getColumnValueList().size() > 0){
+                        if (result != null && result.getColumnValueList().size() > 0) {
                             txtDescCanial.setText(result.getColumnValueList().getAsString(Caniales.DESCRIPCION));
                         } else {
                             txtDescCanial.setText("");
-                            field.setError("El "+field.getHint()+" no se encuentra registrado en la base de datos.");
+                            field.setError("El " + field.getHint() + " no se encuentra registrado en la base de datos.");
                         }
                     }
                 }
             }
         });
+        canial.setOnKeyListener(new OnKeyListenerRefactory(txtDescCanial){
+            @Override
+            public void beforeOnkeyValidate() {
+                setMapValues(getInformation(
+                    Fincas.class, Fincas.ID_FINCA + " key, " + Fincas.DESCRIPCION + " value",
+                    Caniales.ID_FINCA + " = ? ",new String[]{finca.getText().toString()}));
+            }
+        });
+
 
         lote.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -185,30 +206,39 @@ public class CuttingParametersFragment extends Fragment implements MainComponent
                 EditText field = (EditText) v;
                 EntityManager entityManager = ourInstance.context.getEntityManager();
                 if (!hasFocus) {
-                    if ( field.getText().toString().trim().equals("") || field.getText().toString().trim().length() == 0 || field.getText().toString().trim().isEmpty() ) {
-                        field.setError("El campo "+field.getHint()+" es Requerido.");
+                    if (field.getText().toString().trim().equals("") || field.getText().toString().trim().length() == 0 || field.getText().toString().trim().isEmpty()) {
+                        field.setError("El campo " + field.getHint() + " es Requerido.");
                     }
-                    if ( ourInstance.context.getEntityManager() != null ){
+                    if (ourInstance.context.getEntityManager() != null) {
                         Entity result = entityManager.findOnce(Lotes.class, "*",
-                                Lotes.ID_FINCA+" = ? and "+ Lotes.ID_CANIAL+" = ? and "+Lotes.ID_LOTE+" = ?",
+                                Lotes.ID_FINCA + " = ? and " + Lotes.ID_CANIAL + " = ? and " + Lotes.ID_LOTE + " = ?",
                                 new String[]{finca.getText().toString(), canial.getText().toString(), lote.getText().toString()});
-                        if ( result != null &&  result.getColumnValueList().size() > 0){
+                        if (result != null && result.getColumnValueList().size() > 0) {
                             txtDescLote.setText(result.getColumnValueList().getAsString(Lotes.DESCRIPCION));
                         } else {
                             txtDescLote.setText("");
-                            field.setError("El "+field.getHint()+" no se encuentra registrado en la base de datos.");
+                            field.setError("El " + field.getHint() + " no se encuentra registrado en la base de datos.");
                         }
                     }
                 }
             }
         });
+        lote.setOnKeyListener(new OnKeyListenerRefactory(txtDescLote){
+            @Override
+            public void beforeOnkeyValidate() {
+                setMapValues(getInformation(
+                    Lotes.class, Lotes.ID_LOTE + " key, " + Lotes.DESCRIPCION + " value",
+                    Lotes.ID_FINCA + " = ? and " + Lotes.ID_CANIAL + " = ? ",
+                    new String[]{finca.getText().toString(), canial.getText().toString()}));
+            }
+        });
     }
 
-    private Map<String,String> getInformation(Class entityName,String columns){
+    private Map<String,String> getInformation(Class entityName,String columns,String where, String[] whereValues){
 
         Map<String,String> values = new HashMap<String,String>();
 
-        List<Entity> entities = ourInstance.entityManager.find(entityName,columns,null,null);
+        List<Entity> entities = ourInstance.entityManager.find(entityName,columns,where,whereValues);
         for(Entity entity: entities){
            values.put(entity.getColumnsFromSelect().getAsString("key"),
                    entity.getColumnsFromSelect().getAsString("value"));
