@@ -1,10 +1,6 @@
 package com.cac.entities;
 
 import android.content.Context;
-import android.content.res.Resources;
-
-import com.cac.sam.MainActivity;
-import com.cac.sam.R;
 import com.delacrmi.persistences.Entity;
 import com.delacrmi.persistences.EntityColumn;
 
@@ -29,6 +25,7 @@ public class Transaccion extends Entity {
     public static String CORTADOR = "codigo_cortador";
     public static String UNADA = "unada";
     public static String PESO = "peso";
+    public static String LINEA = "linea";
 
     @Override
     public Transaccion entityConfig() {
@@ -42,6 +39,7 @@ public class Transaccion extends Entity {
         addColumn(FECHA_CORTE, EntityColumn.ColumnType.DATE);
         addColumn(CODIGO_TRACTOR, EntityColumn.ColumnType.TEXT);
         addColumn(INDICADOR, EntityColumn.ColumnType.TEXT);
+        addColumn(LINEA, EntityColumn.ColumnType.INTEGER);
         addColumn(new EntityColumn<Integer>(CORTADOR, EntityColumn.ColumnType.INTEGER).setNotNullable());
         addColumn(new EntityColumn<Integer>(UNADA, EntityColumn.ColumnType.INTEGER).setNotNullable());
         addColumn(new EntityColumn<Double>(PESO, EntityColumn.ColumnType.REAL).setNotNullable());

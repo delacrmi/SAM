@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto">
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/card_cutter_insert"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        card_view:cardBackgroundColor="@color/color_light"
+        card_view:cardUseCompatPadding="true"
+        card_view:cardElevation="3dp"
+        card_view:cardCornerRadius="5dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp">
+
+
+            <GridLayout android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:orientation="horizontal"
+                android:columnCount="1"
+                android:id="@+id/gridLayout">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@android:color/black"
+                    android:textSize="18dp"
+                    android:text="No. Tickect: 01"
+                    android:id="@+id/cutterCardViewTxtNoTicket"
+                    android:layout_above="@+id/gridLayout"/>
+
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="18dp"
+                    android:text="Fecha : 01/01/2015"
+                    android:textColor="@android:color/black"
+                    android:id="@+id/cutterCardViewTxtDate"/>
+
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="18dp"
+                    android:text="Cortador: 20834 - Armando Torres"
+                    android:textColor="@android:color/black"
+                    android:id="@+id/cutterCardViewTxtCortador"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18dp"
+                    android:text="Finca : 01 - Santana"
+                    android:textColor="@android:color/black"
+                    android:id="@+id/cutterCardViewTxtFinca"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18dp"
+                    android:text="Canial : 101 - Santana"
+                    android:textColor="@android:color/black"
+                    android:id="@+id/cutterCardViewTxtCanial"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18dp"
+                    android:text="Lote : 01 - Santana"
+                    android:textColor="@android:color/black"
+                    android:id="@+id/cutterCardViewTxtLote"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18dp"
+                    android:text="Linea : 1"
+                    android:textColor="@android:color/black"
+                    android:id="@+id/cutterCardViewTxtLinea"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18dp"
+                    android:text="Total Uñada: 5"
+                    android:textColor="@android:color/black"
+                    android:id="@+id/cutterCardViewTxtUnadas" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18dp"
+                    android:text="Total peso : 350.25 "
+                    android:textColor="@android:color/black"
+                    android:id="@+id/cutterCardViewTxtPeso"/>
+
+                <ImageButton
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/cutterCardViewBtnPrint"
+                    android:background="@drawable/hover_button"
+                    android:src="@drawable/print" />
+
+            </GridLayout>
+
+        </RelativeLayout>
+    </android.support.v7.widget.CardView>
+</LinearLayout>

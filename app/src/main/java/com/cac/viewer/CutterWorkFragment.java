@@ -22,6 +22,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -198,11 +199,11 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
 
         views[0].getLayoutParams().height = MainActivity.VISIBLE_ACTION;
 
-        ((FloatingActionButton)views[1]).setImageResource(R.drawable.grabar);
+        ((ImageButton)views[1]).setImageResource(R.drawable.grabar);
         views[1].setOnClickListener(onClickListener);
         views[1].setVisibility(View.VISIBLE);
 
-        ((FloatingActionButton)views[2]).setImageResource(R.drawable.anterior);
+        ((ImageButton)views[2]).setImageResource(R.drawable.anterior);
         views[2].setOnClickListener(onClickListener);
         views[2].setVisibility(View.VISIBLE);
 

@@ -39,17 +39,15 @@
         android:key="data_base_parameter"
         android:title="@string/data_base_parameter_title">
 
-        <ListPreference android:title="Empresa"
-            android:key="emprsa"
-            android:defaultValue="30"
-            android:entries="@array/empresas"
-            android:entryValues="@array/empresas_valor"/>
+        <com.cac.tools.MyCustomPreferencesEmpresas
+            android:title="Empresa"
+            android:key="EMPRESA"
+            android:defaultValue="30"/>
 
-        <ListPreference android:title="Periodo"
-            android:key="periodo"
-            android:defaultValue="20"
-            android:entries="@array/periodos"
-            android:entryValues="@array/periodo_valor"/>
+        <com.cac.tools.MyCustomPreferencesPeriodos
+            android:title="Periodo"
+            android:key="PERIODO"
+            android:defaultValue="20"/>
 
     </PreferenceCategory>
 </PreferenceScreen>
