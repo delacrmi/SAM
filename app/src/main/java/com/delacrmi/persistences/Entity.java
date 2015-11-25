@@ -164,13 +164,13 @@ public abstract class Entity implements Serializable{
         for (EntityColumn column: this.columns){
             if(!column.isPrimaryKey()){
                 columns += column.getName();
-                if(count < this.columns.size()-1){
+                if(count < this.columns.size()){
                     columns += ",";
                     count++;
                 }
             }else if(primaryKey){
                 columns += column.getName();
-                if(count < this.columns.size()-1){
+                if(count < this.columns.size()){
                     columns += ",";
                     count++;
                 }

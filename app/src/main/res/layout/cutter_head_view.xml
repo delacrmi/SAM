@@ -72,7 +72,7 @@
                 android:layout_below="@id/et_line_insert"
                 />
             <AutoCompleteTextView
-                android:id="@+id/atv_cutter_insert"
+                android:id="@+id/aut_cutter_insert"
                 android:layout_width="85dp"
                 android:layout_height="wrap_content"
                 android:inputType="number"
@@ -90,7 +90,7 @@
                 android:textStyle="bold"
                 android:textColor="@color/color_accent"
                 android:layout_below="@+id/et_line_insert"
-                android:layout_toRightOf="@+id/atv_cutter_insert"
+                android:layout_toRightOf="@+id/aut_cutter_insert"
                 android:layout_marginTop="15dp"
                 android:layout_marginLeft="5dp"
                 android:layout_marginBottom="3dp"/>
