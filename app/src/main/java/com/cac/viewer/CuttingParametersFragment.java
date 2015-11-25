@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -95,7 +96,7 @@ public class CuttingParametersFragment extends Fragment implements MainComponent
 
         views[0].getLayoutParams().height = MainActivity.VISIBLE_ACTION;
 
-        ((FloatingActionButton)views[1]).setImageResource(R.drawable.siguiente);
+        ((ImageButton)views[1]).setImageResource(R.drawable.siguiente);
         views[1].setVisibility(View.VISIBLE);
         views[1].setOnClickListener(new View.OnClickListener() {
             @Override

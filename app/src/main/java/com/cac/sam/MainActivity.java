@@ -6,9 +6,7 @@ import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.preference.PreferenceManager;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -16,28 +14,19 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.GridLayout;
+import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 
-import com.cac.entities.Caniales;
-import com.cac.entities.Empleados;
-import com.cac.entities.Empresas;
-import com.cac.entities.Fincas;
-import com.cac.entities.Frentes;
-import com.cac.entities.Lotes;
-import com.cac.entities.Periodos;
-import com.cac.entities.Rangos;
-import com.cac.entities.SubGrupoVehiculos;
-import com.cac.entities.Transaccion;
-import com.cac.entities.TransactionDetails;
-import com.cac.entities.Vehiculos;
+import com.cac.entities.*;
 import com.cac.services.SyncServerService;
 import com.cac.tools.MainComponentEdit;
 import com.cac.tools.ServerStarter;
+import com.cac.viewer.CutterReportFragment;
 import com.cac.viewer.CutterWorkFragment;
 import com.cac.viewer.CuttingParametersFragment;
 import com.cac.viewer.MainFragment;
@@ -59,10 +48,10 @@ public class MainActivity extends AppCompatActivity {
     private NavigationView navigationView;
 
     private RelativeLayout mainRelativeLayout;
-    public static int VISIBLE_ACTION = 180;
+    public static int VISIBLE_ACTION = GridLayout.LayoutParams.WRAP_CONTENT;
 
-    private FloatingActionButton btn_fab_right;
-    private FloatingActionButton btn_fab_left;
+    private ImageButton btn_fab_right;
+    private ImageButton btn_fab_left;
 
     //Fragments
     private MainFragment mainFragment;
@@ -70,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
     private SettingFragment settingFragment;
     private CuttingParametersFragment cuttingParametersFragment;
     private CutterWorkFragment cutterWorkFragment;
+    private CutterReportFragment cutterReportFragment;
 
     //Events References
     private OnClickListener onClickListener;
@@ -170,7 +160,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onDrawerOpened(View drawerView) {
                 // Code here will be triggered once the drawer open as we dont want anything to happen so we leave this blank
-
                 super.onDrawerOpened(drawerView);
             }
         };
@@ -181,8 +170,8 @@ public class MainActivity extends AppCompatActivity {
         navigationView = (NavigationView)findViewById(R.id.nav_view);
         setDrawerMenu();
 
-        btn_fab_right = (FloatingActionButton)findViewById(R.id.btn_fab_right);
-        btn_fab_left = (FloatingActionButton)findViewById(R.id.btn_fab_left);
+        btn_fab_right = (ImageButton)findViewById(R.id.btn_fab_right);
+        btn_fab_left  = (ImageButton)findViewById(R.id.btn_fab_left);
 
         //init fist main fragment
         frm = getFragmentManager();
@@ -210,14 +199,12 @@ public class MainActivity extends AppCompatActivity {
      * This method is the responsible to change the dynamics fragments
      */
     private void startTransaction(Fragment fragment){
-
         FragmentTransaction frt = frm.beginTransaction();
         frt.replace(R.id.main_body_layout, fragment, ACTUALFRAGMENT);
         frt.commit();
         ((MainComponentEdit) fragment).
                 mainViewConfig(new View[]{mainRelativeLayout,btn_fab_right, btn_fab_left});
         getSupportActionBar().setSubtitle(((MainComponentEdit) fragment).getSubTitle());
-
     }
 
     public void startTransactionByTagFragment(String tag){
@@ -237,8 +224,10 @@ public class MainActivity extends AppCompatActivity {
             case "CutterWorkFragment":
                 actualFragment = getCutterWorkFragment();
                 break;
+            case CutterReportFragment.TAG:
+                actualFragment = getCutterReportFragment();
+                break;
         }
-
         ((MainComponentEdit)actualFragment).setContext(this);
         startTransaction(actualFragment);
     }
@@ -263,8 +252,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public CuttingParametersFragment getCuttingParametersFragment() {
-        if(cuttingParametersFragment == null)
-            cuttingParametersFragment = cuttingParametersFragment.init(this,getEntityManager());
+        if ( cuttingParametersFragment == null )
+            cuttingParametersFragment = cuttingParametersFragment.init(this, getEntityManager());
         return cuttingParametersFragment;
     }
 
@@ -273,6 +262,13 @@ public class MainActivity extends AppCompatActivity {
             cutterWorkFragment = CutterWorkFragment.init(this,entityManager);
         return cutterWorkFragment;
     }
+
+    public CutterReportFragment getCutterReportFragment(){
+        if ( cutterReportFragment == null )
+            cutterReportFragment = CutterReportFragment.init(this);
+        return cutterReportFragment;
+    }
+
 
     /**
      * @args
@@ -296,8 +292,10 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.fingering_work:
                         startTransactionByTagFragment(getCuttingParametersFragment().getTAG());
                         break;
+                    case R.id.cutter_report:
+                        startTransactionByTagFragment(CutterReportFragment.TAG);
+                        break;
                 }
-
                 drawerLayout.closeDrawers();
                 return true;
             }

@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 
 import com.cac.sam.MainActivity;
 import com.cac.sam.R;
@@ -131,7 +132,7 @@ public class SyncFragment extends Fragment implements MainComponentEdit<View[]> 
 
         views[0].getLayoutParams().height = MainActivity.VISIBLE_ACTION;
 
-        ((FloatingActionButton)views[1]).setImageResource(R.drawable.actualizar);
+        ((ImageButton)views[1]).setImageResource(R.drawable.actualizar);
         views[1].setVisibility(View.VISIBLE);
         views[1].setOnClickListener(new View.OnClickListener() {
             @Override
