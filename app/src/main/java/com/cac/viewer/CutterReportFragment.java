@@ -30,7 +30,6 @@ import com.cac.tools.MyDialogDateListenerFactory;
 import com.cac.tools.TransaccionAdapter;
 import com.delacrmi.persistences.*;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;

@@ -2,6 +2,7 @@ package com.delacrmi.persistences;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -142,8 +143,13 @@ public abstract class Entity implements Serializable{
         Iterator i = contentValues.valueSet().iterator();
         while (i.hasNext()){
             me = (Map.Entry)i.next();
-            if(hashcolumns.containsKey(me.getKey().toString()))
-            getColumn(me.getKey().toString()).setValue(me.getValue());
+            if(hashcolumns.containsKey(me.getKey().toString())) {
+                EntityColumn column = getColumn(me.getKey().toString());
+                if(column.getType() == EntityColumn.ColumnType.DATE)
+                    column.setValue(new Date(Long.parseLong(me.getValue().toString())));
+                else
+                    column.setValue(me.getValue());
+            }
         }
     }
 
