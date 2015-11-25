@@ -14,7 +14,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
@@ -22,16 +21,20 @@ import android.widget.Toast;
 import com.atorres.AndroidUtils;
 import com.atorres.bluetoothprinter.BluetoothPrinterManager;
 import com.atorres.bluetoothprinter.PrinterObjectFormat;
+import com.cac.entities.*;
 import com.cac.sam.MainActivity;
 import com.cac.sam.R;
 import com.cac.tools.CutterReportCardHolder;
 import com.cac.tools.MainComponentEdit;
 import com.cac.tools.MyDialogDateListenerFactory;
 import com.cac.tools.TransaccionAdapter;
-import com.delacrmi.persistences.EntityManager;
+import com.delacrmi.persistences.*;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -82,7 +85,7 @@ public class CutterReportFragment extends Fragment implements MainComponentEdit<
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if (hasFocus) {
-                    DatePickerDialog datePicker = new DatePickerDialog(getActivity(),R.style.AppTheme,new MyDialogDateListenerFactory(editFiltroPorFecha),
+                    DatePickerDialog datePicker = new DatePickerDialog(getActivity(), R.style.AppTheme, new MyDialogDateListenerFactory(editFiltroPorFecha),
                             Calendar.getInstance().get(Calendar.YEAR),
                             Calendar.getInstance().get(Calendar.MONTH),
                             Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
@@ -91,16 +94,30 @@ public class CutterReportFragment extends Fragment implements MainComponentEdit<
             }
         });
 
+        TransaccionAdapter adapter = new TransaccionAdapter(ourInstance.context,findTransacciones());
+        listOfCutters.setAdapter(adapter);
+        btnFiltrarRegistros.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                filtrarPorFecha(editFiltroPorFecha.getText().toString());
+            }
+        });
+    }
+
+    private List<CutterReportCardHolder> findTransacciones() {
         EntityManager entityManager = ourInstance.context.getEntityManager();
-        /*
+        List<CutterReportCardHolder> informationList = new ArrayList<>();
         for ( Entity entity :  entityManager.find(Transaccion.class, "*", null, null) ) {
 
-
             CutterReportCardHolder data = new CutterReportCardHolder();
+            data.setTotalUnada(entity.getColumnValueList().getAsString(Transaccion.UNADA));
+            data.setTotalPeso(entity.getColumnValueList().getAsString(Transaccion.PESO));
+            data.setLinea(entity.getColumnValueList().getAsString(Transaccion.LINEA));
 
-            data.setTotalUnada(entity.getColumnValueList().getAsInteger(Transaccion.UNADA));
-            data.setTotalPeso(entity.getColumnValueList().getAsDouble(Transaccion.PESO));
-            data.setLinea(entity.getColumnValueList().getAsInteger(Transaccion.LINEA));
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
+            String fecha = dateFormat.format((Date)entity.getColumn(Transaccion.FECHA_CORTE).getValue());
+            data.setFecha(fecha);
 
             String finca = entityManager.findOnce(Fincas.class,
                                    Fincas.ID_FINCA+"||' - '||"+Fincas.DESCRIPCION + " "+ Fincas.DESCRIPCION,
@@ -131,19 +148,19 @@ public class CutterReportFragment extends Fragment implements MainComponentEdit<
                     .getColumnValueList().getAsString(Fincas.DESCRIPCION);
             data.setIdLote(lote);
 
-            informationList.add(data);
-        }*/
-        TransaccionAdapter adapter = new TransaccionAdapter(ourInstance.context,findTransacciones());
-        listOfCutters.setAdapter(adapter);
-        btnFiltrarRegistros.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                filtrarPorFecha(editFiltroPorFecha.getText().toString());
-            }
-        });
-    }
+            String cortador = entityManager.findOnce(Empleados.class,
+                    Empleados.ID_EMPLEADO+"||' - '||"+Empleados.NOMBRE+" "+Empleados.NOMBRE,
+                    Empleados.ID_EMPRESA+" = ? and "+Empleados.ID_EMPLEADO+" = ?",
+                    new String[]{entity.getColumnValueList().getAsString(Empleados.ID_EMPRESA),
+                    entity.getColumnValueList().getAsString(Empleados.ID_EMPLEADO)})
+                    .getColumnValueList().getAsString(Empleados.NOMBRE);
+            data.setCortador(cortador);
 
-    private List<CutterReportCardHolder> findTransacciones() {
+            informationList.add(data);
+        }
+        return informationList;
+    }
+    /*private List<CutterReportCardHolder> findTransacciones() {
         List<CutterReportCardHolder> informationList = new ArrayList<>();
         for ( int i = 0; i < 5; i++ ) {
             CutterReportCardHolder data = new CutterReportCardHolder();
@@ -159,7 +176,7 @@ public class CutterReportFragment extends Fragment implements MainComponentEdit<
             informationList.add(data);
         }
         return informationList;
-    }
+    }*/
 
     private void filtrarPorFecha(String s) {
         List<CutterReportCardHolder> listado = findTransacciones();
