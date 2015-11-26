@@ -31,8 +31,11 @@ public class SettingFragment extends PreferenceFragment implements MainComponent
     @Override
     public void mainViewConfig(View[] views) {
         views[0].getLayoutParams().height = 0;
+        views[0].invalidate();
         views[1].setVisibility(View.INVISIBLE);
+        views[1].invalidate();
         views[2].setVisibility(View.INVISIBLE);
+        views[2].invalidate();
     }
 
     @Override

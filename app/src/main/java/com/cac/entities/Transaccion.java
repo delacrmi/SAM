@@ -20,7 +20,7 @@ public class Transaccion extends Entity {
     public static String CODIGO_TRACTOR = "codigo_tractor";
     public static String PERIODO     = "id_periodo";
     public static String EMPRESA     = "id_empresa";
-    public static String INDICADOR   = "estado";
+    public static String ESTADO = "estado";
     public static String APLICACION  = "aplicacion";
     public static String CORTADOR = "codigo_cortador";
     public static String UNADA = "unada";
@@ -38,8 +38,10 @@ public class Transaccion extends Entity {
         addColumn(ID_CANIAL, EntityColumn.ColumnType.INTEGER);
         addColumn(ID_LOTE, EntityColumn.ColumnType.INTEGER);
         addColumn(FECHA_CORTE, EntityColumn.ColumnType.DATE);
+        addColumn(FRENTE_CORTE, EntityColumn.ColumnType.INTEGER);
+        addColumn(FRENTE_ALCE, EntityColumn.ColumnType.INTEGER);
         addColumn(CODIGO_TRACTOR, EntityColumn.ColumnType.TEXT);
-        addColumn(INDICADOR, EntityColumn.ColumnType.TEXT);
+        addColumn(ESTADO, EntityColumn.ColumnType.TEXT);
         addColumn(LINEA, EntityColumn.ColumnType.INTEGER);
         addColumn(DISPOSITIVO, EntityColumn.ColumnType.TEXT);
         addColumn(new EntityColumn<Integer>(CORTADOR, EntityColumn.ColumnType.INTEGER).setNotNullable());

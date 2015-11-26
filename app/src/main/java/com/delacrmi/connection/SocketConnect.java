@@ -107,6 +107,10 @@ public abstract class SocketConnect {
         JSONObject obj = (JSONObject) args[0];
         try {
             Log.e("error", obj.getString("error"));
+            Log.e("error", "============================");
+            Log.e("error", obj.getString("valueToInsert"));
+            Log.e("error", "============================");
+            Log.e("error", obj.getString("name"));
         } catch (JSONException e) {
             e.printStackTrace();
         }

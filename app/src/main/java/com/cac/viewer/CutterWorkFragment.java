@@ -151,7 +151,7 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
             });
             ourInstance.autCutter.setOnKeyListener(new OnKeyListenerRefactory(hashCutter, ourInstance.tvCutter));
             ourInstance.autCutter.setAdapter(
-                    getAdapter(Empleados.class,Empleados.ID_EMPLEADO+" key,"+Empleados.NOMBRE+" value", null, null, hashCutter)
+                    getAdapter(Empleados.class, Empleados.ID_EMPLEADO + " key," + Empleados.NOMBRE + " value", null, null, hashCutter)
             );
             ourInstance.autCutter.setThreshold(1);
 
@@ -236,14 +236,17 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
         events();
 
         views[0].getLayoutParams().height = MainActivity.VISIBLE_ACTION;
+        views[0].invalidate();
 
         ((ImageButton)views[1]).setImageResource(R.drawable.grabar);
         views[1].setOnClickListener(onClickListener);
         views[1].setVisibility(View.VISIBLE);
+        views[1].invalidate();
 
         ((ImageButton)views[2]).setImageResource(R.drawable.anterior);
         views[2].setOnClickListener(onClickListener);
         views[2].setVisibility(View.VISIBLE);
+        views[2].invalidate();
 
     }
 
@@ -275,9 +278,9 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
                         transaccion.getColumn(Transaccion.ID_FINCA)
                                 .setValue(Integer.parseInt(parameters.getFinca().getText() + ""));
                         transaccion.getColumn(Transaccion.ID_CANIAL)
-                                .setValue(Integer.parseInt(parameters.getFinca().getText() + ""));
+                                .setValue(Integer.parseInt(parameters.getCanial()));
                         transaccion.getColumn(Transaccion.ID_LOTE)
-                                .setValue(Integer.parseInt(parameters.getFinca().getText() + ""));
+                                .setValue(Integer.parseInt(parameters.getLote()));
 
                         transaccion.getColumn(Transaccion.FECHA_CORTE).setValue(new Date());
 
@@ -287,10 +290,13 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
                                 .setValue(Integer.parseInt(ourInstance.etTotalRaise.getText() + ""));
                         transaccion.getColumn(Transaccion.PESO)
                                 .setValue(Double.parseDouble(ourInstance.etTotalWeight.getText() + ""));
+                        transaccion.getColumn(Transaccion.LINEA)
+                                .setValue(Integer.parseInt(ourInstance.etLine.getText().toString()));
 
-                        transaccion.setValue(Transaccion.APLICACION, APLICACION);
-                        transaccion.setValue(Transaccion.DISPOSITIVO, DISPOSITIVO);
-                        transaccion.setValue(Transaccion.INDICADOR, Transaccion.TransaccionEstado.ACTIVA.toString());
+
+                        transaccion.getColumn(Transaccion.APLICACION).setValue(APLICACION);
+                        transaccion.getColumn(Transaccion.DISPOSITIVO).setValue(DISPOSITIVO);
+                        transaccion.getColumn(Transaccion.ESTADO).setValue(Transaccion.TransaccionEstado.ACTIVA.toString());
 
                         transaccion = (Transaccion)ourInstance.entityManager.save(transaccion);
 
@@ -304,6 +310,7 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
                                 details.getColumn(TransactionDetails.APLICACION).setValue(APLICACION);
                                 details.getColumn(TransactionDetails.NO_RANGO).setValue(envio);
                                 details.getColumn(TransactionDetails.CORRELATIVO).setValue(detailsindex);
+                                details.getColumn(TransactionDetails.ESTADO).setValue(TransactionDetails.TransactionDetailsEstado.ACTIVA.toString());
                                 if(ourInstance.entityManager.save(details) != null)
                                     Log.i("inserted","uñada "+details.getColumn(TransactionDetails.UNADA).getValue()+
                                             " peso "+details.getColumn(TransactionDetails.PESO).getValue());

@@ -112,6 +112,7 @@ public class CutterReportFragment extends Fragment implements MainComponentEdit<
             data.setTotalUnada(entity.getColumnValueList().getAsString(Transaccion.UNADA));
             data.setTotalPeso(entity.getColumnValueList().getAsString(Transaccion.PESO));
             data.setLinea(entity.getColumnValueList().getAsString(Transaccion.LINEA));
+            data.setNoTicket(entity.getColumnValueList().getAsString(Transaccion.NO_ENVIO));
 
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
@@ -137,8 +138,8 @@ public class CutterReportFragment extends Fragment implements MainComponentEdit<
 
             String lote = entityManager.findOnce(Lotes.class,
                     Lotes.ID_LOTE+"||' - '||"+Lotes.DESCRIPCION + " "+Lotes.DESCRIPCION,
-                    Lotes.ID_EMPRESA + " = ? and " +Lotes.ID_FINCA + " = ? and "+Lotes.ID_CANIAL+" = ?"+
-                    Lotes.ID_PERIODO + " = ? and " +Lotes.ID_LOTE,
+                    Lotes.ID_EMPRESA + " = ? and " +Lotes.ID_FINCA + " = ? and "+Lotes.ID_CANIAL+" = ? and "+
+                    Lotes.ID_PERIODO + " = ? and " +Lotes.ID_LOTE+" = ?",
                     new String[]{entity.getColumnValueList().getAsString(Transaccion.EMPRESA),
                                  entity.getColumnValueList().getAsString(Transaccion.ID_FINCA),
                                  entity.getColumnValueList().getAsString(Transaccion.ID_CANIAL),
@@ -151,7 +152,7 @@ public class CutterReportFragment extends Fragment implements MainComponentEdit<
                     Empleados.ID_EMPLEADO+"||' - '||"+Empleados.NOMBRE+" "+Empleados.NOMBRE,
                     Empleados.ID_EMPRESA+" = ? and "+Empleados.ID_EMPLEADO+" = ?",
                     new String[]{entity.getColumnValueList().getAsString(Empleados.ID_EMPRESA),
-                    entity.getColumnValueList().getAsString(Empleados.ID_EMPLEADO)})
+                    entity.getColumnValueList().getAsString(Transaccion.CORTADOR)})
                     .getColumnValueList().getAsString(Empleados.NOMBRE);
             data.setCortador(cortador);
 
@@ -296,8 +297,10 @@ public class CutterReportFragment extends Fragment implements MainComponentEdit<
     public void mainViewConfig(View[] views) {
         for(int i = 0; i < views.length; i++){
             views[i].setVisibility(View.INVISIBLE);
+            views[i].invalidate();
             if ( views[i] instanceof RelativeLayout ){
                 views[i].getLayoutParams().height = 0;
+                views[i].invalidate();
             }
         }
     }
