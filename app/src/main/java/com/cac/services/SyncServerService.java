@@ -10,11 +10,16 @@ import android.util.Log;
 import com.cac.sam.R;
 import com.cac.entities.Transaccion;
 import com.delacrmi.connection.SocketConnect;
+import com.delacrmi.persistences.Entity;
 import com.delacrmi.persistences.EntityManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
 
 import io.socket.client.IO;
 
@@ -71,12 +76,54 @@ public class SyncServerService extends Service {
                     try{
                         Log.d("connected ",connect.getSocket().connected()+"");
                         if(connect.getSocket().connected()){
-                            JSONArray rowArray;
-                            JSONObject row;
-                            String columns = new Transaccion().entityConfig().getColumnsNameAsString(false);
-                            Log.i("columns", columns);
+                            //Encabezado
+                            JSONArray rows = new JSONArray();
+                            // Fechas
+                            JSONArray dates = new JSONArray();
+                            List<Entity> entities = getEntityManager().find(Transaccion.class, "*",
+                                    Transaccion.INDICADOR + " = ? ",
+                                    new String[]{Transaccion.TransaccionEstado.ACTIVA.toString()});
+                            if ( entities != null && !entities.isEmpty() && entities.size() > 0 ) {
+                                for (Entity entity : entities ) {
+                                    // Filas
+                                    JSONObject row = new JSONObject();
+                                    //Columna : valor
+                                    JSONObject values = new JSONObject();
+                                    row.put("tableName",Transaccion.TABLE_NAME);
+                                    Transaccion transaccion = (Transaccion) entity;
+                                    String[] columns = transaccion.getColumnsNameAsString(false).split(",");
+                                    for (int i = 0; i < columns.length; i++) {
+                                        if ( columns[i].toLowerCase().contains("fecha") ){
+                                            Long fechaLong     = Long.valueOf(entity.getColumnValueList().getAsString(columns[i])).longValue();
+                                            Date fecha         = new Date(fechaLong);
+                                            String fechaString = new SimpleDateFormat("yyyy-MM-dd").format(fecha);
+                                            values.put(columns[i],fechaString);
+                                            //Columnas de fechas.
+                                            if ( rows.length() == 0 )
+                                                dates.put(columns[i]);
+                                        } else
+                                            values.put(columns[i],entity.getColumnValueList().getAsString(columns[i]));
+                                    }
+                                    row.put("values",values);
+                                    rows.put(row);
+                                }
+                            }
+                            if ( rows != null && rows.length() > 0 ) {
+                                JSONObject wrapper = new JSONObject();
+                                wrapper.put("value", rows);
+                                wrapper.put("dates",dates);
+                                connect.sendMessage("synchronizerServer", wrapper);
+                                //Log.e("Enviamos","Enviamos el mensaje: "+wrapper.toString());
+                            }
+                            //Detalle
+
+
                         }
-                    }catch (NullPointerException e){}
+                    } catch (NullPointerException e){
+
+                    } catch (JSONException ex) {
+                        Log.e("Error","Al insertar una fila en el JSONObject ",ex);
+                    }
 
                     try {
                         Thread.sleep(10000);
@@ -115,8 +162,15 @@ public class SyncServerService extends Service {
                 public void onSynchronizeServer(Object... args) {
                     Intent iSend = new Intent();
                     iSend.setAction(OBJECT_SYNCHRONIZED);
-                    iSend.putExtra("inserted",2);
-                    sendBroadcast(iSend);
+                    if ( args  != null && args[0] instanceof  JSONObject) {
+                        try {
+                            JSONObject obj = (JSONObject) args[0];
+                            iSend.putExtra("inserted", obj.get("result").toString());
+                            sendBroadcast(iSend);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
 
                 @Override

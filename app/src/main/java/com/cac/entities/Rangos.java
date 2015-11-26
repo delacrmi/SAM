@@ -28,7 +28,7 @@ public class Rangos extends Entity {
         setNickName("Rango");
         addColumn(Rangos.ID_EMPRESA, EntityColumn.ColumnType.INTEGER);
         addColumn(Rangos.ID_PERIODO, EntityColumn.ColumnType.INTEGER);
-        //addColumn(Rangos.DISPOSITIVO, EntityColumn.ColumnType.TEXT);
+        addColumn(Rangos.DISPOSITIVO, EntityColumn.ColumnType.TEXT);
         addColumn(Rangos.APLICACION, EntityColumn.ColumnType.TEXT);
         addColumn(Rangos.RANGO_DESDE, EntityColumn.ColumnType.INTEGER);
         addColumn(Rangos.RANGO_HASTA, EntityColumn.ColumnType.INTEGER);
@@ -41,9 +41,9 @@ public class Rangos extends Entity {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         String empresa     = sharedPreferences.getString("EMPRESA", "30");
         String periodo     = sharedPreferences.getString("PERIODO", "20");
-        //TelephonyManager telephonyManager = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
-        //String dispositivo = telephonyManager.getDeviceId();
+        TelephonyManager telephonyManager = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
+        String dispositivo = telephonyManager.getDeviceId();
         String nombreAplicacion = sharedPreferences.getString("APLICACION", "SAM");
-        setEntityFilter(new EntityFilter(new String[]{ID_EMPRESA, APLICACION, ID_PERIODO}, new String[]{empresa, nombreAplicacion,periodo}));
+        setEntityFilter(new EntityFilter(new String[]{ID_EMPRESA, APLICACION, ID_PERIODO, DISPOSITIVO}, new String[]{empresa, nombreAplicacion,periodo,dispositivo}));
     }
 }

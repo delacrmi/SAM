@@ -13,6 +13,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,7 +29,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.atorres.AndroidUtils;
 import com.cac.entities.Empleados;
+import com.cac.entities.Rangos;
 import com.cac.entities.Transaccion;
 import com.cac.entities.TransactionDetails;
 import com.cac.sam.MainActivity;
@@ -79,6 +82,9 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
 
     private EntityManager entityManager;
     private SharedPreferences sharedPreferences;
+
+    //Filtros queries
+    private String EMPRESA, PERIODO, DISPOSITIVO, APLICACION;
 
 
     public static CutterWorkFragment init(AppCompatActivity context,EntityManager entityManager){
@@ -139,6 +145,12 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
                     new LinearLayoutManager(ourInstance.context, LinearLayoutManager.VERTICAL, false));
             ourInstance.recyclerView.setAdapter(ourInstance.workDetailsAdapter);
         }
+
+        EMPRESA =  sharedPreferences.getString("EMPRESA","30");
+        PERIODO =  sharedPreferences.getString("PERIODO","30");
+        APLICACION = sharedPreferences.getString("NOMBRE_APLICACION","SAM");
+        TelephonyManager telephonyManager = (TelephonyManager)ourInstance.context.getSystemService(Context.TELEPHONY_SERVICE);
+        DISPOSITIVO = telephonyManager.getDeviceId();
 
         ourInstance.writing = true;
         return ourInstance.view;
@@ -217,39 +229,54 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
                     case R.id.btn_fab_right:
 
                         //TODO: Auto Increament the envio options
-                        int envio = 1;
+                        int envio = findMaxEnvio();
+                        if ( envio == 0 ) {
+                            AndroidUtils.showAlertMsg(ourInstance.context, "Notificación", "No se encontro el número de envio.");
+                            return;
+                        }
                         Transaccion transaccion = new Transaccion().entityConfig();
 
-                        transaccion.getColumn(Transaccion.EMPRESA).setValue(sharedPreferences.getInt("empresa",30));
-                        transaccion.getColumn(Transaccion.PERIODO).setValue(sharedPreferences.getInt("periodo", 20));
+                        transaccion.getColumn(Transaccion.EMPRESA).setValue(EMPRESA);
+                        transaccion.getColumn(Transaccion.PERIODO).setValue(PERIODO);
                         transaccion.getColumn(Transaccion.NO_ENVIO).setValue(envio);
-                        transaccion.getColumn(Transaccion.FRENTE_CORTE).setValue(1);
-                        transaccion.getColumn(Transaccion.FRENTE_ALCE).setValue(1);
 
                         CuttingParametersFragment parameters =
                                 ((MainActivity) ourInstance.context).getCuttingParametersFragment();
+                        transaccion.getColumn(Transaccion.FRENTE_CORTE)
+                                .setValue(parameters.getFteCorte());
+                        transaccion.getColumn(Transaccion.FRENTE_ALCE)
+                                .setValue(parameters.getFteAlce());
                         transaccion.getColumn(Transaccion.ID_FINCA)
-                                .setValue(Integer.parseInt(parameters.getFinca().getText()+""));
+                                .setValue(Integer.parseInt(parameters.getFinca().getText() + ""));
                         transaccion.getColumn(Transaccion.ID_CANIAL)
                                 .setValue(Integer.parseInt(parameters.getFinca().getText() + ""));
                         transaccion.getColumn(Transaccion.ID_LOTE)
                                 .setValue(Integer.parseInt(parameters.getFinca().getText() + ""));
 
                         transaccion.getColumn(Transaccion.FECHA_CORTE).setValue(new Date());
-                        transaccion = (Transaccion)ourInstance.entityManager.save(transaccion);
 
                         transaccion.getColumn(Transaccion.CORTADOR)
-                                .setValue(Integer.parseInt(ourInstance.autCutter.getText()+""));
+                                .setValue(Integer.parseInt(ourInstance.autCutter.getText() + ""));
                         transaccion.getColumn(Transaccion.UNADA)
                                 .setValue(Integer.parseInt(ourInstance.etTotalRaise.getText() + ""));
                         transaccion.getColumn(Transaccion.PESO)
-                                .setValue(Double.parseDouble(ourInstance.etTotalWeight.getText()+""));
+                                .setValue(Double.parseDouble(ourInstance.etTotalWeight.getText() + ""));
+
+                        transaccion.setValue(Transaccion.APLICACION, APLICACION);
+                        transaccion.setValue(Transaccion.DISPOSITIVO, DISPOSITIVO);
+                        transaccion.setValue(Transaccion.INDICADOR, Transaccion.TransaccionEstado.ACTIVA.toString());
+
+                        transaccion = (Transaccion)ourInstance.entityManager.save(transaccion);
 
                         int detailsindex = 1;
+
                         if(transaccion != null){
                             for(TransactionDetails details : ourInstance.transactionDetailsList) {
 
-                                details.getColumn(TransactionDetails.ID_TRANSACCION).setValue(envio);
+                                details.getColumn(TransactionDetails.EMPRESA).setValue(EMPRESA);
+                                details.getColumn(TransactionDetails.ID_PERIODO).setValue(PERIODO);
+                                details.getColumn(TransactionDetails.APLICACION).setValue(APLICACION);
+                                details.getColumn(TransactionDetails.NO_RANGO).setValue(envio);
                                 details.getColumn(TransactionDetails.CORRELATIVO).setValue(detailsindex);
                                 if(ourInstance.entityManager.save(details) != null)
                                     Log.i("inserted","uñada "+details.getColumn(TransactionDetails.UNADA).getValue()+
@@ -276,6 +303,46 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
                 }
             }
         };
+    }
+
+    public int findMaxEnvio (){
+
+        int envioActual = 1;
+
+        //Buscamos los numeros permitidos a generar.
+        Rangos rangos =  (Rangos) ourInstance.entityManager.findOnce(Rangos.class,"*",
+                        Rangos.ID_EMPRESA+" = ? and "+Rangos.ID_PERIODO+" = ? and "+
+                        Rangos.APLICACION+" = ? and "+Rangos.DISPOSITIVO+" = ?",
+                new String[]{EMPRESA, PERIODO, APLICACION, DISPOSITIVO});
+        if ( rangos == null ) {
+            AndroidUtils.showAlertMsg(ourInstance.context, "Notificación", "Debe actualizar la tabla de rangos para proseguir.");
+            return 0;
+        }
+
+        int minEnvio = rangos.getColumnValueList().getAsInteger(Rangos.RANGO_DESDE);
+        int maxEnvio = rangos.getColumnValueList().getAsInteger(Rangos.RANGO_HASTA);
+
+        Entity transaccionTemp = ourInstance.entityManager.findOnce(
+                Transaccion.class,"max("+Transaccion.NO_ENVIO+")+1 "+Transaccion.NO_ENVIO,
+                Transaccion.EMPRESA+" = ? and "+Rangos.ID_PERIODO+" = ?",
+                new String[]{EMPRESA, PERIODO});
+        if ( transaccionTemp != null ){
+            try {
+                envioActual = transaccionTemp.getColumnValueList().getAsInteger(Transaccion.NO_ENVIO);
+            } catch (Exception ex) { envioActual = 1; }
+        }
+
+        if ( maxEnvio == 0 || minEnvio == 0 ) {
+            AndroidUtils.showAlertMsg(ourInstance.context,"Notificación","No se han definido los correlativos de envio, favor actualizar la información.");
+            return 0;
+        }else if ( envioActual > maxEnvio ){
+            AndroidUtils.showAlertMsg(ourInstance.context,"Notificación","El dispositivo ha excedido el número maximo de envios, solo tiene permitido generar hasta "+maxEnvio+" Envios y el envio actual es el "+envioActual);
+            return 0;
+        } else if ( envioActual == 0 ) {
+            envioActual = 1;
+        }
+
+        return envioActual;
     }
 
     @Override

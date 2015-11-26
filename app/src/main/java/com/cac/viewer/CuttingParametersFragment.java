@@ -46,24 +46,24 @@ public class CuttingParametersFragment extends Fragment implements MainComponent
 
     public CuttingParametersFragment() {}
 
-    public EditText getFteCorte() {
-        return fteCorte;
+    public String getFteCorte() {
+        return fteCorte.getText().toString();
     }
 
-    public EditText getFteAlce() {
-        return fteAlce;
+    public String getFteAlce() {
+        return fteAlce.getText().toString();
     }
 
     public EditText getFinca() {
         return finca;
     }
 
-    public EditText getCanial() {
-        return canial;
+    public String getCanial() {
+        return canial.getText().toString();
     }
 
-    public EditText getLote() {
-        return lote;
+    public String getLote() {
+        return lote.getText().toString();
     }
 
     public static CuttingParametersFragment init(MainActivity context,EntityManager entityManager) {
