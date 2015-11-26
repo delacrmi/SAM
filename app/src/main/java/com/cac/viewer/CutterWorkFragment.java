@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.telephony.TelephonyManager;
+import android.text.Layout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -79,6 +80,7 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
     private ImageView ivDeleteAll;
 
     private View.OnClickListener onClickListener;
+    private View.OnFocusChangeListener onFocusChangeListener;
     private OnKeyListenerRefactory onKeyListenerRefactory;
 
     private RecyclerView recyclerView;
@@ -118,6 +120,7 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
 
             ourInstance.tvCode = (TextView)ourInstance.view.findViewById(R.id.tv_code_master_row);
             ourInstance.etLine = (EditText)ourInstance.view.findViewById(R.id.et_line_insert);
+            ourInstance.etLine.setOnFocusChangeListener(onFocusChangeListener);
 
             ourInstance.autTractor = (AutoCompleteTextView)ourInstance.view.findViewById(R.id.aut_tractor_insert);
             ourInstance.autTractor.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -176,7 +179,7 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
         PERIODO =  sharedPreferences.getString("PERIODO","30");
         APLICACION = sharedPreferences.getString("NOMBRE_APLICACION","SAM");
         TelephonyManager telephonyManager = (TelephonyManager)ourInstance.context.getSystemService(Context.TELEPHONY_SERVICE);
-        DISPOSITIVO = telephonyManager.getDeviceId();
+//        DISPOSITIVO = telephonyManager.getDeviceId();
 
         ourInstance.writing = true;
         return ourInstance.view;
@@ -254,7 +257,9 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
                 switch (v.getId()){
                     case R.id.btn_fab_right:
 
-                        //TODO: Auto Increament the envio options
+                        if(!validateForm(layout))
+                            return;
+
                         int envio = findMaxEnvio();
                         if ( envio == 0 ) {
                             AndroidUtils.showAlertMsg(ourInstance.context, "Notificación", "No se encontro el número de envio.");
@@ -330,6 +335,17 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
                 }
             }
         };
+
+        onFocusChangeListener = new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                EditText edT =(EditText) v;
+                if(!hasFocus && edT.getText()
+                        .toString().equals("")){
+                    edT.setError("");
+                }
+            }
+        };
     }
 
     public int findMaxEnvio (){
@@ -400,7 +416,6 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
             index++;
         }
 
-
          ArrayAdapter<String> adapter = new ArrayAdapter<String>(ourInstance.context,
                 android.R.layout.simple_dropdown_item_1line, values);
         return adapter;
@@ -431,14 +446,15 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
         this.etTotalWeight = etTotalWeight;
     }
 
-    public boolean validateForm() {
+    public boolean validateForm(RelativeLayout layout) {
         if ( layout != null ){
             for (View a : layout.getFocusables(RelativeLayout.FOCUS_BACKWARD)){
                 if ( a instanceof EditText) {
                     EditText editText = (EditText) a;
-                    a.getOnFocusChangeListener().onFocusChange(editText,false);
-                    if ( editText.getError() != null ){
-                        Toast.makeText(ourInstance.context,"Debe indicar la informacion para el campo "+editText.getHint(), Toast.LENGTH_SHORT).show();
+                    if(editText.getText().toString().equals("") ||
+                            editText.getText().toString().equals(" ")){
+                        Snackbar.make(a,"Campo Requerido",Snackbar.LENGTH_SHORT).show();
+                        a.requestFocus();
                         return false;
                     }
                 }
@@ -454,9 +470,6 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
             transactionDetails.getColumn(TransactionDetails.PESO).setValue(300.0 / 1000);
 
             ((LinkedList)ourInstance.transactionDetailsList).addFirst(transactionDetails);
-
-            BigDecimal text = new BigDecimal(ourInstance.getTotalWeight().getText() + "")
-                    .add(new BigDecimal(transactionDetails.getColumn(Transaccion.PESO).getValue()+""));
 
             ourInstance.getTotalRaise().setText((a + 1) + "");
             ourInstance.getTotalWeight().setText(
