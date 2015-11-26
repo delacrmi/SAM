@@ -43,6 +43,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -387,16 +388,13 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
 
             ((LinkedList)ourInstance.transactionDetailsList).addFirst(transactionDetails);
 
-            Log.d("Peso",(Double)transactionDetails.getColumn(Transaccion.PESO).getValue()+" "+
-                    Double.parseDouble(ourInstance.getTotalWeight().getText() + "")+" "+
-                    (Double.parseDouble(ourInstance.getTotalWeight().getText() + "")+
-                    (Double)transactionDetails.getColumn(Transaccion.PESO).getValue())
-            );
+            BigDecimal text = new BigDecimal(ourInstance.getTotalWeight().getText() + "")
+                    .add(new BigDecimal(transactionDetails.getColumn(Transaccion.PESO).getValue()+""));
 
             ourInstance.getTotalRaise().setText((a + 1) + "");
             ourInstance.getTotalWeight().setText(
-                    (Double)(Double.parseDouble(ourInstance.getTotalWeight().getText() + "")+
-                    Double.parseDouble(transactionDetails.getColumn(Transaccion.PESO).getValue()+""))+""
+                    new BigDecimal(ourInstance.getTotalWeight().getText() + "")
+                            .add(new BigDecimal(transactionDetails.getColumn(Transaccion.PESO).getValue()+"")).toString()
             );
         }
     }
