@@ -8,7 +8,6 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -34,6 +33,7 @@ import com.cac.entities.Empleados;
 import com.cac.entities.Rangos;
 import com.cac.entities.Transaccion;
 import com.cac.entities.TransactionDetails;
+import com.cac.entities.Vehiculos;
 import com.cac.sam.MainActivity;
 import com.cac.sam.R;
 import com.cac.tools.MainComponentEdit;
@@ -46,6 +46,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -66,6 +67,9 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
     private TextView tvCode;
     private EditText etLine;
 
+    private AutoCompleteTextView autTractor;
+    private Map<String,String> hashTractor = new HashMap<String,String>();
+
     private AutoCompleteTextView autCutter;
     private Map<String,String> hashCutter = new HashMap<String,String>();
     private TextView tvCutter;
@@ -73,7 +77,9 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
     private EditText etTotalRaise;
     private EditText etTotalWeight;
     private ImageView ivDeleteAll;
+
     private View.OnClickListener onClickListener;
+    private OnKeyListenerRefactory onKeyListenerRefactory;
 
     private RecyclerView recyclerView;
     private List<TransactionDetails> transactionDetailsList;
@@ -113,8 +119,25 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
             ourInstance.tvCode = (TextView)ourInstance.view.findViewById(R.id.tv_code_master_row);
             ourInstance.etLine = (EditText)ourInstance.view.findViewById(R.id.et_line_insert);
 
+            ourInstance.autTractor = (AutoCompleteTextView)ourInstance.view.findViewById(R.id.aut_tractor_insert);
+            ourInstance.autTractor.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    etLine.requestFocus();
+                    /*InputMethodManager inputMethodManager =
+                            (InputMethodManager) ourInstance.context.getSystemService(ourInstance.context.INPUT_METHOD_SERVICE);
+                    inputMethodManager.hideSoftInputFromWindow(
+                            ourInstance.context.getCurrentFocus().getWindowToken(), 0);*/
+                }
+            });
+            ourInstance.autTractor.setAdapter(
+                    getAdapter(Vehiculos.class,Vehiculos.CODIGO_GRUPO+"||"+Vehiculos.CODIGO_SUBGRUPO+"||"+Vehiculos.CODIGO_VEHICULO+" key,"+
+                            Vehiculos.CODIGO_GRUPO+"||"+Vehiculos.CODIGO_SUBGRUPO+"||"+Vehiculos.CODIGO_VEHICULO+" value",
+                            Vehiculos.CODIGO_GRUPO +" = ?",new String[]{"A"},hashTractor)
+            );
+            ourInstance.autTractor.setThreshold(2);
 
-            ourInstance.autCutter = (AutoCompleteTextView)ourInstance.view.findViewById(R.id.atv_cutter_insert);
+            ourInstance.autCutter = (AutoCompleteTextView)ourInstance.view.findViewById(R.id.aut_cutter_insert);
             ourInstance.tvCutter = (TextView)ourInstance.view.findViewById(R.id.tv_cutter_name_insert);
             ourInstance.autCutter.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
@@ -126,8 +149,11 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
                             ourInstance.context.getCurrentFocus().getWindowToken(), 0);
                 }
             });
-            ourInstance.autCutter.setOnKeyListener(new OnKeyListenerRefactory(hashCutter,ourInstance.tvCutter));
-            setCutterInformation();
+            ourInstance.autCutter.setOnKeyListener(new OnKeyListenerRefactory(hashCutter, ourInstance.tvCutter));
+            ourInstance.autCutter.setAdapter(
+                    getAdapter(Empleados.class,Empleados.ID_EMPLEADO+" key,"+Empleados.NOMBRE+" value", null, null, hashCutter)
+            );
+            ourInstance.autCutter.setThreshold(1);
 
             ourInstance.etTotalRaise = (EditText)ourInstance.view.findViewById(R.id.et_cutter_sum_raise);
             ourInstance.etTotalWeight = (EditText)ourInstance.view.findViewById(R.id.et_cutter_sum_weight);
@@ -169,7 +195,7 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
                     JSONArray json = new JSONArray(intent.getStringExtra("json"));
                     obj = new JSONObject(json.getString(0));
                     TransactionDetails transactionDetails = (TransactionDetails)new TransactionDetails().entityConfig();
-                    transactionDetails.getColumn(TransactionDetails.PESO).setValue(obj.getDouble("weight"));
+                    transactionDetails.getColumn(TransactionDetails.PESO).setValue(obj.getDouble("weight")/1000);
                     ourInstance.workDetailsAdapter.add(transactionDetails);
 
                 } catch (JSONException e) {
@@ -297,6 +323,7 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
                         etLine.setText("");
                         autCutter.setText("");
                         tvCutter.setText("");
+                        autTractor.setText("");
                         while (ourInstance.transactionDetailsList.size()>0)
                             ourInstance.workDetailsAdapter.remove(0);
                         break;
@@ -360,26 +387,23 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
         ourInstance.context = (AppCompatActivity)context;
     }
 
-
-    private void setCutterInformation(){
-        List<Entity> entities = ourInstance.entityManager.find(Empleados.class,
-                Empleados.ID_EMPLEADO+","+Empleados.NOMBRE,null,null);
+    private ArrayAdapter<String> getAdapter(Class entityClass, String columns, String where, String[] whereValue, Map<String, String> map){
+        List<Entity> entities = ourInstance.entityManager.find(entityClass,columns,where,whereValue);
 
         String[] values = new String[entities.size()];
         int index = 0;
 
         for(Entity entity: entities){
-            hashCutter.put(((Integer)entity.getColumn(Empleados.ID_EMPLEADO).getValue())+""
-                    ,(String)entity.getColumn(Empleados.NOMBRE).getValue());
-            values[index] = entity.getColumn(Empleados.ID_EMPLEADO).getValue()+"";
+            map.put(entity.getColumnsFromSelect().getAsString("key")
+                    ,entity.getColumnsFromSelect().getAsString("value"));
+            values[index] = entity.getColumnsFromSelect().getAsString("key");
             index++;
         }
 
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(ourInstance.context,
+         ArrayAdapter<String> adapter = new ArrayAdapter<String>(ourInstance.context,
                 android.R.layout.simple_dropdown_item_1line, values);
-        ourInstance.autCutter.setAdapter(adapter);
-        ourInstance.autCutter.setThreshold(1);
+        return adapter;
 
     }
 
@@ -427,13 +451,17 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
         for(int a=0; a<3; a++){
             TransactionDetails transactionDetails = (TransactionDetails)new TransactionDetails().entityConfig();
             transactionDetails.getColumn(TransactionDetails.UNADA).setValue(a + 1);
-            transactionDetails.getColumn(TransactionDetails.PESO).setValue(300.0D);
+            transactionDetails.getColumn(TransactionDetails.PESO).setValue(300.0 / 1000);
 
             ((LinkedList)ourInstance.transactionDetailsList).addFirst(transactionDetails);
 
-            ourInstance.getTotalRaise().setText((a+1)+"");
+            BigDecimal text = new BigDecimal(ourInstance.getTotalWeight().getText() + "")
+                    .add(new BigDecimal(transactionDetails.getColumn(Transaccion.PESO).getValue()+""));
+
+            ourInstance.getTotalRaise().setText((a + 1) + "");
             ourInstance.getTotalWeight().setText(
-                    Double.parseDouble(ourInstance.getTotalWeight().getText() + "")+300+""
+                    new BigDecimal(ourInstance.getTotalWeight().getText() + "")
+                            .add(new BigDecimal(transactionDetails.getColumn(Transaccion.PESO).getValue()+"")).toString()
             );
         }
     }

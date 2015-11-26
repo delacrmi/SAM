@@ -27,6 +27,7 @@ import com.delacrmi.persistences.Entity;
 import com.delacrmi.persistences.EntityManager;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -144,29 +145,18 @@ public class CuttingParametersFragment extends Fragment implements MainComponent
 
         fteCorte.setOnFocusChangeListener((new MyOnFocusListenerFactory(txtDescFteCorte,
                 ourInstance.context.getEntityManager(), Frentes.class, Frentes.DESCRIPCION, Frentes.ID_FRENTE)).setTitle("Frente"));
-        fteCorte.setOnKeyListener(
-                new OnKeyListenerRefactory(
-                        getInformation(
-                                Frentes.class, Frentes.ID_FRENTE + " key, " + Frentes.DESCRIPCION + " value",
-                                null, null), txtDescFteCorte));
+        fteCorte.setOnKeyListener(new OnKeyListenerRefactory(getInformation(
+                Frentes.class, Frentes.ID_FRENTE + " key, " + Frentes.DESCRIPCION + " value", null, null), txtDescFteCorte));
 
         fteAlce.setOnFocusChangeListener((new MyOnFocusListenerFactory(txtDescFteAlce,
                 ourInstance.context.getEntityManager(), Frentes.class, Frentes.DESCRIPCION, Frentes.ID_FRENTE)).setTitle("Frente"));
-        fteAlce.setOnKeyListener(
-                new OnKeyListenerRefactory(
-                        getInformation(
-                                Frentes.class, Frentes.ID_FRENTE + " key, " + Frentes.DESCRIPCION + " value",
-                                null, null), txtDescFteAlce));
-
+        fteAlce.setOnKeyListener(new OnKeyListenerRefactory(getInformation(
+                Frentes.class, Frentes.ID_FRENTE + " key, " + Frentes.DESCRIPCION + " value", null, null), txtDescFteAlce));
 
         finca.setOnFocusChangeListener((new MyOnFocusListenerFactory(txtDescFinca,
                 ourInstance.context.getEntityManager(), Fincas.class, Fincas.DESCRIPCION, Fincas.ID_FINCA)).setTitle("Finca"));
-        finca.setOnKeyListener(
-                new OnKeyListenerRefactory(
-                        getInformation(
-                                Fincas.class, Fincas.ID_FINCA + " key, " + Fincas.DESCRIPCION + " value",
-                                null, null), txtDescFinca));
-
+        finca.setOnKeyListener(new OnKeyListenerRefactory(getInformation(
+                Fincas.class, Fincas.ID_FINCA + " key, " + Fincas.DESCRIPCION + " value", null, null), txtDescFinca));
 
         canial.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -195,11 +185,10 @@ public class CuttingParametersFragment extends Fragment implements MainComponent
             @Override
             public void beforeOnkeyValidate() {
                 setMapValues(getInformation(
-                    Fincas.class, Fincas.ID_FINCA + " key, " + Fincas.DESCRIPCION + " value",
-                    Caniales.ID_FINCA + " = ? ",new String[]{finca.getText().toString()}));
+                        Caniales.class, Caniales.ID_CANIAL + " key, " + Caniales.DESCRIPCION + " value",
+                        Caniales.ID_FINCA + " = ? ", new String[]{finca.getText().toString()}));
             }
         });
-
 
         lote.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override

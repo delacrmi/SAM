@@ -13,6 +13,7 @@ import com.cac.entities.TransactionDetails;
 import com.cac.sam.R;
 import com.cac.viewer.CutterWorkFragment;
 
+import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -45,8 +46,9 @@ public class WorkDetailsAdapter extends RecyclerView.Adapter<ViewWorkHolder> {
 
         tvRise.setText((Integer.parseInt(tvRise.getText() + "") + 1) + "");
 
-        Double newWeight = (double)transactionDetails.getColumn(TransactionDetails.PESO).getValue();
-        tvWeight.setText((Double.parseDouble(tvWeight.getText() + "") + newWeight) + "");
+        BigDecimal newWeight = new BigDecimal(tvWeight.getText().toString())
+                .add(new BigDecimal(transactionDetails.getColumn(TransactionDetails.PESO).getValue()+""));
+        tvWeight.setText(newWeight.toString());
 
         notifyItemInserted(0);
         ((LinearLayoutManager)CutterWorkFragment.getInstance()
@@ -56,8 +58,11 @@ public class WorkDetailsAdapter extends RecyclerView.Adapter<ViewWorkHolder> {
     public void remove(int position){
 
         tvRise.setText((Integer.parseInt(tvRise.getText() + "")-1)+"");
-        tvWeight.setText((Double.parseDouble(tvWeight.getText() + "") -
-                ((double) transactionDetailsList.get(position).getColumn(TransactionDetails.PESO).getValue())) + "");
+
+        BigDecimal newWeight = new BigDecimal(tvWeight.getText().toString())
+                .subtract(new BigDecimal(transactionDetailsList.get(position).getColumn(TransactionDetails.PESO).getValue()+""));
+
+        tvWeight.setText(newWeight.toString());
 
         transactionDetailsList.remove(position);
         notifyItemRemoved(position);

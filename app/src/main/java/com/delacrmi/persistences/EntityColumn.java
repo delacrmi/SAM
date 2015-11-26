@@ -65,6 +65,7 @@ public class EntityColumn<valueType> {
         isNullable = false;
     }
 
+
     public boolean isNullable() {
         return isNullable;
     }
