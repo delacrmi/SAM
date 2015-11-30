@@ -47,6 +47,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -131,9 +133,10 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
                 }
             });
             ourInstance.autTractor.setAdapter(
-                    getAdapter(Vehiculos.class,Vehiculos.CODIGO_GRUPO+"||"+Vehiculos.CODIGO_SUBGRUPO+"||"+Vehiculos.CODIGO_VEHICULO+" key,"+
-                            Vehiculos.CODIGO_GRUPO+"||"+Vehiculos.CODIGO_SUBGRUPO+"||"+Vehiculos.CODIGO_VEHICULO+" value",
-                            Vehiculos.CODIGO_GRUPO +" = ?",new String[]{"A"},hashTractor)
+                    findCodigosVehiculos(Vehiculos.class, "A" )
+                    //getAdapter(Vehiculos.class,Vehiculos.CODIGO_GRUPO+"||"+Vehiculos.CODIGO_SUBGRUPO+"||"+Vehiculos.CODIGO_VEHICULO+" key,"+
+                      //      Vehiculos.CODIGO_GRUPO+"||"+Vehiculos.CODIGO_SUBGRUPO+"||"+Vehiculos.CODIGO_VEHICULO+" value",
+                        //    Vehiculos.CODIGO_GRUPO +" = ?",new String[]{"A"},hashTractor)
             );
             ourInstance.autTractor.setThreshold(2);
 
@@ -341,7 +344,7 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
 
     public int findMaxEnvio (){
 
-        int envioActual = 1;
+        int envioActual = 0;
 
         //Buscamos los numeros permitidos a generar.
         Rangos rangos =  (Rangos) ourInstance.entityManager.findOnce(Rangos.class,"*",
@@ -363,7 +366,7 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
         if ( transaccionTemp != null ){
             try {
                 envioActual = transaccionTemp.getColumnValueList().getAsInteger(Transaccion.NO_ENVIO);
-            } catch (Exception ex) { envioActual = 1; }
+            } catch (Exception ex) { envioActual = minEnvio; }
         }
 
         if ( maxEnvio == 0 || minEnvio == 0 ) {
@@ -373,7 +376,7 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
             AndroidUtils.showAlertMsg(ourInstance.context,"Notificación","El dispositivo ha excedido el número maximo de envios, solo tiene permitido generar hasta "+maxEnvio+" Envios y el envio actual es el "+envioActual);
             return 0;
         } else if ( envioActual == 0 ) {
-            envioActual = 1;
+            envioActual = minEnvio;
         }
 
         return envioActual;
@@ -472,4 +475,23 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
             );
         }
     }
+
+    private ArrayAdapter<String> findCodigosVehiculos(Class entidad, String codigoGrupo ) {
+
+        List<Entity> entidades =  ourInstance.entityManager.find(entidad, "*", Vehiculos.CODIGO_GRUPO + " = '" + codigoGrupo + "' and " + Vehiculos.STATUS + " = 1", null);
+        List<String> listado = new ArrayList<>();
+        for ( Entity a : entidades ){
+            String descripcion = a.getColumnValueList().getAsString(Vehiculos.CODIGO_GRUPO);
+            descripcion += String.format("%02d", Integer.parseInt(a.getColumnValueList().getAsString(Vehiculos.CODIGO_SUBGRUPO)));
+            descripcion += String.format("%03d", Integer.parseInt(a.getColumnValueList().getAsString(Vehiculos.CODIGO_VEHICULO)));
+            listado.add(descripcion);
+        }
+
+        if ( listado != null && !listado.isEmpty() ) {
+            Collections.sort(listado);
+            return new ArrayAdapter<>(ourInstance.context, android.R.layout.simple_selectable_list_item, listado);
+        }else
+            return new ArrayAdapter<>(ourInstance.context, android.R.layout.simple_selectable_list_item, new ArrayList<String>());
+    }
+
 }

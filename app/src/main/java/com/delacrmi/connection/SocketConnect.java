@@ -110,7 +110,7 @@ public abstract class SocketConnect {
             Log.e("error", "============================");
             Log.e("error", obj.getString("valueToInsert"));
             Log.e("error", "============================");
-            Log.e("error", obj.getString("name"));
+            Log.e("error", obj.getString("tableName"));
         } catch (JSONException e) {
             e.printStackTrace();
         }

@@ -56,7 +56,6 @@ public class CutterReportFragment extends Fragment implements MainComponentEdit<
             if (ourInstance == null) {
                 ourInstance = new CutterReportFragment();
                 ourInstance.context = context;
-                ourInstance.bluetoothPrinterManager = new BluetoothPrinterManager(ourInstance.context);
             }
             return ourInstance;
         } catch (Exception e) {
@@ -160,23 +159,6 @@ public class CutterReportFragment extends Fragment implements MainComponentEdit<
         }
         return informationList;
     }
-    /*private List<CutterReportCardHolder> findTransacciones() {
-        List<CutterReportCardHolder> informationList = new ArrayList<>();
-        for ( int i = 0; i < 5; i++ ) {
-            CutterReportCardHolder data = new CutterReportCardHolder();
-            data.setNoTicket(i+1+"");
-            data.setLinea(i + "");
-            data.setTotalPeso(350.25 + "");
-            data.setIdCanial("101 - Santana #101");
-            data.setIdFinca("01 - Santana");
-            data.setIdLote("01 - Lote 01");
-            data.setFecha("0" + (i + 1) + "/01/2015");
-            data.setTotalUnada(5 + "");
-            data.setCortador("20834 - Armando Torres");
-            informationList.add(data);
-        }
-        return informationList;
-    }*/
 
     private void filtrarPorFecha(String s) {
         List<CutterReportCardHolder> listado = findTransacciones();
@@ -192,11 +174,18 @@ public class CutterReportFragment extends Fragment implements MainComponentEdit<
         }
     }
 
+    public static BluetoothPrinterManager getBluetoothPrinterManager() {
+        if ( ourInstance.bluetoothPrinterManager == null ) {
+            ourInstance.bluetoothPrinterManager = new BluetoothPrinterManager(ourInstance.context);
+        }
+        return ourInstance.bluetoothPrinterManager;
+    }
+
     public static void printBluetoothReport(CutterReportCardHolder item) {
 
-        if ( ourInstance.bluetoothPrinterManager != null) {
+        if ( getBluetoothPrinterManager() != null) {
             //Verificamos si existe alguna impresora seleccionada.
-            if (!ourInstance.bluetoothPrinterManager.isDeviceSelected()) {
+            if (!getBluetoothPrinterManager().isDeviceSelected()) {
                 //De no existe algun dispositivo seleccionado se llama a la lista para que el usuario seleccione un dispositivo.
                 // 1-) Creamos el dialogo.
                 final Dialog dialog = new Dialog(ourInstance.context);
@@ -230,7 +219,7 @@ public class CutterReportFragment extends Fragment implements MainComponentEdit<
             }
 
             // Solo si se selecciono un dispositivo procedemos a imprimir el reporte
-            if ( ourInstance.bluetoothPrinterManager.isDeviceSelected() ) {
+            if ( getBluetoothPrinterManager().isDeviceSelected() ) {
                 //Creamos el arreglo a imprimir.
                 List<PrinterObjectFormat> paramToPrint = new ArrayList<>();
 
@@ -285,7 +274,7 @@ public class CutterReportFragment extends Fragment implements MainComponentEdit<
                         item.getTotalPeso()));
 
                 //Imprimimos el objeto.
-                ourInstance.bluetoothPrinterManager.print(paramToPrint);
+                getBluetoothPrinterManager().print(paramToPrint);
             } else {
                 AndroidUtils.showAlertMsg(ourInstance.context, "Notificación", "Debe seleccionar un dispositivo bluetooth para continuar con la impresion.");
             }

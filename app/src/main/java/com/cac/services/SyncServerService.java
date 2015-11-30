@@ -77,86 +77,21 @@ public class SyncServerService extends Service {
                     try{
                         Log.d("connected ",connect.getSocket().connected()+"");
                         if(connect.getSocket().connected()){
-                            //Encabezado
-                            JSONArray rows = new JSONArray();
-                            // Fechas
-                            JSONArray dates = new JSONArray();
+
                             List<Entity> entities = getEntityManager().find(Transaccion.class, "*",
                                     Transaccion.ESTADO + " = ? ",
                                     new String[]{Transaccion.TransaccionEstado.ACTIVA.toString()});
-                            if ( entities != null && !entities.isEmpty() && entities.size() > 0 ) {
-                                for (Entity entity : entities ) {
-                                    // Filas
-                                    JSONObject row = new JSONObject();
-                                    //Columna : valor
-                                    JSONObject values = new JSONObject();
-                                    row.put("tableName",Transaccion.TABLE_NAME);
-                                    Transaccion transaccion = (Transaccion) entity;
-                                    String[] columns = transaccion.getColumnsNameAsString(false).split(",");
-                                    for (int i = 0; i < columns.length; i++) {
-                                        if ( columns[i].toLowerCase().contains("fecha") ) {
-                                            Long fechaLong = Long.valueOf(entity.getColumnValueList().getAsString(columns[i])).longValue();
-                                            Date fecha = new Date(fechaLong);
-                                            String fechaString = new SimpleDateFormat("yyyy-MM-dd").format(fecha);
-                                            values.put(columns[i], fechaString);
-                                            //Columnas de fechas.
-                                            if (rows.length() == 0)
-                                                dates.put(columns[i]);
-                                        } else
-                                            values.put(columns[i],entity.getColumnValueList().getAsString(columns[i]));
-                                    }
-                                    row.put("values",values);
-                                    rows.put(row);
-                                }
-                            }
-                            if ( rows != null && rows.length() > 0 ) {
-                                JSONObject wrapper = new JSONObject();
-                                wrapper.put("value", rows);
-                                wrapper.put("dates",dates);
-                                connect.sendMessage("synchronizerServer", wrapper);
-                                //Log.e("Enviamos","Enviamos el mensaje: "+wrapper.toString());
-                            }
 
-                            //Detalle
-                            rows = new JSONArray();
-                            dates = new JSONArray();
+                            if ( entities != null && entities.size() > 0 )
+                                connect.sendMessage("synchronizerServer", getInformationToSend(entities,Transaccion.TABLE_NAME));
 
-                            entities = getEntityManager().find(TransactionDetails.class, "*",
+                            List<Entity> entities1 = getEntityManager().find(TransactionDetails.class, "*",
                                     TransactionDetails.ESTADO + " = ? ",
                                     new String[]{TransactionDetails.TransactionDetailsEstado.ACTIVA.toString()});
 
-                            if ( entities != null && !entities.isEmpty() && entities.size() > 0 ) {
-                                for (Entity entity : entities ) {
-                                    // Filas
-                                    JSONObject row = new JSONObject();
-                                    //Columna : valor
-                                    JSONObject values = new JSONObject();
-                                    row.put("tableName",TransactionDetails.TABLE_NAME);
-                                    TransactionDetails transaccion = (TransactionDetails) entity;
-                                    String[] columns = transaccion.getColumnsNameAsString(false).split(",");
-                                    for (int i = 0; i < columns.length; i++) {
-                                        if ( columns[i].toLowerCase().contains("fecha") ) {
-                                            Long fechaLong = Long.valueOf(entity.getColumnValueList().getAsString(columns[i])).longValue();
-                                            Date fecha = new Date(fechaLong);
-                                            String fechaString = new SimpleDateFormat("yyyy-MM-dd").format(fecha);
-                                            values.put(columns[i], fechaString);
-                                            //Columnas de fechas.
-                                            if (rows.length() == 0)
-                                                dates.put(columns[i]);
-                                        } else
-                                            values.put(columns[i],entity.getColumnValueList().getAsString(columns[i]));
-                                    }
-                                    row.put("values",values);
-                                    rows.put(row);
-                                }
-                            }
-                            if ( rows != null && rows.length() > 0 ) {
-                                JSONObject wrapper = new JSONObject();
-                                wrapper.put("value", rows);
-                                wrapper.put("dates",dates);
-                                //connect.sendMessage("synchronizerServer", wrapper);
-                                //Log.e("Enviamos","Enviamos el mensaje: "+wrapper.toString());
-                            }
+                            if ( entities1 != null && entities1.size() > 0 )
+                                connect.sendMessage("synchronizerServer", getInformationToSend(entities1,TransactionDetails.TABLE_NAME));
+
                         }
                     } catch (NullPointerException e){
 
@@ -175,6 +110,43 @@ public class SyncServerService extends Service {
         thread.start();
 
         return Service.START_STICKY;
+    }
+
+    public JSONObject getInformationToSend(List<Entity> registros, String tableName) throws JSONException {
+
+        JSONArray rows = new JSONArray();
+        JSONArray dates = new JSONArray();
+
+        for (Entity entity : registros ) {
+
+            JSONObject row = new JSONObject();
+            JSONObject values = new JSONObject();
+            row.put("tableName",tableName);
+
+            String[] columns =  entity.getColumnsNameAsString(tableName.equals(TransactionDetails.TABLE_NAME)).split(",");
+
+            for (int i = 0; i < columns.length; i++) {
+                if ( columns[i].toLowerCase().contains("fecha") ) {
+                    Long fechaLong = Long.valueOf(entity.getColumnValueList().getAsString(columns[i])).longValue();
+                    Date fecha = new Date(fechaLong);
+                    String fechaString = new SimpleDateFormat("yyyy-MM-dd").format(fecha);
+                    values.put(columns[i], fechaString);
+                    //Columnas de fechas.
+                    if (rows.length() == 0)
+                        dates.put(columns[i]);
+                } else
+                    values.put(columns[i],entity.getColumnValueList().getAsString(columns[i]));
+            }
+            row.put("values",values);
+            rows.put(row);
+        }
+        if ( rows != null && rows.length() > 0 ) {
+            JSONObject wrapper = new JSONObject();
+            wrapper.put("value", rows);
+            wrapper.put("dates",dates);
+            return wrapper;
+        }
+        return new JSONObject();
     }
 
     @Override
@@ -205,6 +177,7 @@ public class SyncServerService extends Service {
                         try {
                             JSONObject obj = (JSONObject) args[0];
                             iSend.putExtra("inserted", obj.get("result").toString());
+                            iSend.putExtra("tableName",obj.get("tableName").toString());
                             sendBroadcast(iSend);
                         } catch (JSONException e) {
                             e.printStackTrace();

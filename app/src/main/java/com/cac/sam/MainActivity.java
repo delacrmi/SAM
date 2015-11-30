@@ -247,7 +247,7 @@ public class MainActivity extends AppCompatActivity {
 
     public SettingFragment getSettingFragment(){
         if(settingFragment == null)
-            settingFragment = SettingFragment.getInstance();
+            settingFragment = SettingFragment.getInstance(this);
         return settingFragment;
     }
 

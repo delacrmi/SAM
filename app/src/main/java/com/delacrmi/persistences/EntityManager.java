@@ -186,7 +186,7 @@ public class EntityManager  {
                 return  save(entity,columnsValue);
 
             ent.setValues(columnsValue);
-            long insert = write().update(ent.getName(), columnsValue, where, null);
+            long insert = write().update(ent.getName(), columnsValue, where, whereValues);
             write().close();
 
             if (insert > 0)

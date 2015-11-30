@@ -6,8 +6,10 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.cac.entities.Transaccion;
+import com.cac.entities.TransactionDetails;
 import com.cac.sam.MainActivity;
 import com.cac.services.SyncServerService;
+import com.delacrmi.persistences.Entity;
 import com.delacrmi.persistences.EntityManager;
 
 import org.json.JSONException;
@@ -26,21 +28,46 @@ public class ServerStarter extends BroadcastReceiver {
                 String empresa = (String) obj.get(Transaccion.EMPRESA);
                 String periodo = (String) obj.get(Transaccion.PERIODO);
                 String aplicacion = (String) obj.get(Transaccion.APLICACION);
-                //String tableName = (String) obj.get("tableName");
+                String tableName = intent.getStringExtra("tableName");
                 if ( !noEnvio.equals("0") || !noEnvio.equals(" ") ) {
 
-                    //if ( tableName.equalsIgnoreCase(Transaccion.TABLE_NAME) ) {
-                        MainActivity mainActivity = (MainActivity) context;
-                        EntityManager entityManager = mainActivity.getEntityManager();
+                    MainActivity mainActivity = (MainActivity) context;
+                    EntityManager entityManager = mainActivity.getEntityManager();
+
+                    if ( tableName.equalsIgnoreCase(Transaccion.TABLE_NAME) ) {
                         Transaccion transaccion = (Transaccion) entityManager.findOnce(
                                 Transaccion.class, "*",
                                 Transaccion.NO_ENVIO + " = ? and " + Transaccion.EMPRESA + " = ? and " +
-                                        Transaccion.PERIODO + " = ? and " + Transaccion.APLICACION + " = ? ",
+                                Transaccion.PERIODO + " = ? and " + Transaccion.APLICACION + " = ? ",
                                 new String[]{noEnvio, empresa, periodo, aplicacion}
                         );
-                        transaccion.setValue(Transaccion.ESTADO, Transaccion.TransaccionEstado.TRASLADADA.toString());
-                        entityManager.update(transaccion, Transaccion.NO_ENVIO + " = ?", new String[]{noEnvio});
-                    //}
+                        transaccion.setValue(Transaccion.ESTADO,Transaccion.TransaccionEstado.TRASLADADA.toString());
+                        entityManager.update(Transaccion.class,
+                                transaccion.getColumnValueList(),
+                                Transaccion.NO_ENVIO + " = ? and " + Transaccion.EMPRESA + " = ? and " +
+                                Transaccion.PERIODO + " = ? and " + Transaccion.APLICACION + " = ? ",
+                                new String[]{noEnvio, empresa, periodo, aplicacion}
+                        );
+                    } else if ( tableName.equalsIgnoreCase(TransactionDetails.TABLE_NAME ) ) {
+                        String correlativo = (String) obj.get(TransactionDetails.CORRELATIVO);
+                        TransactionDetails transaccion = (TransactionDetails) entityManager.findOnce(
+                                TransactionDetails.class, "*",
+                                TransactionDetails.NO_RANGO + " = ? and " + TransactionDetails.EMPRESA + " = ? and " +
+                                TransactionDetails.ID_PERIODO + " = ? and " +
+                                TransactionDetails.APLICACION + " = ? and " +
+                                TransactionDetails.CORRELATIVO+ " = ?",
+                                new String[]{noEnvio, empresa, periodo, aplicacion, correlativo}
+                        );
+                        transaccion.setValue(TransactionDetails.ESTADO,TransactionDetails.TransactionDetailsEstado.TRASLADADA.toString());
+                        entityManager.update(TransactionDetails.class,
+                                transaccion.getColumnValueList(),
+                                TransactionDetails.NO_RANGO + " = ? and " + TransactionDetails.EMPRESA + " = ? and " +
+                                TransactionDetails.ID_PERIODO + " = ? and " +
+                                TransactionDetails.APLICACION + " = ? and " +
+                                TransactionDetails.CORRELATIVO+ " = ?",
+                                new String[]{noEnvio, empresa, periodo, aplicacion, correlativo}
+                        );
+                    }
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
