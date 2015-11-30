@@ -5,6 +5,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.cac.entities.Transaccion;
+import com.cac.entities.TransactionDetails;
 import com.delacrmi.connection.ConnectSQLite;
 
 import java.util.ArrayList;
@@ -65,7 +67,29 @@ public class EntityManager  {
     public EntityManager init(){
         ConnectSQLite.tablesCreater = createList();
         ConnectSQLite.tablesNames = tablesNames;
-        conn = new ConnectSQLite(context,dbName,factory,dbVersion);
+        conn = new ConnectSQLite(context,dbName,factory,dbVersion){
+
+            @Override
+            public void beforeToUpdate(SQLiteDatabase db) {
+                List<Entity> entities = new ArrayList<Entity>();
+
+                Cursor cursor = db.rawQuery("select * from " + Transaccion.TABLE_NAME, null);
+                setListFromCursor(cursor,entities,Transaccion.class);
+
+                cursor = db.rawQuery("select * from " + TransactionDetails.NAME, null);
+                setListFromCursor(cursor,entities,TransactionDetails.class);
+
+                setEntitiesBackup(entities);
+            }
+
+            @Override
+            public void afterToUpdate(SQLiteDatabase db) {
+                List<Entity> entities = getEntitiesBackup();
+                for(Entity entity : entities)
+                    db.insert(entity.getName(),null,entity.getContentValues());
+                super.afterToUpdate(db);
+            }
+        };
         read();
         return this;
     }
@@ -136,28 +160,7 @@ public class EntityManager  {
         }
         return null;*/
     }
-    /*@Deprecated
-    public synchronized Entity save(Entity entity){
-        if(entity != null){
-            //long insert = write().insert(entity.getName(), null, entity.getColumnValueList());
-            long insert = write().insert(entity.getName(), null, entity.getContentValues());
-            write().close();
-            //Log.e("Save", "" + insert);
-            if(insert > 0) {
-                entity.getColumnValueList().put(entity.getPrimaryKey(),insert);
 
-                List<EntityColumn> pk = entity.getPrimariesKeys();
-                if(pk.size() == 1)
-                    pk.get(0).setValue(insert);
-
-                return entity;
-            }else
-                return null;
-        }
-        return null;
-    }*/
-
-    //TODO: change the Deprecated Method
     public synchronized Entity save(Entity entity){
         if(entity != null){
             long insert = write().insert(entity.getName(), null, entity.getContentValues());
@@ -177,11 +180,13 @@ public class EntityManager  {
     //</editor-fold>
 
     //<editor-fold desc="Updating the Entities class">
-    public synchronized Entity update(Class entity,ContentValues columnsValue,String where, String[] whereValues){
+    public  Entity update(Class entity,ContentValues columnsValue,String where, String[] whereValues,boolean save){
 
-        Entity ent= findOnce(entity,"*",where,whereValues);
+        Entity ent= findOnce(entity, "*", where, whereValues);
+        ent.setValues(columnsValue);
+        return update(ent,where,whereValues,save);
 
-        if(ent != null || columnsValue != null){
+        /*if(ent != null || columnsValue != null){
             if(ent == null)
                 return  save(entity,columnsValue);
 
@@ -194,16 +199,16 @@ public class EntityManager  {
 
         }
 
-        return null;
+        return null;*/
     }
 
-    public synchronized Entity update(Entity entity,String where,String[] whereValues){
+    public synchronized Entity update(Entity entity,String where,String[] whereValues,boolean save){
         if(entity != null){
             long insert = write().update(entity.getName(), entity.getColumnValueList(), where, whereValues);
             write().close();
             if(insert > 0)
                 return entity;
-            else
+            else if(save)
                 return save(entity);
         }
         return null;
@@ -233,9 +238,10 @@ public class EntityManager  {
 
         Cursor cursor = read().rawQuery(sql, args);
 
-
-        if(cursor != null && cursor.moveToFirst())
+        if(cursor != null && cursor.moveToFirst()) {
             addEntityValues(cursor, ent);
+
+        }
 
         read().close();
         return ent;
@@ -272,8 +278,10 @@ public class EntityManager  {
             sql += " where "+conditions;
 
         Cursor cursor = read().rawQuery(sql, args);
+        List<Entity> list = new ArrayList<Entity>();
+        setListFromCursor(cursor,list,entity);
 
-        if(cursor != null && cursor.moveToFirst()){
+        /*if(cursor != null && cursor.moveToFirst()){
             List<Entity> list = new ArrayList<Entity>();
             do {
                 ent= initInstance(entity);
@@ -284,9 +292,10 @@ public class EntityManager  {
             read().close();
 
             return  list;
-        }
+        }*/
+
         read().close();
-        return new ArrayList<Entity>();
+        return list;
     }
     //</editor-fold>
 
@@ -325,6 +334,17 @@ public class EntityManager  {
                 entity.setValue(columnName,cursor.getString(col));
                 entity.setColumnValue(columnName,cursor.getString(col));
             }
+        }
+    }
+
+    private void setListFromCursor(Cursor cursor, List<Entity> entities,Class entity){
+        Entity ent;
+        if(cursor != null && cursor.moveToFirst()){
+            do {
+                ent= initInstance(entity);
+                addEntityValues(cursor,ent);
+                entities.add(ent);
+            }while(cursor.moveToNext());
         }
     }
 

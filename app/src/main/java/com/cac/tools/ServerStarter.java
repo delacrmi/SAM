@@ -38,7 +38,7 @@ public class ServerStarter extends BroadcastReceiver {
                             new String[]{noEnvio, empresa, periodo, aplicacion}
                     );
                     transaccion.setValue(Transaccion.INDICADOR, Transaccion.TransaccionEstado.TRASLADADA.toString());
-                    entityManager.update(transaccion,Transaccion.NO_ENVIO+" = ?", new String[]{noEnvio});
+                    entityManager.update(transaccion,Transaccion.NO_ENVIO+" = ?", new String[]{noEnvio},false);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
