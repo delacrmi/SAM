@@ -39,9 +39,11 @@ public class MainFragment extends Fragment implements MainComponentEdit<View[]> 
     @Override
     public void mainViewConfig(View[] views) {
         views[0].getLayoutParams().height = 0;
+        views[0].invalidate();
         views[1].setVisibility(view.INVISIBLE);
+        views[1].invalidate();
         views[2].setVisibility(view.INVISIBLE);
-
+        views[2].invalidate();
     }
 
     @Override

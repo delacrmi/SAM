@@ -48,6 +48,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -134,9 +136,10 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
                 }
             });
             ourInstance.autTractor.setAdapter(
-                    getAdapter(Vehiculos.class,Vehiculos.CODIGO_GRUPO+"||"+Vehiculos.CODIGO_SUBGRUPO+"||"+Vehiculos.CODIGO_VEHICULO+" key,"+
-                            Vehiculos.CODIGO_GRUPO+"||"+Vehiculos.CODIGO_SUBGRUPO+"||"+Vehiculos.CODIGO_VEHICULO+" value",
-                            Vehiculos.CODIGO_GRUPO +" = ?",new String[]{"A"},hashTractor)
+                    findCodigosVehiculos(Vehiculos.class, "A" )
+                    //getAdapter(Vehiculos.class,Vehiculos.CODIGO_GRUPO+"||"+Vehiculos.CODIGO_SUBGRUPO+"||"+Vehiculos.CODIGO_VEHICULO+" key,"+
+                      //      Vehiculos.CODIGO_GRUPO+"||"+Vehiculos.CODIGO_SUBGRUPO+"||"+Vehiculos.CODIGO_VEHICULO+" value",
+                        //    Vehiculos.CODIGO_GRUPO +" = ?",new String[]{"A"},hashTractor)
             );
             ourInstance.autTractor.setThreshold(2);
 
@@ -154,7 +157,7 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
             });
             ourInstance.autCutter.setOnKeyListener(new OnKeyListenerRefactory(hashCutter, ourInstance.tvCutter));
             ourInstance.autCutter.setAdapter(
-                    getAdapter(Empleados.class,Empleados.ID_EMPLEADO+" key,"+Empleados.NOMBRE+" value", null, null, hashCutter)
+                    getAdapter(Empleados.class, Empleados.ID_EMPLEADO + " key," + Empleados.NOMBRE + " value", null, null, hashCutter)
             );
             ourInstance.autCutter.setThreshold(1);
 
@@ -239,14 +242,17 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
         events();
 
         views[0].getLayoutParams().height = MainActivity.VISIBLE_ACTION;
+        views[0].invalidate();
 
         ((ImageButton)views[1]).setImageResource(R.drawable.grabar);
         views[1].setOnClickListener(onClickListener);
         views[1].setVisibility(View.VISIBLE);
+        views[1].invalidate();
 
         ((ImageButton)views[2]).setImageResource(R.drawable.anterior);
         views[2].setOnClickListener(onClickListener);
         views[2].setVisibility(View.VISIBLE);
+        views[2].invalidate();
 
     }
 
@@ -280,9 +286,9 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
                         transaccion.getColumn(Transaccion.ID_FINCA)
                                 .setValue(Integer.parseInt(parameters.getFinca().getText() + ""));
                         transaccion.getColumn(Transaccion.ID_CANIAL)
-                                .setValue(Integer.parseInt(parameters.getFinca().getText() + ""));
+                                .setValue(Integer.parseInt(parameters.getCanial()));
                         transaccion.getColumn(Transaccion.ID_LOTE)
-                                .setValue(Integer.parseInt(parameters.getFinca().getText() + ""));
+                                .setValue(Integer.parseInt(parameters.getLote()));
 
                         transaccion.getColumn(Transaccion.FECHA_CORTE).setValue(new Date());
 
@@ -292,10 +298,13 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
                                 .setValue(Integer.parseInt(ourInstance.etTotalRaise.getText() + ""));
                         transaccion.getColumn(Transaccion.PESO)
                                 .setValue(Double.parseDouble(ourInstance.etTotalWeight.getText() + ""));
+                        transaccion.getColumn(Transaccion.LINEA)
+                                .setValue(Integer.parseInt(ourInstance.etLine.getText().toString()));
 
-                        transaccion.setValue(Transaccion.APLICACION, APLICACION);
-                        transaccion.setValue(Transaccion.DISPOSITIVO, DISPOSITIVO);
-                        transaccion.setValue(Transaccion.INDICADOR, Transaccion.TransaccionEstado.ACTIVA.toString());
+
+                        transaccion.getColumn(Transaccion.APLICACION).setValue(APLICACION);
+                        transaccion.getColumn(Transaccion.DISPOSITIVO).setValue(DISPOSITIVO);
+                        transaccion.getColumn(Transaccion.ESTADO).setValue(Transaccion.TransaccionEstado.ACTIVA.toString());
 
                         transaccion = (Transaccion)ourInstance.entityManager.save(transaccion);
 
@@ -309,6 +318,7 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
                                 details.getColumn(TransactionDetails.APLICACION).setValue(APLICACION);
                                 details.getColumn(TransactionDetails.NO_RANGO).setValue(envio);
                                 details.getColumn(TransactionDetails.CORRELATIVO).setValue(detailsindex);
+                                details.getColumn(TransactionDetails.ESTADO).setValue(TransactionDetails.TransactionDetailsEstado.ACTIVA.toString());
                                 if(ourInstance.entityManager.save(details) != null)
                                     Log.i("inserted","uñada "+details.getColumn(TransactionDetails.UNADA).getValue()+
                                             " peso "+details.getColumn(TransactionDetails.PESO).getValue());
@@ -350,7 +360,7 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
 
     public int findMaxEnvio (){
 
-        int envioActual = 1;
+        int envioActual = 0;
 
         //Buscamos los numeros permitidos a generar.
         Rangos rangos =  (Rangos) ourInstance.entityManager.findOnce(Rangos.class,"*",
@@ -372,7 +382,7 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
         if ( transaccionTemp != null ){
             try {
                 envioActual = transaccionTemp.getColumnValueList().getAsInteger(Transaccion.NO_ENVIO);
-            } catch (Exception ex) { envioActual = 1; }
+            } catch (Exception ex) { envioActual = minEnvio; }
         }
 
         if ( maxEnvio == 0 || minEnvio == 0 ) {
@@ -382,7 +392,7 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
             AndroidUtils.showAlertMsg(ourInstance.context,"Notificación","El dispositivo ha excedido el número maximo de envios, solo tiene permitido generar hasta "+maxEnvio+" Envios y el envio actual es el "+envioActual);
             return 0;
         } else if ( envioActual == 0 ) {
-            envioActual = 1;
+            envioActual = minEnvio;
         }
 
         return envioActual;
@@ -478,4 +488,23 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
             );
         }
     }
+
+    private ArrayAdapter<String> findCodigosVehiculos(Class entidad, String codigoGrupo ) {
+
+        List<Entity> entidades =  ourInstance.entityManager.find(entidad, "*", Vehiculos.CODIGO_GRUPO + " = '" + codigoGrupo + "' and " + Vehiculos.STATUS + " = 1", null);
+        List<String> listado = new ArrayList<>();
+        for ( Entity a : entidades ){
+            String descripcion = a.getColumnValueList().getAsString(Vehiculos.CODIGO_GRUPO);
+            descripcion += String.format("%02d", Integer.parseInt(a.getColumnValueList().getAsString(Vehiculos.CODIGO_SUBGRUPO)));
+            descripcion += String.format("%03d", Integer.parseInt(a.getColumnValueList().getAsString(Vehiculos.CODIGO_VEHICULO)));
+            listado.add(descripcion);
+        }
+
+        if ( listado != null && !listado.isEmpty() ) {
+            Collections.sort(listado);
+            return new ArrayAdapter<>(ourInstance.context, android.R.layout.simple_selectable_list_item, listado);
+        }else
+            return new ArrayAdapter<>(ourInstance.context, android.R.layout.simple_selectable_list_item, new ArrayList<String>());
+    }
+
 }

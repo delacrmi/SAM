@@ -69,4 +69,8 @@
 
     <string name="cutter_report">Reporte de Cortadores</string>
 
+    <!-- DEFAULT DATE FORMAT-->
+    <string name="default_date_format">yyyy-MM-dd</string>
+    <string name="mobile_setting_title">Parametros del Dispositivo</string>
+
 </resources>

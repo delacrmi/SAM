@@ -20,7 +20,7 @@ import java.util.Set;
 /**
  * Created by miguel on 09/10/15.
  */
-public abstract class Entity implements Serializable{
+public abstract class Entity implements Serializable {
 
     private String entityName = "";
     private String nickName = "";

@@ -8,8 +8,7 @@ import com.delacrmi.persistences.EntityColumn;
  */
 public class TransactionDetails extends Entity {
 
-    public static String NAME = "ba_dtransaccion";
-
+    public static String TABLE_NAME = "ba_dtransaccion";
     public static String EMPRESA = "id_empresa";
     public static String ID_PERIODO = "id_periodo";
     public static String APLICACION = "aplicacion";
@@ -18,10 +17,11 @@ public class TransactionDetails extends Entity {
     public static String PESO = "peso";
     public static String UNADA = "unada";
     public static String ID_TRACTOR = "codigo_tractor";
+    public static String ESTADO = "estado";
 
     @Override
     public Entity entityConfig() {
-        setName(NAME);
+        setName(TABLE_NAME);
         setNickName("Detalle Transaccion");
         addColumn(new EntityColumn<Integer>(EMPRESA, EntityColumn.ColumnType.INTEGER).setNotNullable());
         addColumn(new EntityColumn<Integer>(ID_PERIODO, EntityColumn.ColumnType.INTEGER).setNotNullable());
@@ -30,8 +30,14 @@ public class TransactionDetails extends Entity {
         addColumn(new EntityColumn<String>(ID_TRACTOR, EntityColumn.ColumnType.TEXT).setNotNullable());
         addColumn(new EntityColumn<Integer>(CORRELATIVO,true).setAutoIncrement());
         addColumn(new EntityColumn<Double>(PESO,EntityColumn.ColumnType.REAL).setNotNullable());
+        addColumn(new EntityColumn<String>(Transaccion.ESTADO, EntityColumn.ColumnType.TEXT)
+                .setDefaultValue(TransactionDetailsEstado.ACTIVA.toString()));
         addColumn(new EntityColumn<Integer>(UNADA, EntityColumn.ColumnType.INTEGER)
                 .setOutServerColumn());
         return this;
+    }
+
+    public enum TransactionDetailsEstado {
+        ACTIVA, TRASLADADA
     }
 }

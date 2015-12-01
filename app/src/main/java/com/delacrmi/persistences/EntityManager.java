@@ -76,7 +76,7 @@ public class EntityManager  {
                 Cursor cursor = db.rawQuery("select * from " + Transaccion.TABLE_NAME, null);
                 setListFromCursor(cursor,entities,Transaccion.class);
 
-                cursor = db.rawQuery("select * from " + TransactionDetails.NAME, null);
+                cursor = db.rawQuery("select * from " + TransactionDetails.TABLE_NAME, null);
                 setListFromCursor(cursor,entities,TransactionDetails.class);
 
                 setEntitiesBackup(entities);
@@ -191,7 +191,7 @@ public class EntityManager  {
                 return  save(entity,columnsValue);
 
             ent.setValues(columnsValue);
-            long insert = write().update(ent.getName(), columnsValue, where, null);
+            long insert = write().update(ent.getName(), columnsValue, where, whereValues);
             write().close();
 
             if (insert > 0)
@@ -280,19 +280,6 @@ public class EntityManager  {
         Cursor cursor = read().rawQuery(sql, args);
         List<Entity> list = new ArrayList<Entity>();
         setListFromCursor(cursor,list,entity);
-
-        /*if(cursor != null && cursor.moveToFirst()){
-            List<Entity> list = new ArrayList<Entity>();
-            do {
-                ent= initInstance(entity);
-                addEntityValues(cursor,ent);
-                list.add(ent);
-            }while(cursor.moveToNext());
-
-            read().close();
-
-            return  list;
-        }*/
 
         read().close();
         return list;

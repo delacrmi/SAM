@@ -96,6 +96,7 @@ public class CuttingParametersFragment extends Fragment implements MainComponent
     public void mainViewConfig(View[] views) {
 
         views[0].getLayoutParams().height = MainActivity.VISIBLE_ACTION;
+        views[0].invalidate();
 
         ((ImageButton)views[1]).setImageResource(R.drawable.siguiente);
         views[1].setVisibility(View.VISIBLE);
@@ -108,8 +109,9 @@ public class CuttingParametersFragment extends Fragment implements MainComponent
                     );
             }
         });
-
+        views[1].invalidate();
         views[2].setVisibility(View.INVISIBLE);
+        views[2].invalidate();
     }
 
     @Override

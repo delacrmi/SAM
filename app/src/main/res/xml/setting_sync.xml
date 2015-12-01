@@ -50,4 +50,15 @@
             android:defaultValue="20"/>
 
     </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="mobile_settings"
+        android:title="@string/mobile_setting_title">
+
+        <EditTextPreference
+            android:key="EMEI"
+            android:title="Identificador EMEI"
+            android:editable="false"/>
+
+    </PreferenceCategory>
 </PreferenceScreen>
