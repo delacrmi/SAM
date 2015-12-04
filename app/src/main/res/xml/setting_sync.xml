@@ -35,6 +35,30 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory
+        android:key="data_base_parameter"
+        android:title="@string/data_base_parameter_title">
 
+        <com.cac.tools.MyCustomPreferencesEmpresas
+            android:title="Empresa"
+            android:key="EMPRESA"
+            android:defaultValue="30"/>
 
+        <com.cac.tools.MyCustomPreferencesPeriodos
+            android:title="Periodo"
+            android:key="PERIODO"
+            android:defaultValue="20"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="mobile_settings"
+        android:title="@string/mobile_setting_title">
+
+        <EditTextPreference
+            android:key="EMEI"
+            android:title="Identificador EMEI"
+            android:editable="false"/>
+
+    </PreferenceCategory>
 </PreferenceScreen>

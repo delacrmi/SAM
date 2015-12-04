@@ -1,12 +1,18 @@
 package com.cac.entities;
 
-import com.delacrmi.controller.Entity;
+import com.delacrmi.persistences.Entity;
+import com.delacrmi.persistences.EntityColumn;
 
 /**
  * Created by miguel on 10/10/15.
  */
 public class Empresas extends Entity {
-    //private String sqlCreateEmpresa = "CREATE TABLE PG_EMPRESA( ID_EMPRESA INTEGER,DIRECCION_COMERCIAL TEXT)
+
+    public static String ID_EMPRESA = "id_empresa";
+    public static String DIRECCION_COMERCIAL = "direccion_comercial";
+    public static String DESCRIPCION = "descripcion";
+    public static String TABLE_NAME = "pg_empresa";
+    public static String ESTADO = "estado";
 
     private boolean selected = false;
 
@@ -16,16 +22,18 @@ public class Empresas extends Entity {
 
     @Override
     public Empresas entityConfig() {
-        setName("rh_empresa");
-        setPrimaryKey("id_empresa");
-        addColumn("direccion_comercial","text");
+        setName(Empresas.TABLE_NAME);
+        setNickName("Empresa");
+        addColumn(ID_EMPRESA, EntityColumn.ColumnType.INTEGER);
+        addColumn(DESCRIPCION, EntityColumn.ColumnType.TEXT);
+        addColumn(DIRECCION_COMERCIAL,EntityColumn.ColumnType.TEXT);
+        addColumn(ESTADO,EntityColumn.ColumnType.TEXT);
+        setSynchronizable(true);
         return this;
     }
 
-    public void setSelected(boolean selected){
-        this.selected = selected;
+    public enum EstadoEmpresas{
+        ACTIVA, INACTIVA
     }
-    public boolean isselected(){
-        return selected;
-    }
+
 }

@@ -3,10 +3,10 @@ package com.cac.sam;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.app.Service;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.support.design.widget.FloatingActionButton;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -14,50 +14,66 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.GridLayout;
+import android.widget.ImageButton;
+import android.widget.RelativeLayout;
 
+import com.cac.entities.*;
 import com.cac.services.SyncServerService;
 import com.cac.tools.MainComponentEdit;
 import com.cac.tools.ServerStarter;
+import com.cac.viewer.CutterReportFragment;
+import com.cac.viewer.CutterWorkFragment;
+import com.cac.viewer.CuttingParametersFragment;
 import com.cac.viewer.MainFragment;
 import com.cac.viewer.SettingFragment;
 import com.cac.viewer.SyncFragment;
-import com.delacrmi.controller.EntityManager;
+import com.delacrmi.persistences.EntityManager;
 
 public class MainActivity extends AppCompatActivity {
+
     private FragmentManager frm;
+    private boolean returningWithResult = false;
     private Fragment actualFragment;
     private String ACTUALFRAGMENT = "MainFragment";
+    private ServerStarter serverStarter;
 
     //App Menu
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
 
-    private FloatingActionButton btn_fab;
+    private RelativeLayout mainRelativeLayout;
+    public static int VISIBLE_ACTION = GridLayout.LayoutParams.WRAP_CONTENT;
+
+    private ImageButton btn_fab_right;
+    private ImageButton btn_fab_left;
 
     //Fragments
     private MainFragment mainFragment;
     private SyncFragment syncFragment;
     private SettingFragment settingFragment;
+    private CuttingParametersFragment cuttingParametersFragment;
+    private CutterWorkFragment cutterWorkFragment;
+    private CutterReportFragment cutterReportFragment;
 
     //Events References
     private OnClickListener onClickListener;
 
     private EntityManager entityManager;
+    private SharedPreferences sharedPreferences;
 
     //<editor-fold desc="Override Methods">
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
-        events();
+        setContentView(R.layout.activity_main);
 
         if(savedInstanceState != null)
             ACTUALFRAGMENT = savedInstanceState.getString("started");
@@ -71,15 +87,30 @@ public class MainActivity extends AppCompatActivity {
         intentFilter.addAction(SyncServerService.SYNCHRONIZE_STARTED);
         intentFilter.addAction(SyncServerService.OBJECT_SYNCHRONIZED);
         intentFilter.addAction(SyncServerService.SYNCHRONIZE_END);
-        ServerStarter serverStarter = new ServerStarter();
-        registerReceiver(serverStarter,intentFilter);
+        serverStarter = new ServerStarter();
+
+        try {
+            registerReceiver(serverStarter, intentFilter);
+        }catch (NullPointerException npe){}
 
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        returningWithResult = true;
+    }
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        returningWithResult = true;
+    }
+
+    @Override
     public void onSaveInstanceState(Bundle outState) {
+       // super.onSaveInstanceState(outState);
         outState.putString("started", ((MainComponentEdit) actualFragment).getTAG());
-        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -97,6 +128,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        unregisterReceiver(serverStarter);
+        super.onDestroy();
+    }
+
     //</editor-fold>
 
     private void initComponent(){
@@ -104,6 +141,10 @@ public class MainActivity extends AppCompatActivity {
         toolbar = (Toolbar)findViewById(R.id.appbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setSubtitle(R.string.app_description_name);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        mainRelativeLayout = (RelativeLayout)findViewById(R.id.main_body_action_layout);
+
+        getEntityManager();
 
         drawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle actionBarDrawerToggle =
@@ -119,7 +160,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onDrawerOpened(View drawerView) {
                 // Code here will be triggered once the drawer open as we dont want anything to happen so we leave this blank
-
                 super.onDrawerOpened(drawerView);
             }
         };
@@ -130,34 +170,26 @@ public class MainActivity extends AppCompatActivity {
         navigationView = (NavigationView)findViewById(R.id.nav_view);
         setDrawerMenu();
 
-        btn_fab = (FloatingActionButton)findViewById(R.id.btn_fab);
-        btn_fab.setOnClickListener(onClickListener);
+        btn_fab_right = (ImageButton)findViewById(R.id.btn_fab_right);
+        btn_fab_left  = (ImageButton)findViewById(R.id.btn_fab_left);
 
         //init fist main fragment
         frm = getFragmentManager();
-        startTransactionByFragmentTag(ACTUALFRAGMENT);
+        startTransactionByTagFragment(ACTUALFRAGMENT);
 
-    }
-
-    private void events(){
-        onClickListener = new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-            switch (v.getId()){
-                case R.id.btn_fab:
-                    ((MainComponentEdit)actualFragment).onClickFloating();
-                    break;
-            }
-            }
-        };
     }
 
     public EntityManager getEntityManager() {
         if ( entityManager == null ) {
-            entityManager = new EntityManager(this,
-                    getResources().getString(R.string.db_name),
-                    null,
-                    Integer.parseInt(getResources().getString(R.string.db_version)));
+            entityManager = new EntityManager(this, getResources().getString(R.string.db_name), null,
+                    Integer.parseInt(getResources().getString(R.string.db_version)))
+            .addTable(Caniales.class)
+            .addTable(Empleados.class).addTable(Empresas.class)
+            .addTable(Fincas.class).addTable(Frentes.class)
+            .addTable(Lotes.class).addTable(Periodos.class)
+            .addTable(Rangos.class).addTable(Transaccion.class)
+            .addTable(TransactionDetails.class)
+            .addTable(Vehiculos.class).init();
         }
         return entityManager;
     }
@@ -168,26 +200,36 @@ public class MainActivity extends AppCompatActivity {
      */
     private void startTransaction(Fragment fragment){
         FragmentTransaction frt = frm.beginTransaction();
-        frt.replace(R.id.body_layout, fragment, ACTUALFRAGMENT);
+        frt.replace(R.id.main_body_layout, fragment, ACTUALFRAGMENT);
         frt.commit();
-
-        actualFragment = fragment;
-        ((MainComponentEdit)fragment).FloatingButtonConfig(btn_fab);
+        ((MainComponentEdit) fragment).
+                mainViewConfig(new View[]{mainRelativeLayout,btn_fab_right, btn_fab_left});
         getSupportActionBar().setSubtitle(((MainComponentEdit) fragment).getSubTitle());
-
     }
 
-    private void startTransactionByFragmentTag(String tag){
+    public void startTransactionByTagFragment(String tag){
         switch (tag){
             case "MainFragment":
-                startTransaction(getMainFragment());
+                actualFragment = getMainFragment();
                 break;
             case "SyncFragment":
-                startTransaction(getSyncFragment());
+                actualFragment = getSyncFragment();
                 break;
             case "SettingFragment":
-                startTransaction(getSettingFragment());
+                actualFragment = getSettingFragment();
+                break;
+            case "CuttingParametersFragment":
+                actualFragment = getCuttingParametersFragment();
+                break;
+            case "CutterWorkFragment":
+                actualFragment = getCutterWorkFragment();
+                break;
+            case CutterReportFragment.TAG:
+                actualFragment = getCutterReportFragment();
+                break;
         }
+        ((MainComponentEdit)actualFragment).setContext(this);
+        startTransaction(actualFragment);
     }
 
     public MainFragment getMainFragment(){
@@ -198,15 +240,35 @@ public class MainActivity extends AppCompatActivity {
 
     public SyncFragment getSyncFragment(){
         if(syncFragment == null)
-            syncFragment = SyncFragment.init(this,getEntityManager(),"http:/100.10.20.171:3000");
+            syncFragment = SyncFragment.init(this,getEntityManager(),
+                    sharedPreferences.getString("etp_uri1", ""));
         return syncFragment;
     }
 
     public SettingFragment getSettingFragment(){
         if(settingFragment == null)
-            settingFragment = SettingFragment.getInstance();
+            settingFragment = SettingFragment.getInstance(this);
         return settingFragment;
     }
+
+    public CuttingParametersFragment getCuttingParametersFragment() {
+        if ( cuttingParametersFragment == null )
+            cuttingParametersFragment = cuttingParametersFragment.init(this, getEntityManager());
+        return cuttingParametersFragment;
+    }
+
+    public CutterWorkFragment getCutterWorkFragment(){
+        if(cutterWorkFragment == null)
+            cutterWorkFragment = CutterWorkFragment.init(this,entityManager);
+        return cutterWorkFragment;
+    }
+
+    public CutterReportFragment getCutterReportFragment(){
+        if ( cutterReportFragment == null )
+            cutterReportFragment = CutterReportFragment.init(this);
+        return cutterReportFragment;
+    }
+
 
     /**
      * @args
@@ -219,16 +281,21 @@ public class MainActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(MenuItem menuItem) {
                 switch (menuItem.getItemId()){
                     case R.id.nav_home:
-                        startTransaction(getMainFragment());
+                        startTransactionByTagFragment(getMainFragment().getTAG());
                         break;
                     case R.id.client_sync:
-                        startTransaction(getSyncFragment());
+                        startTransactionByTagFragment(getSyncFragment().getTAG());
                         break;
                     case R.id.setting:
-                        startTransaction(getSettingFragment());
+                        startTransactionByTagFragment(getSettingFragment().getTAG());
+                        break;
+                    case R.id.fingering_work:
+                        startTransactionByTagFragment(getCuttingParametersFragment().getTAG());
+                        break;
+                    case R.id.cutter_report:
+                        startTransactionByTagFragment(CutterReportFragment.TAG);
                         break;
                 }
-
                 drawerLayout.closeDrawers();
                 return true;
             }

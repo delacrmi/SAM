@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/card_cutter_insert"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        card_view:cardBackgroundColor="@color/color_primary_light"
+        card_view:cardElevation="4dp">
+
+        <RelativeLayout
+            android:id="@+id/cutter_head_layout"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+
+            <EditText
+                android:id="@+id/tv_code_master_row"
+                android:layout_width="140dp"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:textStyle="bold"
+                android:textSize="25dp"
+                android:textColor="@color/color_accent"
+                android:textColorHint="@color/color_accent"
+                android:editable="false"
+                android:gravity="center"
+                android:hint="# Ticket"
+                android:layout_centerHorizontal="true" />
+
+            <ImageView
+                android:id="@+id/iv_cutter_delete_all"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/eliminar"
+                android:layout_alignParentRight="true"
+                android:contentDescription="close_head"/>
+
+            <TextView
+                android:id="@+id/tv_cutter_map"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/map"
+                android:textSize="20dp"
+                android:textStyle="bold"
+                android:textColor="@color/color_Black_Dark"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="5dp"
+                android:layout_below="@+id/iv_cutter_delete_all"/>
+
+            <EditText
+                android:id="@+id/et_cutter_map"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="number"
+                android:textColor="@color/color_accent"
+                android:layout_below="@+id/iv_cutter_delete_all"
+                android:layout_marginLeft="5dp"
+                android:layout_toRightOf="@+id/tv_cutter_map"/>
+
+            <TextView
+                android:id="@+id/tv_tractor_insert"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/tractor"
+                android:textSize="20dp"
+                android:textStyle="bold"
+                android:textColor="@color/color_Black_Dark"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="5dp"
+                android:layout_below="@+id/et_cutter_map"
+                android:layout_alignParentLeft="true"/>
+
+            <AutoCompleteTextView
+                android:id="@+id/aut_tractor_insert"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:inputType="textAutoComplete"
+                android:ems="10"
+                android:textColor="@color/color_accent"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_below="@+id/et_cutter_map"
+                android:layout_toRightOf="@+id/tv_tractor_insert"/>
+
+            <TextView
+                android:id="@+id/tv_line_insert"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/line"
+                android:textSize="20dp"
+                android:textStyle="bold"
+                android:textColor="@color/color_Black_Dark"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="5dp"
+                android:layout_below="@+id/et_cutter_map"
+                android:layout_toLeftOf="@+id/et_line_insert"/>
+
+            <EditText
+                android:id="@+id/et_line_insert"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:ems="10"
+                android:textColor="@color/color_accent"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_below="@+id/et_cutter_map"
+                android:layout_alignParentRight="true"/>
+
+            <TextView
+                android:id="@+id/tv_cutter_insert"
+                android:layout_width="wrap_content"
+                android:layout_height="25dp"
+                android:text="@string/cutter"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/color_Black_Dark"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="5dp"
+                android:layout_below="@id/et_line_insert"
+                />
+            <AutoCompleteTextView
+                android:id="@+id/aut_cutter_insert"
+                android:layout_width="90dp"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:textColor="@color/color_accent"
+                android:ems="10"
+                android:layout_toRightOf="@+id/tv_cutter_insert"
+                android:layout_below="@+id/et_line_insert"
+                android:layout_marginLeft="5dp"
+                />
+            <TextView
+                android:id="@+id/tv_cutter_name_insert"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/color_Black_Dark"
+                android:layout_below="@+id/et_line_insert"
+                android:layout_toRightOf="@+id/aut_cutter_insert"
+                android:layout_marginTop="15dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginBottom="3dp"/>
+
+        </RelativeLayout>
+
+    </android.support.v7.widget.CardView>
+
+    <RelativeLayout
+        android:id="@+id/rl_sum_amount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/card_cutter_insert"
+        android:background="#a1a7da"
+        android:layout_marginTop="3dp">
+        <TextView
+            android:id="@+id/tv_cutter_sum_raise"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/raise"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/color_Black_Dark"
+            android:layout_marginTop="15dp"
+            android:layout_marginLeft="5dp"
+            android:layout_alignParentLeft="true"
+            />
+        <EditText
+            android:id="@+id/et_cutter_sum_raise"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:editable="false"
+            android:text="0"
+            android:ems="10"
+            android:textColor="@color/color_accent"
+            android:layout_marginTop="5dp"
+            android:layout_toRightOf="@+id/tv_cutter_sum_raise"/>
+
+        <EditText
+            android:id="@+id/et_cutter_sum_weight"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:editable="false"
+            android:text="0.0"
+            android:ems="10"
+            android:textColor="@color/color_accent"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_alignParentRight="true"
+            />
+        <TextView
+            android:id="@+id/tv_cutter_sum_weight"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/weight"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/color_Black_Dark"
+            android:layout_marginTop="15dp"
+            android:layout_marginLeft="5dp"
+            android:layout_toLeftOf="@+id/et_cutter_sum_weight"
+            />
+
+    </RelativeLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycle_cutter_insert"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_below="@+id/rl_sum_amount">
+
+    </android.support.v7.widget.RecyclerView>
+
+</RelativeLayout>

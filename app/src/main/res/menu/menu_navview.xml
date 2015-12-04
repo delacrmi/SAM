@@ -28,7 +28,7 @@
         android:menuCategory="container">
         <menu>
             <item
-                android:id="@+id/work_digitacion"
+                android:id="@+id/fingering_work"
                 android:icon="@drawable/ic_launcher"
                 android:title="@string/work"/>
         </menu>

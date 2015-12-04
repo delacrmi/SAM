@@ -18,17 +18,21 @@
     <string name="cane">Cañial</string>
     <string name="batch">Lote</string>
     <string name="line">Linea</string>
-
-    <!-- ======================== Drawer Menu ============================ -->
-    <string name="raise">Uñadas</string>
-    <string name="weight">Peso</string>
-    <!-- ================================================================= -->
-
-    <string name="openDrawer">opening drawer component</string>
-    <string name="closeDrawer">closing drawer component</string>
+    <string name="map">Mapa Corte</string>
+    <string name="tractor">Tractor</string>
 
     <string name="syncSuccess">Sincronizado</string>
     <string name="sync_name">Sincronizar Tablas</string>
+
+    <string name="cutting_title_fragment">Parametros Generales</string>
+
+    <!-- ======================== Drawer ================================= -->
+    <string name="raise">Uñadas</string>
+    <string name="weight">Peso</string>
+
+    <string name="openDrawer">opening drawer component</string>
+    <string name="closeDrawer">closing drawer component</string>
+    <!-- ================================================================= -->
 
     <!-- ======================== Drawer Menu ============================ -->
     <string name="work_title">Mapa de Corte</string>
@@ -59,5 +63,15 @@
     <string name="auto_execute">Ejecutar Automaticamente</string>
     <string name="interval">Tiempo de sincronización</string>
     <!-- ================================================================= -->
+
+    <!-- Required Fields -->
+    <string name="required_fields">Debe indicar la informacion para el campo </string>
+    <string name="data_base_parameter_title">Parametros Generales</string>
+
+    <string name="cutter_report">Reporte de Cortadores</string>
+
+    <!-- DEFAULT DATE FORMAT-->
+    <string name="default_date_format">yyyy-MM-dd</string>
+    <string name="mobile_setting_title">Parametros del Dispositivo</string>
 
 </resources>

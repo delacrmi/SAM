@@ -9,6 +9,8 @@ import android.widget.TextView;
 import com.cac.sam.R;
 import com.cac.viewer.SyncFragment;
 
+import org.json.JSONArray;
+
 import java.util.Vector;
 
 
@@ -22,6 +24,8 @@ public class ViewSyncHolder extends RecyclerView.ViewHolder {
     public ProgressBar pgb_sync;
     public TextView tvProgress;
     public String tableName;
+    public String whereCondition;
+    public JSONArray whereValues;
     private View view;
 
     private View.OnClickListener onClickListener;
@@ -48,10 +52,14 @@ public class ViewSyncHolder extends RecyclerView.ViewHolder {
 
     }
 
-    public void bindTableSync(Vector<String> tableInfo){
-        title.setText(tableInfo.get(0));
-        tableName = tableInfo.get(1);
-        pgb_sync.setProgress(Integer.parseInt(tableInfo.get(2)));
+    public void bindTableSync(Vector<Object> tableInfo){
+        title.setText((String)tableInfo.get(0));
+        tableName = (String)tableInfo.get(1);
+        if ( tableInfo.size() == 5 ) {
+            whereCondition = (String) tableInfo.get(3);
+            whereValues    = (JSONArray) tableInfo.get(4);
+        }
+        pgb_sync.setProgress(Integer.parseInt((String) tableInfo.get(2)));
         tvProgress.setText(tableInfo.get(2)+"%");
     }
 
@@ -64,7 +72,9 @@ public class ViewSyncHolder extends RecyclerView.ViewHolder {
 
             @Override
             public void onClick(View v) {
-                SyncFragment.getInstance().threadSynchronizer(ViewSyncHolder.this.tableName);
+                SyncFragment.getInstance().threadSynchronizer(
+                        ViewSyncHolder.this.tableName,
+                        ViewSyncHolder.this.whereCondition,ViewSyncHolder.this.whereValues);
             }
         };
     }

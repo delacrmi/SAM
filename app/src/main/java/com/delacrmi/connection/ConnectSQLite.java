@@ -6,6 +6,9 @@ import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.delacrmi.persistences.Entity;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -15,6 +18,7 @@ public class ConnectSQLite extends SQLiteOpenHelper{
     //Catalog tablesCreater
     public static List<String> tablesCreater;
     public static List<String> tablesNames;
+    public List<Entity> entitiesBackup;
 
     {
         if(tablesCreater == null || tablesNames == null) throw new  NullPointerException();
@@ -44,12 +48,25 @@ public class ConnectSQLite extends SQLiteOpenHelper{
     public void onCreate(SQLiteDatabase db) {
         Log.d("creating", "Creando");
         createTables(db);
+        //db.close();
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         //Log.d("creating", "Actualizando");
+        beforeToUpdate(db);
         dropTables(db);
         createTables(db);
+        afterToUpdate(db);
     }
+
+    public void setEntitiesBackup(List<Entity> entitiesBackup){
+        this.entitiesBackup = entitiesBackup;
+    }
+    public List<Entity> getEntitiesBackup(){
+        return entitiesBackup;
+    }
+
+    public void beforeToUpdate(SQLiteDatabase db){}
+    public void afterToUpdate(SQLiteDatabase db){}
 }

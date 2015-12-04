@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- SharedPreferences Values-->
+    <string-array name="empresas">
+        <item>CONSORCIO AZUCARERO CENTRAL, S. A.</item>
+    </string-array>
+    <string-array name="empresas_valor">
+        <item>30</item>
+    </string-array>
+    <string-array name="periodos">
+        <item>2014 - 2015</item>
+        <item>2015 - 2016</item>
+    </string-array>
+    <string-array name="periodo_valor">
+        <item>19</item>
+        <item>20</item>
+    </string-array>
+</resources>

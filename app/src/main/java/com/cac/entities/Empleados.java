@@ -1,22 +1,37 @@
 package com.cac.entities;
 
-import com.delacrmi.controller.Entity;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+
+import com.delacrmi.persistences.Entity;
+import com.delacrmi.persistences.EntityColumn;
+import com.delacrmi.persistences.EntityFilter;
 
 /**
  * Created by miguel on 10/10/15.
  */
 public class Empleados extends Entity{
-    //"CREATE TABLE RH_EMPLEADO(ID_EMPRESA INTEGER,ID_EMPLEADO INTEGER, ID_PUESTO INTEGER, NOMBRE TEXT, ESTADO TEXT)";
+    public static String ID_EMPLEADO = "id_empleado";
+    public static String ID_EMPRESA = "id_empresa";
+    public static String NOMBRE = "nombre";
+    public static String TABLE_NAME = "inf_view_empleado_cortador";
 
     @Override
     public Empleados entityConfig() {
-        setName("rh_empleado");
-        setPrimaryKey("id_empleado");
-        addColumn("id_empresa", "integer");
-        addColumn("id_puesto", "integer");
-        addColumn("nombre", "text");
-        addColumn("estado","text");
-
+        setName(Empleados.TABLE_NAME);
+        setNickName("Cortadores");
+        addColumn(Empleados.ID_EMPLEADO, EntityColumn.ColumnType.INTEGER);
+        addColumn(Empleados.ID_EMPRESA, EntityColumn.ColumnType.INTEGER);
+        addColumn(Empleados.NOMBRE, EntityColumn.ColumnType.TEXT);
+        setSynchronizable(true);
         return this;
+    }
+
+    @Override
+    public void configureEntityFilter(Context context) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String empresa = sharedPreferences.getString("EMPRESA", "30");
+        setEntityFilter(new EntityFilter(new String[]{ID_EMPRESA}, new String[]{empresa}));
     }
 }
