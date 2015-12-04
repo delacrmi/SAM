@@ -18,16 +18,19 @@
             android:layout_width="fill_parent"
             android:layout_height="fill_parent">
 
-            <TextView
+            <EditText
                 android:id="@+id/tv_code_master_row"
-                android:layout_width="wrap_content"
+                android:layout_width="140dp"
                 android:layout_height="wrap_content"
-                android:textSize="30sp"
+                android:ems="10"
                 android:textStyle="bold"
+                android:textSize="25dp"
                 android:textColor="@color/color_accent"
-                android:layout_marginTop="0dp"
-                android:layout_alignParentLeft="true"
-                android:layout_marginLeft="5dp"/>
+                android:textColorHint="@color/color_accent"
+                android:editable="false"
+                android:gravity="center"
+                android:hint="# Ticket"
+                android:layout_centerHorizontal="true" />
 
             <ImageView
                 android:id="@+id/iv_cutter_delete_all"
@@ -36,6 +39,29 @@
                 android:src="@drawable/eliminar"
                 android:layout_alignParentRight="true"
                 android:contentDescription="close_head"/>
+
+            <TextView
+                android:id="@+id/tv_cutter_map"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/map"
+                android:textSize="20dp"
+                android:textStyle="bold"
+                android:textColor="@color/color_Black_Dark"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="5dp"
+                android:layout_below="@+id/iv_cutter_delete_all"/>
+
+            <EditText
+                android:id="@+id/et_cutter_map"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="number"
+                android:textColor="@color/color_accent"
+                android:layout_below="@+id/iv_cutter_delete_all"
+                android:layout_marginLeft="5dp"
+                android:layout_toRightOf="@+id/tv_cutter_map"/>
 
             <TextView
                 android:id="@+id/tv_tractor_insert"
@@ -47,7 +73,7 @@
                 android:textColor="@color/color_Black_Dark"
                 android:layout_marginTop="10dp"
                 android:layout_marginLeft="5dp"
-                android:layout_below="@+id/iv_cutter_delete_all"
+                android:layout_below="@+id/et_cutter_map"
                 android:layout_alignParentLeft="true"/>
 
             <AutoCompleteTextView
@@ -59,7 +85,7 @@
                 android:textColor="@color/color_accent"
                 android:layout_marginLeft="5dp"
                 android:layout_marginRight="5dp"
-                android:layout_below="@+id/iv_cutter_delete_all"
+                android:layout_below="@+id/et_cutter_map"
                 android:layout_toRightOf="@+id/tv_tractor_insert"/>
 
             <TextView
@@ -72,7 +98,7 @@
                 android:textColor="@color/color_Black_Dark"
                 android:layout_marginTop="10dp"
                 android:layout_marginLeft="5dp"
-                android:layout_below="@+id/iv_cutter_delete_all"
+                android:layout_below="@+id/et_cutter_map"
                 android:layout_toLeftOf="@+id/et_line_insert"/>
 
             <EditText
@@ -84,7 +110,7 @@
                 android:textColor="@color/color_accent"
                 android:layout_marginLeft="5dp"
                 android:layout_marginRight="5dp"
-                android:layout_below="@+id/iv_cutter_delete_all"
+                android:layout_below="@+id/et_cutter_map"
                 android:layout_alignParentRight="true"/>
 
             <TextView

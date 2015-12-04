@@ -42,14 +42,13 @@ public class ConnectSQLite extends SQLiteOpenHelper{
             Log.d("creating", value);
             db.execSQL("drop table if exists "+value);
         }
-        db.close();
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
         Log.d("creating", "Creando");
         createTables(db);
-        db.close();
+        //db.close();
     }
 
     @Override
@@ -69,7 +68,5 @@ public class ConnectSQLite extends SQLiteOpenHelper{
     }
 
     public void beforeToUpdate(SQLiteDatabase db){}
-    public void afterToUpdate(SQLiteDatabase db){
-        db.close();
-    }
+    public void afterToUpdate(SQLiteDatabase db){}
 }

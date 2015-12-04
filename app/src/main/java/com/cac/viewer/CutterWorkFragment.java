@@ -13,7 +13,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.telephony.TelephonyManager;
-import android.text.Layout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -67,7 +66,8 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
     public AppCompatActivity context;
 
     private View view;
-    private TextView tvCode;
+    private EditText etCode;
+    private EditText etMap;
     private EditText etLine;
 
     private AutoCompleteTextView autTractor;
@@ -76,6 +76,8 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
     private AutoCompleteTextView autCutter;
     private Map<String,String> hashCutter = new HashMap<String,String>();
     private TextView tvCutter;
+    private BigDecimal latitude;
+    private  BigDecimal longitude;
 
     private EditText etTotalRaise;
     private EditText etTotalWeight;
@@ -120,7 +122,10 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
             ourInstance.view = inflater.inflate(R.layout.cutter_work_view, container, false);
             ourInstance.layout = (RelativeLayout)ourInstance.view.findViewById(R.id.cutter_head_layout);
 
-            ourInstance.tvCode = (TextView)ourInstance.view.findViewById(R.id.tv_code_master_row);
+            ourInstance.etCode = (EditText)ourInstance.view.findViewById(R.id.tv_code_master_row);
+
+            ourInstance.etMap = (EditText)ourInstance.view.findViewById(R.id.et_cutter_map);
+            ourInstance.etMap.setOnFocusChangeListener(onFocusChangeListener);
             ourInstance.etLine = (EditText)ourInstance.view.findViewById(R.id.et_line_insert);
             ourInstance.etLine.setOnFocusChangeListener(onFocusChangeListener);
 
@@ -141,7 +146,7 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
                       //      Vehiculos.CODIGO_GRUPO+"||"+Vehiculos.CODIGO_SUBGRUPO+"||"+Vehiculos.CODIGO_VEHICULO+" value",
                         //    Vehiculos.CODIGO_GRUPO +" = ?",new String[]{"A"},hashTractor)
             );
-            ourInstance.autTractor.setThreshold(2);
+            ourInstance.autTractor.setThreshold(1);
 
             ourInstance.autCutter = (AutoCompleteTextView)ourInstance.view.findViewById(R.id.aut_cutter_insert);
             ourInstance.tvCutter = (TextView)ourInstance.view.findViewById(R.id.tv_cutter_name_insert);
@@ -182,7 +187,7 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
         PERIODO =  sharedPreferences.getString("PERIODO","30");
         APLICACION = sharedPreferences.getString("NOMBRE_APLICACION","SAM");
         TelephonyManager telephonyManager = (TelephonyManager)ourInstance.context.getSystemService(Context.TELEPHONY_SERVICE);
-//        DISPOSITIVO = telephonyManager.getDeviceId();
+        DISPOSITIVO = telephonyManager.getDeviceId();
 
         ourInstance.writing = true;
         return ourInstance.view;
@@ -202,6 +207,14 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
                     obj = new JSONObject(json.getString(0));
                     TransactionDetails transactionDetails = (TransactionDetails)new TransactionDetails().entityConfig();
                     transactionDetails.getColumn(TransactionDetails.PESO).setValue(obj.getDouble("weight")/1000);
+
+                    latitude = new BigDecimal(obj.optDouble("latitude")+"");
+                    longitude = new BigDecimal(obj.optDouble("longitude")+"");
+                    transactionDetails.getColumn(TransactionDetails.LATITUD).setValue(latitude.doubleValue());
+                    transactionDetails.getColumn(TransactionDetails.LONGITUD).setValue(longitude.doubleValue());
+                    transactionDetails.getColumn(TransactionDetails.ID_TRACTOR).setValue(
+                            autTractor.getText().toString()
+                    );
                     ourInstance.workDetailsAdapter.add(transactionDetails);
 
                 } catch (JSONException e) {
@@ -218,6 +231,9 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
             ourInstance.context.registerReceiver(ourInstance.receiver, intentFilter);
         }catch (NullPointerException npe){}
 
+        ourInstance.etCode.setText(findMaxEnvio()+"");
+        etMap.requestFocus();
+
     }
 
     @Override
@@ -229,7 +245,7 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
     public void insert(JSONObject obj){
         try {
             Entity transactionDetails = new TransactionDetails().entityConfig();
-            transactionDetails.setColumnValue(TransactionDetails.PESO,
+            transactionDetails.setColumnFromSelect(TransactionDetails.PESO,
                     Double.parseDouble(obj.getString("weight")));
             ourInstance.workDetailsAdapter.add((TransactionDetails)transactionDetails);
         } catch (JSONException e) {
@@ -266,7 +282,7 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
                         if(!validateForm(layout))
                             return;
 
-                        int envio = findMaxEnvio();
+                        int envio = Integer.parseInt(ourInstance.etCode.getText().toString());
                         if ( envio == 0 ) {
                             AndroidUtils.showAlertMsg(ourInstance.context, "Notificación", "No se encontro el número de envio.");
                             return;
@@ -318,7 +334,10 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
                                 details.getColumn(TransactionDetails.APLICACION).setValue(APLICACION);
                                 details.getColumn(TransactionDetails.NO_RANGO).setValue(envio);
                                 details.getColumn(TransactionDetails.CORRELATIVO).setValue(detailsindex);
-                                details.getColumn(TransactionDetails.ESTADO).setValue(TransactionDetails.TransactionDetailsEstado.ACTIVA.toString());
+                                details.getColumn(TransactionDetails.MAPA_CORTE).setValue(
+                                        Integer.parseInt(etMap.getText().toString()));
+                                details.getColumn(TransactionDetails.ESTADO).setValue(
+                                        TransactionDetails.TransactionDetailsEstado.ACTIVA.toString());
                                 if(ourInstance.entityManager.save(details) != null)
                                     Log.i("inserted","uñada "+details.getColumn(TransactionDetails.UNADA).getValue()+
                                             " peso "+details.getColumn(TransactionDetails.PESO).getValue());
@@ -327,6 +346,9 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
                             }
 
                             Snackbar.make(ourInstance.view,"Registro Guardado",Snackbar.LENGTH_SHORT).show();
+
+                            deleteAll();
+                            ourInstance.etCode.setText(findMaxEnvio()+"");
                         }
 
                         break;
@@ -335,12 +357,7 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
                                 ((MainActivity) ourInstance.context).getCuttingParametersFragment().getTAG());
                         break;
                     case R.id.iv_cutter_delete_all:
-                        etLine.setText("");
-                        autCutter.setText("");
-                        tvCutter.setText("");
-                        autTractor.setText("");
-                        while (ourInstance.transactionDetailsList.size()>0)
-                            ourInstance.workDetailsAdapter.remove(0);
+                        deleteAll();
                         break;
                 }
             }
@@ -358,11 +375,24 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
         };
     }
 
+    public void deleteAll(){
+        etMap.setText("");
+        etLine.setText("");
+        autCutter.setText("");
+        tvCutter.setText("");
+        autTractor.setText("");
+        while (ourInstance.transactionDetailsList.size()>0)
+            ourInstance.workDetailsAdapter.remove(0);
+    }
+
     public int findMaxEnvio (){
 
         int envioActual = 0;
 
         //Buscamos los numeros permitidos a generar.
+
+        Log.d("Parametros", EMPRESA+" "+PERIODO+" "+APLICACION+" "+DISPOSITIVO);
+
         Rangos rangos =  (Rangos) ourInstance.entityManager.findOnce(Rangos.class,"*",
                         Rangos.ID_EMPRESA+" = ? and "+Rangos.ID_PERIODO+" = ? and "+
                         Rangos.APLICACION+" = ? and "+Rangos.DISPOSITIVO+" = ?",

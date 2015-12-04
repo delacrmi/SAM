@@ -29,6 +29,9 @@ public class SyncServerService extends Service {
     public static String SYNCHRONIZE_STARTED = "com.cac.services.SYNCHRONIZE_STARTED";
     public static String OBJECT_SYNCHRONIZED = "com.cac.services.OBJECT_SYNCHRONIZED";
     public static String SYNCHRONIZE_END = "com.cac.services.SYNCHRONIZE_END";
+    public static int UPDATE_SUCCESS = 0;
+    public static int UPDATE_REJECTED = 1;
+
     private String TAG = "services";
     private Thread thread;
     private Boolean threadRunning;
@@ -38,6 +41,8 @@ public class SyncServerService extends Service {
     private SocketConnect connect;
     private String URI;
     private SharedPreferences sharedPreferences;
+
+    private int updateCount = 0;
 
     public SyncServerService() {
         super();
@@ -85,6 +90,8 @@ public class SyncServerService extends Service {
                             if ( entities != null && entities.size() > 0 )
                                 connect.sendMessage("synchronizerServer", getInformationToSend(entities,Transaccion.TABLE_NAME));
 
+                            updateCount += entities.size();
+
                             List<Entity> entities1 = getEntityManager().find(TransactionDetails.class, "*",
                                     TransactionDetails.ESTADO + " = ? ",
                                     new String[]{TransactionDetails.TransactionDetailsEstado.ACTIVA.toString()});
@@ -92,6 +99,7 @@ public class SyncServerService extends Service {
                             if ( entities1 != null && entities1.size() > 0 )
                                 connect.sendMessage("synchronizerServer", getInformationToSend(entities1,TransactionDetails.TABLE_NAME));
 
+                            updateCount += entities.size();
                         }
                     } catch (NullPointerException e){
 
@@ -172,17 +180,29 @@ public class SyncServerService extends Service {
                 @Override
                 public void onSynchronizeServer(Object... args) {
                     Intent iSend = new Intent();
+                    updateCount --;
                     iSend.setAction(OBJECT_SYNCHRONIZED);
                     if ( args  != null && args[0] instanceof  JSONObject) {
                         try {
                             JSONObject obj = (JSONObject) args[0];
-                            iSend.putExtra("inserted", obj.get("result").toString());
-                            iSend.putExtra("tableName",obj.get("tableName").toString());
-                            sendBroadcast(iSend);
+                            updateInfo(obj.get("tableName").toString(),new JSONObject(obj.get("result").toString()));
+                            if(updateCount == 0){
+                                iSend.putExtra("inserted", UPDATE_SUCCESS);
+                                sendBroadcast(iSend);
+                            }
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
                     }
+                }
+
+                @Override
+                public void onSyncReject(Object... args) {
+                    super.onSyncReject(args);
+                    Intent iSend = new Intent();
+                    iSend.setAction(OBJECT_SYNCHRONIZED);
+                    iSend.putExtra("reject", UPDATE_REJECTED);
+                    sendBroadcast(iSend);
                 }
 
                 @Override
@@ -209,7 +229,7 @@ public class SyncServerService extends Service {
             };
     }
 
-    public void connectSocket(){
+    private void connectSocket(){
         if (URI.equals(sharedPreferences.getString("etp_uri1", ""))) {
             URI = sharedPreferences.getString("etp_uri2", "");
         } else {
@@ -225,4 +245,53 @@ public class SyncServerService extends Service {
         connect.setURI(URI);
         connect.init();
     }
+
+    private void updateInfo(String tableName, JSONObject value){
+        try {
+            String noEnvio = (String) value.get(Transaccion.NO_ENVIO);
+            String empresa = (String) value.get(Transaccion.EMPRESA);
+            String periodo = (String) value.get(Transaccion.PERIODO);
+            String aplicacion = (String) value.get(Transaccion.APLICACION);
+            if ( !noEnvio.equals("0") || !noEnvio.equals(" ") ) {
+
+                if ( tableName.equalsIgnoreCase(Transaccion.TABLE_NAME) ) {
+                    Transaccion transaccion = (Transaccion) entityManager.findOnce(
+                            Transaccion.class, "*",
+                            Transaccion.NO_ENVIO + " = ? and " + Transaccion.EMPRESA + " = ? and " +
+                                    Transaccion.PERIODO + " = ? and " + Transaccion.APLICACION + " = ? ",
+                            new String[]{noEnvio, empresa, periodo, aplicacion}
+                    );
+                    transaccion.setValue(Transaccion.ESTADO,Transaccion.TransaccionEstado.TRASLADADA.toString());
+                    entityManager.update(Transaccion.class,
+                            transaccion.getColumnValueList(),
+                            Transaccion.NO_ENVIO + " = ? and " + Transaccion.EMPRESA + " = ? and " +
+                                    Transaccion.PERIODO + " = ? and " + Transaccion.APLICACION + " = ? ",
+                            new String[]{noEnvio, empresa, periodo, aplicacion},false);
+                } else if ( tableName.equalsIgnoreCase(TransactionDetails.TABLE_NAME ) ) {
+                    String correlativo = (String) value.get(TransactionDetails.CORRELATIVO);
+                    TransactionDetails transaccion = (TransactionDetails) entityManager.findOnce(
+                            TransactionDetails.class, "*",
+                            TransactionDetails.NO_RANGO + " = ? and " + TransactionDetails.EMPRESA + " = ? and " +
+                                    TransactionDetails.ID_PERIODO + " = ? and " +
+                                    TransactionDetails.APLICACION + " = ? and " +
+                                    TransactionDetails.CORRELATIVO+ " = ?",
+                            new String[]{noEnvio, empresa, periodo, aplicacion, correlativo}
+                    );
+                    transaccion.setValue(TransactionDetails.ESTADO,TransactionDetails.TransactionDetailsEstado.TRASLADADA.toString());
+                    entityManager.update(TransactionDetails.class,
+                            transaccion.getColumnValueList(),
+                            TransactionDetails.NO_RANGO + " = ? and " + TransactionDetails.EMPRESA + " = ? and " +
+                                    TransactionDetails.ID_PERIODO + " = ? and " +
+                                    TransactionDetails.APLICACION + " = ? and " +
+                                    TransactionDetails.CORRELATIVO+ " = ?",
+                            new String[]{noEnvio, empresa, periodo, aplicacion, correlativo},false);
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (Exception ex){
+            Log.e("Error","Al recivir la informacion: ",ex);
+        }
+    }
+
 }

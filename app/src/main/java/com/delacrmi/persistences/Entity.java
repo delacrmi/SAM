@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -215,11 +216,6 @@ public abstract class Entity implements Serializable {
         for(String set: sets)
             array.put(set);
 
-        /*Iterator iterator = iterator();
-        while (iterator.hasNext()){
-            array.put(((Map.Entry)iterator.next()).getKey());
-        }*/
-
         return array;
     }
 
@@ -274,17 +270,34 @@ public abstract class Entity implements Serializable {
     }
 
     @Deprecated
-    public void setValue(String columnName,String value){
+    public boolean setValue(String columnName,String value){
+        boolean set = false;
+
         if(columnList.containsKey(columnName))
             addValuesByType(columnValueList,columnName,value,columnList.getAsString(columnName));
+
+        if(hashcolumns.containsKey(columnName)) {
+            addValuesByType(columns.get(hashcolumns.get(columnName)), value);
+            set = true;
+        }
+        return set;
     }
 
-    public void setColumnValue(String column, Object value){
-        if(hashcolumns.containsKey(column)){
-            addValuesByType(columns.get(hashcolumns.get(column)), value);
+    public boolean setValue(String columnName,Object value){
+        boolean set = false;
+        if(hashcolumns.containsKey(columnName)) {
+            addValuesByType(columns.get(hashcolumns.get(columnName)), value);
+            set = true;
+        }
+        return set;
+    }
+
+    public void setColumnFromSelect(String columnName, Object value){
+        if(hashcolumns.containsKey(columnName)){
+            addValuesByType(columns.get(hashcolumns.get(columnName)), value);
         }
         else
-            addValuesByType(newColumnsOnSelect,column,value,value.getClass().getSimpleName().toLowerCase());
+            addValuesByType(newColumnsOnSelect,columnName,value,value.getClass().getSimpleName().toLowerCase());
     }
 
     public ContentValues getColumnsFromSelect(){

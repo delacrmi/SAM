@@ -185,21 +185,6 @@ public class EntityManager  {
         Entity ent= findOnce(entity, "*", where, whereValues);
         ent.setValues(columnsValue);
         return update(ent,where,whereValues,save);
-
-        /*if(ent != null || columnsValue != null){
-            if(ent == null)
-                return  save(entity,columnsValue);
-
-            ent.setValues(columnsValue);
-            long insert = write().update(ent.getName(), columnsValue, where, whereValues);
-            write().close();
-
-            if (insert > 0)
-                return ent;
-
-        }
-
-        return null;*/
     }
 
     public synchronized Entity update(Entity entity,String where,String[] whereValues,boolean save){
@@ -319,7 +304,7 @@ public class EntityManager  {
                 String columnName = cursor.getColumnName(index);
                 int col = cursor.getColumnIndex(columnName);
                 entity.setValue(columnName,cursor.getString(col));
-                entity.setColumnValue(columnName,cursor.getString(col));
+                entity.setColumnFromSelect(columnName, cursor.getString(col));
             }
         }
     }

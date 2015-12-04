@@ -15,28 +15,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:id="@+id/tv_cutter_map"
-            android:text="Mapa de Corte"
-            android:textStyle="bold"
-            android:layout_marginTop="10dp"/>
-
-        <EditText
-            android:layout_width="107dp"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="number"
-            android:id="@+id/et_cutter_map"
-            android:layout_below="@+id/tv_cutter_map"
-            android:layout_marginBottom="10dp"
-            android:textColorHint="#FFFFFFFF"
-            android:hint="mapa"/>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:textAppearance="?android:attr/textAppearanceMedium"
             android:id="@+id/textViewFrenteCorte"
-            android:layout_below="@+id/et_cutter_map"
             android:text="Frente de Corte"
             android:textStyle="bold"
             android:layout_marginTop="10dp"/>

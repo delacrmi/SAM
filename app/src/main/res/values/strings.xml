@@ -18,6 +18,7 @@
     <string name="cane">Cañial</string>
     <string name="batch">Lote</string>
     <string name="line">Linea</string>
+    <string name="map">Mapa Corte</string>
     <string name="tractor">Tractor</string>
 
     <string name="syncSuccess">Sincronizado</string>
