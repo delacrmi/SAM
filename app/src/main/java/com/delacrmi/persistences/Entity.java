@@ -126,9 +126,7 @@ public abstract class Entity implements Serializable {
     }
 
     public void addColumn(String name,EntityColumn.ColumnType type){
-        columnList.put(name, type.toString().toLowerCase());
-        columns.add(createColumn(name, type));
-        hashcolumns.put(name,columns.size()-1);
+        addColumn(createColumn(name, type));
     }
 
     public void addColumn(EntityColumn column){
@@ -152,6 +150,7 @@ public abstract class Entity implements Serializable {
                     column.setValue(me.getValue());
             }
         }
+
     }
 
     public ContentValues getColumns(){
@@ -175,10 +174,39 @@ public abstract class Entity implements Serializable {
                     columns += ",";
                     count++;
                 }
+            }else{
+                count++;
             }
         }
 
         return columns;
+    }
+
+    public String getColumnsNameAsWithout(String [] withoutNames){
+        int count = 1;
+        String columns = "";
+
+        for (EntityColumn column: this.columns){
+            if(!arrayContains(column.getName(),withoutNames)){
+                columns += column.getName();
+                if(count < this.columns.size()-withoutNames.length){
+                    columns += ",";
+                    count++;
+                }
+            }else{
+                count++;
+            }
+        }
+
+        return columns;
+    }
+
+    private boolean arrayContains(String arg1, String [] arg2){
+        for (int a =0; a < arg2.length; a++){
+            if (arg1.equals(arg2[a]))
+                return true;
+        }
+        return false;
     }
 
     public JSONObject getJSON(){
@@ -236,11 +264,11 @@ public abstract class Entity implements Serializable {
 
     public Entity setName(String entityName){
         this.entityName = entityName;
-        if(pk.equals("")){
-            pk = entityName+"_id";
-            columnList.put(pk,"integer");
+        /*if(pk.equals("")){
+            //pk = entityName+"_id";
+            //columnList.put(pk,"integer");
             addColumn(new EntityColumn<Long>(pk, EntityColumn.ColumnType.NUMERIC, true, true));
-        }
+        }*/
         return this;
     }
 
@@ -269,7 +297,6 @@ public abstract class Entity implements Serializable {
         }
     }
 
-    @Deprecated
     public boolean setValue(String columnName,String value){
         boolean set = false;
 
@@ -371,9 +398,9 @@ public abstract class Entity implements Serializable {
 
             if(!value.getClass().getSimpleName().toLowerCase()
                     .equals(content.getType().toString().toLowerCase()))
-                content.setValue(Float.parseFloat((String) value));
+                content.setValue(Double.parseDouble((String) value));
             else
-                content.setValue((Float) value);
+                content.setValue((Double) value);
 
         }else if (content.getType() == EntityColumn.ColumnType.DATE) {
             Date d = new Date(Long.parseLong(value+""));

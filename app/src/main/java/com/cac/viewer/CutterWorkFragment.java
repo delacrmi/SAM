@@ -321,6 +321,8 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
                         transaccion.getColumn(Transaccion.APLICACION).setValue(APLICACION);
                         transaccion.getColumn(Transaccion.DISPOSITIVO).setValue(DISPOSITIVO);
                         transaccion.getColumn(Transaccion.ESTADO).setValue(Transaccion.TransaccionEstado.ACTIVA.toString());
+                        transaccion.getColumn(transaccion.MAPA_CORTE).setValue(
+                                Integer.parseInt(etMap.getText().toString()));
 
                         transaccion = (Transaccion)ourInstance.entityManager.save(transaccion);
 
@@ -334,8 +336,6 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
                                 details.getColumn(TransactionDetails.APLICACION).setValue(APLICACION);
                                 details.getColumn(TransactionDetails.NO_RANGO).setValue(envio);
                                 details.getColumn(TransactionDetails.CORRELATIVO).setValue(detailsindex);
-                                details.getColumn(TransactionDetails.MAPA_CORTE).setValue(
-                                        Integer.parseInt(etMap.getText().toString()));
                                 details.getColumn(TransactionDetails.ESTADO).setValue(
                                         TransactionDetails.TransactionDetailsEstado.ACTIVA.toString());
                                 if(ourInstance.entityManager.save(details) != null)

@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.cac.entities.Transaccion;
 import com.cac.entities.TransactionDetails;
@@ -72,11 +73,13 @@ public class EntityManager  {
             @Override
             public void beforeToUpdate(SQLiteDatabase db) {
                 List<Entity> entities = new ArrayList<Entity>();
-
-                Cursor cursor = db.rawQuery("select * from " + Transaccion.TABLE_NAME, null);
+                Entity ent = new Transaccion().entityConfig();
+                Cursor cursor = db.rawQuery("select "+ent.getColumnsNameAsWithout(new String[]{Transaccion.MAPA_CORTE}) +
+                        " from " + Transaccion.TABLE_NAME, null);
                 setListFromCursor(cursor,entities,Transaccion.class);
 
-                cursor = db.rawQuery("select * from " + TransactionDetails.TABLE_NAME, null);
+                ent = new TransactionDetails().entityConfig();
+                cursor = db.rawQuery("select "+ent.getColumnsNameAsString(false)+" from " + TransactionDetails.TABLE_NAME, null);
                 setListFromCursor(cursor,entities,TransactionDetails.class);
 
                 setEntitiesBackup(entities);
@@ -87,7 +90,6 @@ public class EntityManager  {
                 List<Entity> entities = getEntitiesBackup();
                 for(Entity entity : entities)
                     db.insert(entity.getName(),null,entity.getContentValues());
-                super.afterToUpdate(db);
             }
         };
         read();
@@ -138,27 +140,9 @@ public class EntityManager  {
 
     //<editor-fold desc="Saving the Entities class">
     public Entity save(Class entity,ContentValues args){
-        Entity ent= initInstance(entity);
+        Entity ent = initInstance(entity);
         ent.entityConfig().addColumns(args);
         return save(ent);
-
-
-        /*if(args != null){
-            ent.setValues(args);
-
-            long insert = write().insert(ent.getName(),null,ent.getColumnValueList());
-            write().close();
-
-            if(insert > 0) {
-                ent.getColumnValueList().put(ent.getPrimaryKey(),insert);
-                List<EntityColumn> pk = ent.getPrimariesKeys();
-                if(pk.size() == 1)
-                    pk.get(0).setValue(insert);
-
-                return ent;
-            }
-        }
-        return null;*/
     }
 
     public synchronized Entity save(Entity entity){
@@ -232,8 +216,8 @@ public class EntityManager  {
         return ent;
     }
 
-    public synchronized List<Entity> find(Class entity,boolean distinct,String[] columns,String where,
-                           String[] whereValues, String groupBy, String having, String orderBy,
+    public synchronized List<Entity> find(Class entity, boolean distinct, String[] columns, String where,
+                                          String[] whereValues, String groupBy, String having, String orderBy,
                            String limit){
         Cursor cursor = read().query(distinct, initInstance(entity).getName(),
                 columns, where, whereValues, groupBy, having, orderBy, limit);

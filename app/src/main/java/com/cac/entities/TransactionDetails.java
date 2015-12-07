@@ -17,7 +17,7 @@ public class TransactionDetails extends Entity {
     public static String PESO = "peso";
     public static String UNADA = "unada";
     public static String ID_TRACTOR = "codigo_tractor";
-    public static String MAPA_CORTE = "mapa_corte";
+    //public static String MAPA_CORTE = "mapa_corte";
     public static String ESTADO = "estado";
     public static String LATITUD ="latitud";
     public static String LONGITUD = "longitud";
@@ -32,7 +32,7 @@ public class TransactionDetails extends Entity {
         addColumn(new EntityColumn<Integer>(NO_RANGO, EntityColumn.ColumnType.INTEGER).setNotNullable());
         addColumn(new EntityColumn<String>(ID_TRACTOR, EntityColumn.ColumnType.TEXT).setNotNullable());
         addColumn(new EntityColumn<Integer>(CORRELATIVO,true).setAutoIncrement());
-        addColumn(new EntityColumn<Integer>(MAPA_CORTE, EntityColumn.ColumnType.INTEGER).setNotNullable());
+        //addColumn(new EntityColumn<Integer>(MAPA_CORTE, EntityColumn.ColumnType.INTEGER).setNotNullable());
         addColumn(new EntityColumn<Double>(PESO,EntityColumn.ColumnType.REAL).setNotNullable());
         addColumn(new EntityColumn<Double>(LATITUD,EntityColumn.ColumnType.REAL).setNotNullable());
         addColumn(new EntityColumn<Double>(LONGITUD,EntityColumn.ColumnType.REAL).setNotNullable());

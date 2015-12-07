@@ -27,6 +27,7 @@ public class Transaccion extends Entity {
     public static String PESO = "peso";
     public static String LINEA = "linea";
     public static String DISPOSITIVO = "dispositivo";
+    public static String MAPA_CORTE = "mapa_corte";
 
     @Override
     public Transaccion entityConfig() {
@@ -49,6 +50,7 @@ public class Transaccion extends Entity {
         addColumn(new EntityColumn<Double>(PESO, EntityColumn.ColumnType.REAL).setNotNullable());
         addColumn(new EntityColumn<String>(Transaccion.APLICACION, EntityColumn.ColumnType.TEXT)
                 .setDefaultValue("SAM"));
+        addColumn(new EntityColumn<Integer>(MAPA_CORTE, EntityColumn.ColumnType.INTEGER).setNotNullable());
         setSynchronizable(false);
         return this;
     }
