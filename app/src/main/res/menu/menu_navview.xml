@@ -29,7 +29,7 @@
         <menu>
             <item
                 android:id="@+id/fingering_work"
-                android:icon="@drawable/ic_launcher"
+                android:icon="@drawable/new_envio"
                 android:title="@string/work"/>
         </menu>
     </item>
@@ -42,11 +42,11 @@
         <menu>
             <item
                 android:id="@+id/cutter_report"
-                android:icon="@drawable/ic_launcher"
+                android:icon="@drawable/report_envio"
                 android:title="@string/cutter"/>
             <item
                 android:id="@+id/place_report"
-                android:icon="@drawable/ic_launcher"
+                android:icon="@drawable/report_envio"
                 android:title="@string/place"/>
         </menu>
     </item>
@@ -54,30 +54,28 @@
     <!--Sync Categories-->
     <item
         android:id="@+id/nav_sync"
-        android:icon="@drawable/search"
         android:menuCategory="container"
         android:title="@string/sync_title">
         <menu>
             <item
                 android:id="@+id/client_sync"
                 android:title="@string/client"
-                android:icon="@drawable/add"/>
+                android:icon="@drawable/sync_cliente"/>
             <item
                 android:id="@+id/server_sync"
                 android:title="@string/server"
-                android:icon="@drawable/add"/>
+                android:icon="@drawable/sync_server"/>
         </menu>
     </item>
 
     <!--Settings Categories-->
     <item
         android:id="@+id/nav_categories"
-        android:icon="@drawable/search"
         android:title="@string/settings">
         <menu>
             <item
                 android:id="@+id/setting"
-                android:icon="@drawable/add"
+                android:icon="@drawable/setting"
                 android:title="@string/server"/>
         </menu>
     </item>
