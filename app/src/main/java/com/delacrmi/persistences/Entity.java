@@ -264,11 +264,11 @@ public abstract class Entity implements Serializable {
 
     public Entity setName(String entityName){
         this.entityName = entityName;
-        /*if(pk.equals("")){
-            //pk = entityName+"_id";
-            //columnList.put(pk,"integer");
+        if(pk.equals("")){
+            pk = entityName+"_id";
+            columnList.put(pk,"integer");
             addColumn(new EntityColumn<Long>(pk, EntityColumn.ColumnType.NUMERIC, true, true));
-        }*/
+        }
         return this;
     }
 
