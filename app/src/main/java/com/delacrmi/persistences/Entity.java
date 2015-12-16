@@ -2,6 +2,7 @@ package com.delacrmi.persistences;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.util.Base64;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -26,6 +27,7 @@ public abstract class Entity implements Serializable {
     private String entityName = "";
     private String nickName = "";
     private String pk = "";
+
     private HashMap<String,ContentValues> constraint = new HashMap<String,ContentValues>();
     private ContentValues constraintDetails;
     private ContentValues columnList = new ContentValues();
@@ -34,7 +36,9 @@ public abstract class Entity implements Serializable {
     private ContentValues newColumnsOnSelect = new ContentValues();
     private ContentValues columnValueList = new ContentValues();
     private boolean synchronizable = false;
+
     private EntityFilter entityFilter;
+    private EntityManager manager = null;
 
     public abstract Entity entityConfig();
 
@@ -63,6 +67,17 @@ public abstract class Entity implements Serializable {
     }
 
     public void configureEntityFilter(Context context){}
+
+    public void setEntityManager(EntityManager manager){
+        this.manager = manager;
+    }
+    public EntityManager getEntityManager(){
+        return manager;
+    }
+
+    public List<Entity> getDefaultInsert(){
+        return null;
+    }
 
     public String getCreateString(){
         int count = 1;
@@ -187,7 +202,7 @@ public abstract class Entity implements Serializable {
         String columns = "";
 
         for (EntityColumn column: this.columns){
-            if(!arrayContains(column.getName(),withoutNames)){
+            if(!arrayContains(column.getName(), withoutNames)){
                 columns += column.getName();
                 if(count < this.columns.size()-withoutNames.length){
                     columns += ",";
@@ -317,6 +332,27 @@ public abstract class Entity implements Serializable {
             set = true;
         }
         return set;
+    }
+
+    public boolean setValueToEncrypt(String columnName, String value){
+        boolean set = false;
+        if(hashcolumns.containsKey(columnName)) {
+            EntityColumn column = columns.get(hashcolumns.get(columnName));
+
+            if(column.getEncryption() != null)
+                value = encode(column.getEncryption(), column.getEncodeFlag(), value);
+            else return set;
+
+            addValuesByType(columns.get(hashcolumns.get(columnName)), value);
+            set = true;
+        }
+        return set;
+    }
+
+    public static String encode(EntityColumn.EncryptionType encrypt,int flag, String value){
+        String encrypted = "";
+        if(encrypt == EntityColumn.EncryptionType.BS64) encrypted =  Base64.encodeToString(value.getBytes(),flag);
+        return encrypted;
     }
 
     public void setColumnFromSelect(String columnName, Object value){

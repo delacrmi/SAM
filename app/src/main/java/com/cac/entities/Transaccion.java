@@ -3,6 +3,9 @@ package com.cac.entities;
 import android.content.Context;
 import com.delacrmi.persistences.Entity;
 import com.delacrmi.persistences.EntityColumn;
+import com.delacrmi.persistences.EntityManager;
+
+import java.util.List;
 
 /**
  * Created by Legal on 15/10/2015.
@@ -28,6 +31,11 @@ public class Transaccion extends Entity {
     public static String LINEA = "linea";
     public static String DISPOSITIVO = "dispositivo";
     public static String MAPA_CORTE = "mapa_corte";
+
+    public Transaccion(){}
+    public Transaccion(EntityManager manager){
+        setEntityManager(manager);
+    }
 
     @Override
     public Transaccion entityConfig() {
@@ -57,6 +65,11 @@ public class Transaccion extends Entity {
 
     @Override
     public void configureEntityFilter(Context context) {}
+
+    @Override
+    public List<Entity> getDefaultInsert(){
+        return getEntityManager().find(getClass(), "*" , null, null);
+    }
 
     public enum TransaccionEstado {
         ACTIVA, TRASLADADA

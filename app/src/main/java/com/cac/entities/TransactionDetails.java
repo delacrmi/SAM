@@ -2,6 +2,9 @@ package com.cac.entities;
 
 import com.delacrmi.persistences.Entity;
 import com.delacrmi.persistences.EntityColumn;
+import com.delacrmi.persistences.EntityManager;
+
+import java.util.List;
 
 /**
  * Created by miguel on 11/11/15.
@@ -22,6 +25,11 @@ public class TransactionDetails extends Entity {
     public static String LATITUD ="latitud";
     public static String LONGITUD = "longitud";
 
+    public TransactionDetails(){}
+    public TransactionDetails(EntityManager manager){
+        setEntityManager(manager);
+    }
+
     @Override
     public Entity entityConfig() {
         setName(TABLE_NAME);
@@ -32,7 +40,6 @@ public class TransactionDetails extends Entity {
         addColumn(new EntityColumn<Integer>(NO_RANGO, EntityColumn.ColumnType.INTEGER).setNotNullable());
         addColumn(new EntityColumn<String>(ID_TRACTOR, EntityColumn.ColumnType.TEXT).setNotNullable());
         addColumn(new EntityColumn<Integer>(CORRELATIVO,true).setAutoIncrement());
-        //addColumn(new EntityColumn<Integer>(MAPA_CORTE, EntityColumn.ColumnType.INTEGER).setNotNullable());
         addColumn(new EntityColumn<Double>(PESO,EntityColumn.ColumnType.REAL).setNotNullable());
         addColumn(new EntityColumn<Double>(LATITUD,EntityColumn.ColumnType.REAL).setNotNullable());
         addColumn(new EntityColumn<Double>(LONGITUD,EntityColumn.ColumnType.REAL).setNotNullable());
@@ -41,6 +48,11 @@ public class TransactionDetails extends Entity {
         addColumn(new EntityColumn<Integer>(UNADA, EntityColumn.ColumnType.INTEGER)
                 .setOutServerColumn());
         return this;
+    }
+
+    @Override
+    public List<Entity> getDefaultInsert(){
+        return getEntityManager().find(getClass(), "*" , null, null);
     }
 
     public enum TransactionDetailsEstado {

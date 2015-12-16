@@ -4,7 +4,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import com.cac.entities.Transaccion;
 import com.cac.entities.TransactionDetails;
@@ -71,30 +70,21 @@ public class EntityManager  {
         conn = new ConnectSQLite(context,dbName,factory,dbVersion){
 
             @Override
-            public void beforeToUpdate(SQLiteDatabase db) {
-                List<Entity> entities = new ArrayList<Entity>();
-                Entity ent = new Transaccion().entityConfig();
-                Cursor cursor = db.rawQuery("select "+ent.getColumnsNameAsWithout(new String[]{Transaccion.MAPA_CORTE}) +
-                        " from " + Transaccion.TABLE_NAME, null);
-                setListFromCursor(cursor,entities,Transaccion.class);
-
-                ent = new TransactionDetails().entityConfig();
-                cursor = db.rawQuery("select "+ent.getColumnsNameAsString(false)+" from " + TransactionDetails.TABLE_NAME, null);
-                setListFromCursor(cursor,entities,TransactionDetails.class);
-
-                setEntitiesBackup(entities);
+            public void beforeToCreate(SQLiteDatabase db){
+                onCreateDataBase(this, db);
             }
 
             @Override
-            public void afterToUpdate(SQLiteDatabase db) {
-                List<Entity> entities = getEntitiesBackup();
-                for(Entity entity : entities)
-                    db.insert(entity.getName(),null,entity.getContentValues());
+            public void afterToCreate(SQLiteDatabase db) {
+                onDataBaseCreated(this, db);
             }
         };
         read();
         return this;
     }
+
+    public void onCreateDataBase(ConnectSQLite conn, SQLiteDatabase db){}
+    public void onDataBaseCreated(ConnectSQLite conn, SQLiteDatabase db){}
 
     protected SQLiteDatabase write(){
         if(conn == null)
@@ -293,7 +283,7 @@ public class EntityManager  {
         }
     }
 
-    private void setListFromCursor(Cursor cursor, List<Entity> entities,Class entity){
+    public void setListFromCursor(Cursor cursor, List<Entity> entities,Class entity){
         Entity ent;
         if(cursor != null && cursor.moveToFirst()){
             do {
@@ -310,15 +300,16 @@ public class EntityManager  {
         tablesNames = new ArrayList<String>();
         Entity entity;
         while (tablesIterator.hasNext()){
+
             Class entityClass = (Class)tablesIterator.next();
             entity = initInstance(entityClass);
-            if(entity != null){
-                //entity.entityConfig();
-                tablesNames.add(entity.getName());
-                entitiesNickName.put(entity.getName(),entity.getNickName());
-                name_class.put(entity.getName(),entityClass);
-                value.add(createString(entity));
-            }
+            entity.setEntityManager(this);
+
+            tablesNames.add(entity.getName());
+            entitiesNickName.put(entity.getName(),entity.getNickName());
+            name_class.put(entity.getName(),entityClass);
+            value.add(createString(entity));
+
         }
 
         return value;

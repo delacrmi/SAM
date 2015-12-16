@@ -6,6 +6,7 @@ import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
@@ -14,10 +15,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import android.os.Bundle;
+import android.util.Base64;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.WindowManager;
 import android.widget.GridLayout;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
@@ -32,7 +36,13 @@ import com.cac.viewer.CuttingParametersFragment;
 import com.cac.viewer.MainFragment;
 import com.cac.viewer.SettingFragment;
 import com.cac.viewer.SyncFragment;
+import com.delacrmi.connection.ConnectSQLite;
+import com.delacrmi.persistences.Entity;
 import com.delacrmi.persistences.EntityManager;
+
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -41,6 +51,12 @@ public class MainActivity extends AppCompatActivity {
     private Fragment actualFragment;
     private String ACTUALFRAGMENT = "MainFragment";
     private ServerStarter serverStarter;
+
+    private static int USER = 0;
+
+    //static code activities values;
+    private static final int EXIT = 0;
+    private static final int LOGIN = 3;
 
     //App Menu
     private Toolbar toolbar;
@@ -73,6 +89,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        try {
+            Log.d("decode", new String(Base64.decode("bWNydXo=".getBytes(), Base64.DEFAULT),"UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
         setContentView(R.layout.activity_main);
 
         if(savedInstanceState != null)
@@ -98,6 +121,20 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (data.getExtras().getInt("user") == 1){
+            Menu menu = navigationView.getMenu();
+            menu.findItem(R.id.setting).setEnabled(false);
+            menu.findItem(R.id.client_sync).setEnabled(false);
+            menu.findItem(R.id.server_sync).setEnabled(false);
+        }else if(data.getExtras().getInt("user") == 2){
+            Menu menu = navigationView.getMenu();
+            menu.findItem(R.id.setting).setEnabled(true);
+            menu.findItem(R.id.client_sync).setEnabled(true);
+            menu.findItem(R.id.server_sync).setEnabled(true);
+        }else if(data.getExtras().getInt("user") == 0){
+            finish();
+        }
+
         returningWithResult = true;
     }
 
@@ -177,22 +214,59 @@ public class MainActivity extends AppCompatActivity {
         frm = getFragmentManager();
         startTransactionByTagFragment(ACTUALFRAGMENT);
 
+        initOtherActivity(LOGIN);
+
+    }
+
+    private void initOtherActivity (int activityId){
+        Intent intent = new Intent(getApplicationContext(),LoginActivity.class);
+        startActivityForResult(intent, activityId);
     }
 
     public EntityManager getEntityManager() {
         if ( entityManager == null ) {
             entityManager = new EntityManager(this, getResources().getString(R.string.db_name), null,
-                    Integer.parseInt(getResources().getString(R.string.db_version)))
-            .addTable(Caniales.class)
-            .addTable(Empleados.class).addTable(Empresas.class)
-            .addTable(Fincas.class).addTable(Frentes.class)
-            .addTable(Lotes.class).addTable(Periodos.class)
-            .addTable(Rangos.class).addTable(Transaccion.class)
-            .addTable(TransactionDetails.class)
-            .addTable(Vehiculos.class).init();
+                    Integer.parseInt(getResources().getString(R.string.db_version))){
+
+                @Override
+                public void onCreateDataBase(ConnectSQLite conn, SQLiteDatabase db) {
+                    List<List<Entity>> entities = new ArrayList<List<Entity>>();
+                    List<Entity> value;
+
+                    entities.add(new Users().getDefaultInsert());
+
+                    value = new Transaccion(this).getDefaultInsert();
+                    if(value != null)
+                        entities.add(value);
+
+                    value = new TransactionDetails(this).getDefaultInsert();
+                    if(value != null)
+                        entities.add(value);
+
+                    conn.setEntitiesBackup(entities);
+
+                }
+
+                @Override
+                public void onDataBaseCreated(ConnectSQLite conn, SQLiteDatabase db) {
+                    for(List<Entity> entities : (List<List<Entity>>)conn.getEntitiesBackup())
+                        for (Entity entity : entities)
+                            db.insert(entity.getName(),null,entity.getContentValues());
+                }
+
+            }
+            .addTable(Caniales.class).addTable(Empleados.class)
+            .addTable(Empresas.class).addTable(Fincas.class)
+            .addTable(Frentes.class).addTable(Lotes.class)
+            .addTable(Periodos.class).addTable(Rangos.class)
+            .addTable(Transaccion.class).addTable(TransactionDetails.class)
+            .addTable(Vehiculos.class).addTable(Users.class).init();
         }
+
         return entityManager;
     }
+
+
 
     /**
      *@args: Fragment fragment

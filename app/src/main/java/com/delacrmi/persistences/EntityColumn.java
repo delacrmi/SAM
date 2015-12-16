@@ -1,5 +1,6 @@
 package com.delacrmi.persistences;
 
+import android.util.Base64;
 import android.util.Log;
 
 import java.util.UnknownFormatConversionException;
@@ -17,6 +18,8 @@ public class EntityColumn<valueType> {
     private boolean serverColumn = true;
     private valueType defaultValue = null;
     private valueType value = null;
+    private EncryptionType encryption = null;
+    private int flag = 0;
 
     public EntityColumn(){}
 
@@ -152,7 +155,24 @@ public class EntityColumn<valueType> {
         return create;
     }
 
+    public EncryptionType getEncryption() {
+        return encryption;
+    }
+    public int getEncodeFlag(){
+        return flag;
+    }
+
+    public EntityColumn setEncryption(EncryptionType encryption, int flag) {
+        this.encryption = encryption;
+        this.flag = flag;
+        return this;
+    }
+
     public enum ColumnType{
         TEXT,INTEGER,REAL,DATE,NUMERIC
+    }
+
+    public enum EncryptionType{
+        BS64
     }
 }

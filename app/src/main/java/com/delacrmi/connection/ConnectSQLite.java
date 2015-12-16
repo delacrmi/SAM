@@ -18,7 +18,7 @@ public class ConnectSQLite extends SQLiteOpenHelper{
     //Catalog tablesCreater
     public static List<String> tablesCreater;
     public static List<String> tablesNames;
-    public List<Entity> entitiesBackup;
+    public Object entitiesBackup;
 
     {
         if(tablesCreater == null || tablesNames == null) throw new  NullPointerException();
@@ -31,10 +31,12 @@ public class ConnectSQLite extends SQLiteOpenHelper{
     }
 
     private void createTables(SQLiteDatabase db) {
+        beforeToCreate(db);
         for (String value: tablesCreater) {
             Log.d("creating", value);
             db.execSQL(value);
         }
+        afterToCreate(db);
     }
 
     private void dropTables(SQLiteDatabase db){
@@ -48,25 +50,22 @@ public class ConnectSQLite extends SQLiteOpenHelper{
     public void onCreate(SQLiteDatabase db) {
         Log.d("creating", "Creando");
         createTables(db);
-        //db.close();
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         //Log.d("creating", "Actualizando");
-        beforeToUpdate(db);
         dropTables(db);
         createTables(db);
-        afterToUpdate(db);
     }
 
-    public void setEntitiesBackup(List<Entity> entitiesBackup){
+    public void setEntitiesBackup(Object entitiesBackup){
         this.entitiesBackup = entitiesBackup;
     }
-    public List<Entity> getEntitiesBackup(){
+    public Object getEntitiesBackup(){
         return entitiesBackup;
     }
 
-    public void beforeToUpdate(SQLiteDatabase db){}
-    public void afterToUpdate(SQLiteDatabase db){}
+    public void beforeToCreate(SQLiteDatabase db){}
+    public void afterToCreate(SQLiteDatabase db){}
 }
