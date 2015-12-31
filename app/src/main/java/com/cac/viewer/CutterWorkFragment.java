@@ -141,10 +141,10 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
                 }
             });
             ourInstance.autTractor.setAdapter(
-                    findCodigosVehiculos(Vehiculos.class, "A" )
+                    findCodigosVehiculos(Vehiculos.class, "A")
                     //getAdapter(Vehiculos.class,Vehiculos.CODIGO_GRUPO+"||"+Vehiculos.CODIGO_SUBGRUPO+"||"+Vehiculos.CODIGO_VEHICULO+" key,"+
-                      //      Vehiculos.CODIGO_GRUPO+"||"+Vehiculos.CODIGO_SUBGRUPO+"||"+Vehiculos.CODIGO_VEHICULO+" value",
-                        //    Vehiculos.CODIGO_GRUPO +" = ?",new String[]{"A"},hashTractor)
+                    //      Vehiculos.CODIGO_GRUPO+"||"+Vehiculos.CODIGO_SUBGRUPO+"||"+Vehiculos.CODIGO_VEHICULO+" value",
+                    //    Vehiculos.CODIGO_GRUPO +" = ?",new String[]{"A"},hashTractor)
             );
             ourInstance.autTractor.setThreshold(1);
 
@@ -173,7 +173,7 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
             ourInstance.ivDeleteAll.setOnClickListener(onClickListener);
 
             ourInstance.transactionDetailsList = new LinkedList<TransactionDetails>();
-            addValueTest();
+            //addValueTest();
 
             ourInstance.workDetailsAdapter = new WorkDetailsAdapter(ourInstance.transactionDetailsList);
 
@@ -347,7 +347,7 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
 
                             Snackbar.make(ourInstance.view,"Registro Guardado",Snackbar.LENGTH_SHORT).show();
 
-                            deleteAll();
+                            tvCutter.setText("");
                             ourInstance.etCode.setText(findMaxEnvio()+"");
                         }
 
@@ -402,8 +402,8 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
             return 0;
         }
 
-        int minEnvio = rangos.getColumnValueList().getAsInteger(Rangos.RANGO_DESDE);
-        int maxEnvio = rangos.getColumnValueList().getAsInteger(Rangos.RANGO_HASTA);
+        int minEnvio = (Integer)rangos.getValue(Rangos.RANGO_DESDE);
+        int maxEnvio = (Integer)rangos.getValue(Rangos.RANGO_HASTA);
 
         Entity transaccionTemp = ourInstance.entityManager.findOnce(
                 Transaccion.class,"max("+Transaccion.NO_ENVIO+")+1 "+Transaccion.NO_ENVIO,
@@ -423,7 +423,7 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
             return 0;
         } else if ( envioActual == 0 ) {
             envioActual = minEnvio;
-        }
+        } else if (minEnvio > envioActual) envioActual = minEnvio;
 
         return envioActual;
     }

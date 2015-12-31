@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.IBinder;
+import android.preference.EditTextPreference;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -18,7 +19,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -29,12 +33,17 @@ public class SyncServerService extends Service {
     public static String SYNCHRONIZE_STARTED = "com.cac.services.SYNCHRONIZE_STARTED";
     public static String OBJECT_SYNCHRONIZED = "com.cac.services.OBJECT_SYNCHRONIZED";
     public static String SYNCHRONIZE_END = "com.cac.services.SYNCHRONIZE_END";
+    public static String STATUS_CONNECTION = "com.cac.services.connect";
     public static int UPDATE_SUCCESS = 0;
     public static int UPDATE_REJECTED = 1;
+    public static int CONNECTED = 2;
+    public static int UNCONNECTED = 3;
 
     private String TAG = "services";
     private Thread thread;
     private Boolean threadRunning;
+    private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+    private String defaultStringDate = "29/12/2015 17:56";
 
     private EntityManager entityManager;
     IO.Options opts;
@@ -78,7 +87,16 @@ public class SyncServerService extends Service {
         thread = new Thread(new Runnable() {
             @Override
             public void run() {
+                Intent iSend= new Intent();
+                iSend.setAction(STATUS_CONNECTION);
+
                 while (threadRunning){
+
+                    isTimeOver();
+
+                    iSend.putExtra("status", CONNECTED);
+                    sendBroadcast(iSend);
+
                     try{
                         Log.d("connected ",connect.getSocket().connected()+"");
                         if(connect.getSocket().connected()){
@@ -100,6 +118,8 @@ public class SyncServerService extends Service {
                                 connect.sendMessage("synchronizerServer", getInformationToSend(entities1,TransactionDetails.TABLE_NAME));
 
                             updateCount += entities.size();
+
+                            if(updateCount == 0) updateTimerSync();
                         }
                     } catch (NullPointerException e){
 
@@ -113,6 +133,9 @@ public class SyncServerService extends Service {
                         e.printStackTrace();
                     }
                 }
+
+                iSend.putExtra("status", UNCONNECTED);
+                sendBroadcast(iSend);
             }
         });
         thread.start();
@@ -139,21 +162,25 @@ public class SyncServerService extends Service {
                     Date fecha = new Date(fechaLong);
                     String fechaString = new SimpleDateFormat("yyyy-MM-dd").format(fecha);
                     values.put(columns[i], fechaString);
+
                     //Columnas de fechas.
                     if (rows.length() == 0)
                         dates.put(columns[i]);
+
                 } else
                     values.put(columns[i],entity.getColumnValueList().getAsString(columns[i]));
             }
             row.put("values",values);
             rows.put(row);
         }
+
         if ( rows != null && rows.length() > 0 ) {
             JSONObject wrapper = new JSONObject();
             wrapper.put("value", rows);
             wrapper.put("dates",dates);
             return wrapper;
         }
+
         return new JSONObject();
     }
 
@@ -189,6 +216,7 @@ public class SyncServerService extends Service {
                             if(updateCount == 0){
                                 iSend.putExtra("inserted", UPDATE_SUCCESS);
                                 sendBroadcast(iSend);
+                                updateTimerSync();
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -208,6 +236,11 @@ public class SyncServerService extends Service {
                 @Override
                 public void onSyncSuccess(Object... args) {
                     JSONObject obj = new JSONObject();
+                    Intent iSend = new Intent();
+                    iSend.setAction(STATUS_CONNECTION);
+                    iSend.putExtra("status", CONNECTED);
+                    sendBroadcast(iSend);
+
                     try{
                         obj.put("login","sync");
                     }catch (JSONException e){
@@ -230,6 +263,11 @@ public class SyncServerService extends Service {
     }
 
     private void connectSocket(){
+        Intent iSend = new Intent();
+        iSend.setAction(STATUS_CONNECTION);
+        iSend.putExtra("status", UNCONNECTED);
+        sendBroadcast(iSend);
+
         if (URI.equals(sharedPreferences.getString("etp_uri1", ""))) {
             URI = sharedPreferences.getString("etp_uri2", "");
         } else {
@@ -294,4 +332,33 @@ public class SyncServerService extends Service {
         }
     }
 
+    private void updateTimerSync(){
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        String date = sdf.format(new Date());
+        editor.putString("etp_last_execution",date);
+        editor.commit();
+    }
+
+    private boolean isTimeOver(){
+        boolean isOver = true;
+
+        try {
+
+            Log.i("Calendar","Into");
+
+            Calendar lastTime = Calendar.getInstance();
+            lastTime.setTime(sdf.parse(sharedPreferences.getString("etp_last_execution", defaultStringDate)));
+            Calendar actualTime = Calendar.getInstance();
+            if(actualTime.before(lastTime)) isOver = false;
+
+            Log.i("Calendar",lastTime.toString()+" "+actualTime.toString());
+
+            actualTime.setTime(sdf.parse(defaultStringDate));
+            if(lastTime.getTimeInMillis() == actualTime.getTimeInMillis()) updateTimerSync();
+
+        } catch (ParseException e) {}
+
+        return isOver;
+    }
 }

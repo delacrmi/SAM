@@ -124,15 +124,7 @@ public abstract class SocketConnect {
 
         @Override
         public void call(Object... args) {
-            /*if (context != null)
-                context.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        onErrorConnection();
-                    }
-                });
-            else*/
-                onErrorConnection();
+            onErrorConnection();
         }
     };
 
@@ -140,15 +132,7 @@ public abstract class SocketConnect {
 
         @Override
         public void call(Object... args) {
-            /*if (context != null)
-                context.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        onDisconnected();
-                    }
-                });
-            else*/
-                onDisconnected();
+            onDisconnected();
         }
     };
 

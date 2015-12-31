@@ -3,7 +3,6 @@ package com.delacrmi.persistences;
 import android.content.ContentValues;
 import android.content.Context;
 import android.util.Base64;
-import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -16,7 +15,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -79,6 +77,32 @@ public abstract class Entity implements Serializable {
         return null;
     }
 
+    /*public void findOne(){
+        if(manager == null) throw new NullPointerException("The EntityManager can`t be null");
+
+        List<EntityColumn> list = getPrimariesKeys();
+        String[] values = null;
+        String name = null;
+
+        if(list.size() > 0){
+            values = new String[list.size()];
+            name = "";
+            int ind = 0;
+
+            for(EntityColumn column : list){
+                values[ind] = getValuesByTypeAsString(column);
+
+                ind++;
+                name += column.getName();
+                if((ind+1) != list.size())
+                    name += ",";
+            }
+        }
+
+        addColumns( manager.findOnce(getClass(),"*", name, values).getContentValues());
+
+    }*/
+
     public String getCreateString(){
         int count = 1;
         String create = "create table "+entityName+"(";
@@ -113,9 +137,7 @@ public abstract class Entity implements Serializable {
     public List<EntityColumn> getPrimariesKeys(){
 
         List<EntityColumn> list = new ArrayList<EntityColumn>();
-        for(EntityColumn column : columns)
-            if(column.isPrimaryKey())
-                list.add(column);
+        for(EntityColumn column : columns) if(column.isPrimaryKey()) list.add(column);
 
         return  list;
     }
@@ -140,7 +162,7 @@ public abstract class Entity implements Serializable {
         return constraint.get(getName());
     }
 
-    public void addColumn(String name,EntityColumn.ColumnType type){
+    public void addColumn(String name,EntityColumn.ColumnType type) {
         addColumn(createColumn(name, type));
     }
 
@@ -195,6 +217,14 @@ public abstract class Entity implements Serializable {
         }
 
         return columns;
+    }
+
+    public String getPrimaryKeyAsString(){
+        String pks = "";
+        for(EntityColumn column : getPrimariesKeys())
+            pks += column.getName();
+
+        return pks;
     }
 
     public String getColumnsNameAsWithout(String [] withoutNames){
@@ -349,10 +379,25 @@ public abstract class Entity implements Serializable {
         return set;
     }
 
+    public String getValueAsString(String columnName){
+        String value = "";
+        if(hashcolumns.containsKey(columnName)){
+            EntityColumn column = columns.get(hashcolumns.get(columnName));
+        }
+
+        return value;
+    }
+
+    public Object getValue(String columnName){
+        if(hashcolumns.containsKey(columnName))
+            return columns.get(hashcolumns.get(columnName)).getValue();
+        return null;
+    }
+
     public static String encode(EntityColumn.EncryptionType encrypt,int flag, String value){
         String encrypted = "";
         if(encrypt == EntityColumn.EncryptionType.BS64) encrypted =  Base64.encodeToString(value.getBytes(),flag);
-        return encrypted;
+        return encrypted.replaceAll("\n","");
     }
 
     public void setColumnFromSelect(String columnName, Object value){
@@ -413,6 +458,27 @@ public abstract class Entity implements Serializable {
             else
                 content.put(name,(Long)value);
         }
+    }
+
+    private String getValuesByTypeAsString(EntityColumn content){
+        String value = "";
+
+        if (content.getType() == EntityColumn.ColumnType.INTEGER) {
+            if(content.getValue() != null) value = ((Integer)content.getValue()).toString();
+
+        }else if (content.getType() == EntityColumn.ColumnType.TEXT) {
+            if(content.getValue() != null) value = ((String)content.getValue());
+
+        }else if (content.getType() == EntityColumn.ColumnType.REAL) {
+            if(content.getValue() != null) value = ((Double)content.getValue()).toString();
+
+        }else if (content.getType() == EntityColumn.ColumnType.DATE) {
+            if(content.getValue() != null) value = ((Long)((Date)content.getValue()).getTime()).toString();
+
+        }else
+            if (content.getValue() != null) value = ((Double)content.getValue()).toString();
+
+        return value;
     }
 
     private void addValuesByType(EntityColumn content,Object value){

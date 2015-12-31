@@ -514,9 +514,11 @@ public class SyncFragment extends Fragment implements MainComponentEdit<View[]> 
             try {
                 ViewSyncHolder vsh = (ViewSyncHolder)
                         ourInstance.syncAdapter.getViewOfTable(tableName).getTag();
-                if(vsh.tableName.equals(tableName))
+                if(vsh.tableName.equals(tableName)){
                     vsh.pgb_sync.setProgress(progress);
-                vsh.tvProgress.setText(progress+"%");
+                    vsh.tvProgress.setText(progress+"%");
+                }
+
             }catch (NullPointerException e){}
 
             if(ourInstance.syncCount == ourInstance.SYNCHRONIZED)

@@ -63,11 +63,11 @@ public class Users extends Entity {
         return list;
     }
 
-    public int getBaseEncryption(){
+    public static int getBaseEncryption(){
         return Base64.DEFAULT;
     }
 
-    public EntityColumn.EncryptionType getEncryptionType(){
+    public static EntityColumn.EncryptionType getEncryptionType(){
         return EntityColumn.EncryptionType.BS64;
     }
 }

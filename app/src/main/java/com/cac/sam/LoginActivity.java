@@ -11,7 +11,10 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
+
+import com.cac.entities.Users;
+import com.delacrmi.persistences.Entity;
+import com.delacrmi.persistences.EntityManager;
 
 /**
  * Created by delacrmi on 12/10/2015.
@@ -20,32 +23,41 @@ public class LoginActivity extends FragmentActivity {
 
     private EditText userName;
     private EditText password;
-    private TextView loginStatus;
 
     private Button signin;
     private Button cancel;
     private Intent intent;
+
+    private EntityManager entityManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_layout);
 
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        this.entityManager = new EntityManager(this,
+                getResources().getString(R.string.db_name),
+                null,
+                Integer.parseInt(getResources().getString(R.string.db_version))).addTable(Users.class);
+
         userName = (EditText)findViewById(R.id.et_username);
         password = (EditText)findViewById(R.id.et_password);
-        loginStatus = (TextView)findViewById(R.id.tv_login_status);
 
         signin = (Button)findViewById(R.id.btn_sign_in);
         signin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 intent = new Intent();
-                if (userName.getText().toString().equals("mcruz") &&
-                        password.getText().toString().equals("1234")){
-                    intent.putExtra("user", 2);
-                    setResult(50,intent);
+                String json;
+                json = findUser(userName.getText().toString(),password.getText().toString(),entityManager).getJSON().toString();
+
+                if(!json.equals("{}")){
+                    intent.putExtra("user",json);
+                    setResult(50, intent);
                     finish();
-                } else Snackbar.make(v,"UserName or Password incorrect",Snackbar.LENGTH_SHORT).show();
+                } else Snackbar.make(v, getResources().getString(R.string.login_reject), Snackbar.LENGTH_SHORT).show();
             }
         });
 
@@ -54,6 +66,9 @@ public class LoginActivity extends FragmentActivity {
             @Override
             public void onClick(View v) {
                 intent = new Intent();
+                intent.putExtra("user","out");
+                setResult(50, intent);
+                finish();
 
             }
         });
@@ -96,5 +111,20 @@ public class LoginActivity extends FragmentActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+    }
+
+    public static Users findUser(String user, String passport, EntityManager entityManager){
+        String us = user;
+        String auth;
+
+        if(us.contains("@")) auth = Users.EMAIL;
+        else auth = Users.USER;
+
+        String pass = Entity.encode(Users.getEncryptionType(),
+                Users.getBaseEncryption(),passport);
+
+        return (Users)entityManager.findOnce(Users.class,"*",
+            auth + " = ? and " + Users.PASSWORD + " = ?",
+            new String[]{us,pass});
     }
 }

@@ -73,10 +73,19 @@ public class EntityManager  {
             public void beforeToCreate(SQLiteDatabase db){
                 onCreateDataBase(this, db);
             }
-
             @Override
             public void afterToCreate(SQLiteDatabase db) {
                 onDataBaseCreated(this, db);
+            }
+
+            @Override
+            public void beforeToUpdate(SQLiteDatabase db) {
+                onDatabaseUpdate(this, db);
+            }
+
+            @Override
+            public void afterToUpdate(SQLiteDatabase db) {
+                onUpdatedDataBase(this, db);
             }
         };
         read();
@@ -85,6 +94,9 @@ public class EntityManager  {
 
     public void onCreateDataBase(ConnectSQLite conn, SQLiteDatabase db){}
     public void onDataBaseCreated(ConnectSQLite conn, SQLiteDatabase db){}
+
+    public void onDatabaseUpdate(ConnectSQLite conn, SQLiteDatabase db){}
+    public void onUpdatedDataBase(ConnectSQLite conn, SQLiteDatabase db){}
 
     protected SQLiteDatabase write(){
         if(conn == null)
@@ -158,7 +170,7 @@ public class EntityManager  {
 
         Entity ent= findOnce(entity, "*", where, whereValues);
         ent.setValues(columnsValue);
-        return update(ent,where,whereValues,save);
+        return update(ent, where, whereValues, save);
     }
 
     public synchronized Entity update(Entity entity,String where,String[] whereValues,boolean save){
@@ -197,10 +209,7 @@ public class EntityManager  {
 
         Cursor cursor = read().rawQuery(sql, args);
 
-        if(cursor != null && cursor.moveToFirst()) {
-            addEntityValues(cursor, ent);
-
-        }
+        if(cursor != null && cursor.moveToFirst()) addEntityValues(cursor, ent);
 
         read().close();
         return ent;

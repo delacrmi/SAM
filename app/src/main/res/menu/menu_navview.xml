@@ -21,6 +21,11 @@
         android:icon="@drawable/home"
         android:title="@string/app_name"/>
 
+    <item
+        android:id="@+id/nav_change_user"
+        android:icon="@drawable/user"
+        android:title="@string/switch_user"/>
+
     <!--Works Categories-->
     <item
         android:id="@+id/nav_work_item"
@@ -79,5 +84,11 @@
                 android:title="@string/server"/>
         </menu>
     </item>
+
+    <!--Sign out-->
+    <item
+        android:id="@+id/nav_sign_out"
+        android:title="@string/logout"
+        android:icon="@drawable/logout"/>
 
 </menu>

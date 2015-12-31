@@ -1,8 +1,6 @@
 <resources>
     <string name="app_name">SAM</string>
     <string name="app_description_name">Sistema de Alce Manual</string>
-
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
 
     <string name="accion_buscar">Search</string>
@@ -26,6 +24,11 @@
 
     <string name="cutting_title_fragment">Parametros Generales</string>
 
+    <!-- ======================== Menu ================================= -->
+    <string name="unplugged">Desconectado</string>
+    <string name="plugged">Connectado</string>
+    <!-- ================================================================= -->
+
     <!-- ======================== Drawer ================================= -->
     <string name="raise">Uñadas</string>
     <string name="weight">Peso</string>
@@ -35,6 +38,7 @@
     <!-- ================================================================= -->
 
     <!-- ======================== Drawer Menu ============================ -->
+    <string name="switch_user">Cambiar Usuario</string>
     <string name="work_title">Mapa de Corte</string>
     <string name="work">Digitación</string>
 
@@ -47,6 +51,8 @@
     <string name="sync_title">Sincronizar</string>
     <string name="client">Cliente</string>
     <string name="server">Servidor</string>
+
+    <string name="logout">Salir</string>
     <!-- ================================================================= -->
 
     <!-- ========================= Data Base ============================= -->
@@ -62,6 +68,14 @@
     <string name="server_execute">Sincronizar Servidor</string>
     <string name="auto_execute">Ejecutar Automaticamente</string>
     <string name="interval">Tiempo de sincronización</string>
+    <!-- ================================================================= -->
+
+    <!-- ========================== Login ================================ -->
+    <string name="username">Usuario</string>
+    <string name="password">Contraseña</string>
+
+    <string name="login_success">Login Exitoso!!!</string>
+    <string name="login_reject">Ususario o Contraseña Incorrecto</string>
     <!-- ================================================================= -->
 
     <!-- Required Fields -->

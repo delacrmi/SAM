@@ -31,12 +31,10 @@ public class ConnectSQLite extends SQLiteOpenHelper{
     }
 
     private void createTables(SQLiteDatabase db) {
-        beforeToCreate(db);
         for (String value: tablesCreater) {
             Log.d("creating", value);
             db.execSQL(value);
         }
-        afterToCreate(db);
     }
 
     private void dropTables(SQLiteDatabase db){
@@ -49,14 +47,18 @@ public class ConnectSQLite extends SQLiteOpenHelper{
     @Override
     public void onCreate(SQLiteDatabase db) {
         Log.d("creating", "Creando");
+        beforeToCreate(db);
         createTables(db);
+        afterToCreate(db);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         //Log.d("creating", "Actualizando");
+        beforeToUpdate(db);
         dropTables(db);
         createTables(db);
+        afterToUpdate(db);
     }
 
     public void setEntitiesBackup(Object entitiesBackup){
@@ -66,6 +68,8 @@ public class ConnectSQLite extends SQLiteOpenHelper{
         return entitiesBackup;
     }
 
+    public void beforeToUpdate(SQLiteDatabase db){}
+    public void afterToUpdate(SQLiteDatabase db){}
     public void beforeToCreate(SQLiteDatabase db){}
     public void afterToCreate(SQLiteDatabase db){}
 }

@@ -33,6 +33,12 @@
             android:inputType="number"
             android:text="30"/>
 
+        <EditTextPreference
+            android:key="etp_last_execution"
+            android:title="@string/logout"
+            android:editable="false"
+            android:summary="00/00/00 00:00"/>
+
     </PreferenceCategory>
 
     <PreferenceCategory
