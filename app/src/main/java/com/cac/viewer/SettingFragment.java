@@ -20,6 +20,8 @@ public class SettingFragment extends PreferenceFragment implements MainComponent
     private EditTextPreference editTextEmei;
     private MainActivity context;
 
+    private EditTextPreference etpLastExecution;
+
     public static SettingFragment getInstance(MainActivity context){
         if(ourInstance == null) {
             ourInstance = new SettingFragment();
@@ -35,7 +37,10 @@ public class SettingFragment extends PreferenceFragment implements MainComponent
 
         editTextEmei = (EditTextPreference) findPreference("EMEI");
         TelephonyManager telephonyManager = (TelephonyManager)ourInstance.context.getSystemService(Context.TELEPHONY_SERVICE);
-        editTextEmei.setText(telephonyManager.getDeviceId());
+        editTextEmei.setSummary(telephonyManager.getDeviceId());
+        editTextEmei.setEnabled(false);
+
+        updateLastExecutionSummary();
 
     }
 
@@ -60,5 +65,10 @@ public class SettingFragment extends PreferenceFragment implements MainComponent
     @Override
     public int getSubTitle() {
         return R.string.settings;
+    }
+
+    public void updateLastExecutionSummary(){
+        etpLastExecution = (EditTextPreference) findPreference("etp_last_execution");
+        etpLastExecution.setSummary(etpLastExecution.getText());
     }
 }

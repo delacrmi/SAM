@@ -58,7 +58,11 @@ public class ViewSyncHolder extends RecyclerView.ViewHolder {
         if ( tableInfo.size() == 5 ) {
             whereCondition = (String) tableInfo.get(3);
             whereValues    = (JSONArray) tableInfo.get(4);
+        }else{
+            whereCondition = null;
+            whereValues = null;
         }
+
         pgb_sync.setProgress(Integer.parseInt((String) tableInfo.get(2)));
         tvProgress.setText(tableInfo.get(2)+"%");
     }

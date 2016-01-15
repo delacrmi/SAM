@@ -125,10 +125,7 @@ public class MainActivity extends AppCompatActivity {
         startService(new Intent(this, SyncServerService.class));
 
         IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(SyncServerService.SYNCHRONIZE_STARTED);
-        intentFilter.addAction(SyncServerService.OBJECT_SYNCHRONIZED);
-        intentFilter.addAction(SyncServerService.SYNCHRONIZE_END);
-        intentFilter.addAction(SyncServerService.STATUS_CONNECTION);
+        intentFilter.addAction(SyncServerService.SAM);
         serverStarter = new ServerStarter(this);
 
         try {

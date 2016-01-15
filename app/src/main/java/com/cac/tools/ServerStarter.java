@@ -21,17 +21,26 @@ public class ServerStarter extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        if(intent.getAction().equals(SyncServerService.STATUS_CONNECTION)){
+        if(intent.getAction().equals(SyncServerService.SAM)){
             int status = intent.getIntExtra("status",SyncServerService.UNCONNECTED);
             try {
-                if (status == SyncServerService.CONNECTED) {
-                    mainActivity.getStatusConnection()
-                            .setIcon(R.drawable.plugged)
-                            .setTitle(R.string.plugged);
-                } else if (status == SyncServerService.UNCONNECTED) {
-                    mainActivity.getStatusConnection()
-                            .setIcon(R.drawable.unplugged)
-                            .setTitle(R.string.unplugged);
+
+                switch (status){
+                    case SyncServerService.CONNECTED:
+                        mainActivity.getStatusConnection()
+                                .setIcon(R.drawable.plugged)
+                                .setTitle(R.string.plugged);
+                        break;
+
+                    case SyncServerService.UNCONNECTED:
+                        mainActivity.getStatusConnection()
+                                .setIcon(R.drawable.unplugged)
+                                .setTitle(R.string.unplugged);
+                        break;
+
+                    case SyncServerService.LAST_SERVER_SYNC:
+                        mainActivity.getSettingFragment().updateLastExecutionSummary();
+                        break;
                 }
             }catch(NullPointerException e){}
         }

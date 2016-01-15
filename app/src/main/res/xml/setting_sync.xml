@@ -28,7 +28,7 @@
             android:checked="true"/>
 
         <EditTextPreference
-            android:key="etp_inverval"
+            android:key="etp_interval"
             android:title="@string/interval"
             android:inputType="number"
             android:text="30"/>
@@ -36,7 +36,7 @@
         <EditTextPreference
             android:key="etp_last_execution"
             android:title="@string/logout"
-            android:editable="false"
+            android:enabled="false"
             android:summary="00/00/00 00:00"/>
 
     </PreferenceCategory>
@@ -64,7 +64,7 @@
         <EditTextPreference
             android:key="EMEI"
             android:title="Identificador EMEI"
-            android:editable="false"/>
+            android:enabled="false"/>
 
     </PreferenceCategory>
 </PreferenceScreen>

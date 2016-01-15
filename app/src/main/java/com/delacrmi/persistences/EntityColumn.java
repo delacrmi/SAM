@@ -1,10 +1,5 @@
 package com.delacrmi.persistences;
 
-import android.util.Base64;
-import android.util.Log;
-
-import java.util.UnknownFormatConversionException;
-
 /**
  * Created by miguel on 13/11/15.
  */

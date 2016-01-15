@@ -14,6 +14,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -140,13 +141,41 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
                             ourInstance.context.getCurrentFocus().getWindowToken(), 0);*/
                 }
             });
-            ourInstance.autTractor.setAdapter(
-                    findCodigosVehiculos(Vehiculos.class, "A")
-                    //getAdapter(Vehiculos.class,Vehiculos.CODIGO_GRUPO+"||"+Vehiculos.CODIGO_SUBGRUPO+"||"+Vehiculos.CODIGO_VEHICULO+" key,"+
-                    //      Vehiculos.CODIGO_GRUPO+"||"+Vehiculos.CODIGO_SUBGRUPO+"||"+Vehiculos.CODIGO_VEHICULO+" value",
-                    //    Vehiculos.CODIGO_GRUPO +" = ?",new String[]{"A"},hashTractor)
-            );
-            ourInstance.autTractor.setThreshold(1);
+            ourInstance.autTractor.setAdapter(findCodigosVehiculos(Vehiculos.class, "A"));
+            /*ourInstance.autTractor.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View v, boolean hasFocus) {
+                    if(hasFocus && ((AutoCompleteTextView) v).getText().length() <= 1) addInitValue((TextView)v,"A"+((AutoCompleteTextView) v).getText());
+                }
+            });*/
+            ourInstance.autTractor.setOnKeyListener(new View.OnKeyListener() {
+                @Override
+                public boolean onKey(View v, int keyCode, KeyEvent event) {
+                    String values;
+                    try{
+                        if (((AutoCompleteTextView) v).getText().length() == 1 &&
+                                Integer.parseInt(((AutoCompleteTextView) v).getText()+"") != 2){
+                            values = ((AutoCompleteTextView) v).getText()+"";
+                            ((AutoCompleteTextView) v).setText("");
+
+                            if(Integer.parseInt(values) <= 1) ((AutoCompleteTextView) v).append("A180" + values);
+                            else if(Integer.parseInt(values) <= 3) ((AutoCompleteTextView) v).append("A090" + values);
+
+                        }else if(((AutoCompleteTextView) v).getText().length() == 2){
+                            values = ((AutoCompleteTextView) v).getText()+"";
+                            ((AutoCompleteTextView) v).setText("");
+
+                            if(Integer.parseInt(values) > 20) ((AutoCompleteTextView) v).append("A090" + values);
+                            else ((AutoCompleteTextView) v).append("A180" + values);
+                        }
+                    }catch (NumberFormatException e){
+                        ((AutoCompleteTextView) v).setText("");
+                        return true;
+                    }
+                    return false;
+                }
+            });
+            ourInstance.autTractor.setThreshold(2);
 
             ourInstance.autCutter = (AutoCompleteTextView)ourInstance.view.findViewById(R.id.aut_cutter_insert);
             ourInstance.tvCutter = (TextView)ourInstance.view.findViewById(R.id.tv_cutter_name_insert);
@@ -347,7 +376,10 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
 
                             Snackbar.make(ourInstance.view,"Registro Guardado",Snackbar.LENGTH_SHORT).show();
 
+                            autCutter.setText("");
                             tvCutter.setText("");
+                            deleteDetails();
+
                             ourInstance.etCode.setText(findMaxEnvio()+"");
                         }
 
@@ -381,6 +413,10 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
         autCutter.setText("");
         tvCutter.setText("");
         autTractor.setText("");
+        deleteDetails();
+    }
+
+    private void deleteDetails(){
         while (ourInstance.transactionDetailsList.size()>0)
             ourInstance.workDetailsAdapter.remove(0);
     }
@@ -535,6 +571,10 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
             return new ArrayAdapter<>(ourInstance.context, android.R.layout.simple_selectable_list_item, listado);
         }else
             return new ArrayAdapter<>(ourInstance.context, android.R.layout.simple_selectable_list_item, new ArrayList<String>());
+    }
+
+    public void addInitValue(TextView t, String value){
+        t.append(value);
     }
 
 }

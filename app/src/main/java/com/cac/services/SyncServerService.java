@@ -30,20 +30,19 @@ import io.socket.client.IO;
 
 public class SyncServerService extends Service {
 
-    public static String SYNCHRONIZE_STARTED = "com.cac.services.SYNCHRONIZE_STARTED";
-    public static String OBJECT_SYNCHRONIZED = "com.cac.services.OBJECT_SYNCHRONIZED";
-    public static String SYNCHRONIZE_END = "com.cac.services.SYNCHRONIZE_END";
-    public static String STATUS_CONNECTION = "com.cac.services.connect";
-    public static int UPDATE_SUCCESS = 0;
-    public static int UPDATE_REJECTED = 1;
-    public static int CONNECTED = 2;
-    public static int UNCONNECTED = 3;
+    public final static String SAM = "com.cac.services.sam";
+    public final static int UPDATE_SUCCESS = 0;
+    public final static int UPDATE_REJECTED = 1;
+    public final static int CONNECTED = 2;
+    public final static int UNCONNECTED = 3;
+    public final static int LAST_SERVER_SYNC = 4;
 
     private String TAG = "services";
     private Thread thread;
     private Boolean threadRunning;
     private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
     private String defaultStringDate = "29/12/2015 17:56";
+    private boolean toSend = false;
 
     private EntityManager entityManager;
     IO.Options opts;
@@ -88,7 +87,7 @@ public class SyncServerService extends Service {
             @Override
             public void run() {
                 Intent iSend= new Intent();
-                iSend.setAction(STATUS_CONNECTION);
+                iSend.setAction(SAM);
 
                 while (threadRunning){
 
@@ -105,8 +104,10 @@ public class SyncServerService extends Service {
                                     Transaccion.ESTADO + " = ? ",
                                     new String[]{Transaccion.TransaccionEstado.ACTIVA.toString()});
 
-                            if ( entities != null && entities.size() > 0 )
-                                connect.sendMessage("synchronizerServer", getInformationToSend(entities,Transaccion.TABLE_NAME));
+                            if ( entities != null && entities.size() > 0 ) {
+                                toSend = true;
+                                connect.sendMessage("synchronizerServer", getInformationToSend(entities, Transaccion.TABLE_NAME));
+                            }
 
                             updateCount += entities.size();
 
@@ -114,12 +115,17 @@ public class SyncServerService extends Service {
                                     TransactionDetails.ESTADO + " = ? ",
                                     new String[]{TransactionDetails.TransactionDetailsEstado.ACTIVA.toString()});
 
-                            if ( entities1 != null && entities1.size() > 0 )
-                                connect.sendMessage("synchronizerServer", getInformationToSend(entities1,TransactionDetails.TABLE_NAME));
+                            if ( entities1 != null && entities1.size() > 0 ) {
+                                toSend = true;
+                                connect.sendMessage("synchronizerServer", getInformationToSend(entities1, TransactionDetails.TABLE_NAME));
+                            }
 
                             updateCount += entities.size();
 
-                            if(updateCount == 0) updateTimerSync();
+                            if(updateCount == 0 && toSend) updateTimerSync();
+                        }else{
+                            iSend.putExtra("status", UNCONNECTED);
+                            sendBroadcast(iSend);
                         }
                     } catch (NullPointerException e){
 
@@ -133,9 +139,6 @@ public class SyncServerService extends Service {
                         e.printStackTrace();
                     }
                 }
-
-                iSend.putExtra("status", UNCONNECTED);
-                sendBroadcast(iSend);
             }
         });
         thread.start();
@@ -208,7 +211,7 @@ public class SyncServerService extends Service {
                 public void onSynchronizeServer(Object... args) {
                     Intent iSend = new Intent();
                     updateCount --;
-                    iSend.setAction(OBJECT_SYNCHRONIZED);
+                    iSend.setAction(SAM);
                     if ( args  != null && args[0] instanceof  JSONObject) {
                         try {
                             JSONObject obj = (JSONObject) args[0];
@@ -228,7 +231,7 @@ public class SyncServerService extends Service {
                 public void onSyncReject(Object... args) {
                     super.onSyncReject(args);
                     Intent iSend = new Intent();
-                    iSend.setAction(OBJECT_SYNCHRONIZED);
+                    iSend.setAction(SAM);
                     iSend.putExtra("reject", UPDATE_REJECTED);
                     sendBroadcast(iSend);
                 }
@@ -237,7 +240,7 @@ public class SyncServerService extends Service {
                 public void onSyncSuccess(Object... args) {
                     JSONObject obj = new JSONObject();
                     Intent iSend = new Intent();
-                    iSend.setAction(STATUS_CONNECTION);
+                    iSend.setAction(SAM);
                     iSend.putExtra("status", CONNECTED);
                     sendBroadcast(iSend);
 
@@ -264,7 +267,7 @@ public class SyncServerService extends Service {
 
     private void connectSocket(){
         Intent iSend = new Intent();
-        iSend.setAction(STATUS_CONNECTION);
+        iSend.setAction(SAM);
         iSend.putExtra("status", UNCONNECTED);
         sendBroadcast(iSend);
 
@@ -335,24 +338,35 @@ public class SyncServerService extends Service {
     private void updateTimerSync(){
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
+        toSend = false;
+
         String date = sdf.format(new Date());
         editor.putString("etp_last_execution",date);
         editor.commit();
+
+        Intent intent = new Intent();
+        intent.setAction(SAM);
+        intent.putExtra("status", LAST_SERVER_SYNC);
     }
 
     private boolean isTimeOver(){
         boolean isOver = true;
+        int sendMount = 1;
+
+        try{
+            sendMount = Integer.parseInt(sharedPreferences.getString("etp_interval", "1"));
+        }catch (ClassCastException e){}
 
         try {
-
-            Log.i("Calendar","Into");
 
             Calendar lastTime = Calendar.getInstance();
             lastTime.setTime(sdf.parse(sharedPreferences.getString("etp_last_execution", defaultStringDate)));
             Calendar actualTime = Calendar.getInstance();
-            if(actualTime.before(lastTime)) isOver = false;
+            if(actualTime.before(lastTime)
+                    || ((actualTime.getTimeInMillis() - lastTime.getTimeInMillis())/1000) < sendMount) isOver = false;
 
-            Log.i("Calendar",lastTime.toString()+" "+actualTime.toString());
+            //Log.i("Calendar",lastTime.toString()+" "+actualTime.toString()
+            //        +" "+((actualTime.getTimeInMillis() - lastTime.getTimeInMillis()) / 1000) +" "+ sendMount);
 
             actualTime.setTime(sdf.parse(defaultStringDate));
             if(lastTime.getTimeInMillis() == actualTime.getTimeInMillis()) updateTimerSync();
