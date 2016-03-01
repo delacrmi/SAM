@@ -8,7 +8,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -34,6 +36,7 @@ import android.widget.TextView;
 
 import com.cac.entities.*;
 import com.cac.services.SyncServerService;
+import com.cac.tools.BackupBD;
 import com.cac.tools.MainComponentEdit;
 import com.cac.tools.ServerStarter;
 import com.cac.viewer.CutterReportFragment;
@@ -205,11 +208,17 @@ public class MainActivity extends AppCompatActivity {
                 menu.findItem(R.id.client_sync).setEnabled(false);
                 menu.findItem(R.id.server_sync).setEnabled(false);
                 menu.findItem(R.id.setting).setEnabled(false);
+                menu.findItem(R.id.nav_bk_database).setEnabled(false);
+                menu.findItem(R.id.nav_up_database).setEnabled(false);
+
             }else if(userLow.equals("admin")){
                 menu = navigationView.getMenu();
                 menu.findItem(R.id.client_sync).setEnabled(true);
                 menu.findItem(R.id.server_sync).setEnabled(true);
                 menu.findItem(R.id.setting).setEnabled(true);
+                menu.findItem(R.id.nav_bk_database).setEnabled(true);
+                menu.findItem(R.id.nav_up_database).setEnabled(true);
+
             }else{
                 USER = "";
                 finish();
@@ -306,15 +315,16 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onDatabaseUpdate(ConnectSQLite conn, SQLiteDatabase db) {
                     List<List<Entity>> entities = new ArrayList<List<Entity>>();
-                    List<Entity> value;
+                    List<Entity> value = new ArrayList<Entity>();;
 
                     entities.add(new Users().getDefaultInsert());
 
-                    value = new Transaccion(this).getDefaultInsert();
-                    if(value != null)
-                        entities.add(value);
+                    //Backingup database tables.
+                    for (String str : getTablesNames()){
+                        Cursor cursor = db.rawQuery("select * from "+str,null);
+                        setListFromCursor(cursor,value,getClassByName(str));
+                    }
 
-                    value = new TransactionDetails(this).getDefaultInsert();
                     if(value != null)
                         entities.add(value);
 
@@ -475,6 +485,12 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.nav_sign_out:
                         USER = "";
                         initOtherActivity();
+                        break;
+                    case R.id.nav_bk_database:
+                        new BackupBD(MainActivity.this,getEntityManager()).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,0);
+                        break;
+                    case R.id.nav_up_database:
+                        new BackupBD(MainActivity.this,getEntityManager()).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,1);
                         break;
                 }
                 drawerLayout.closeDrawers();

@@ -18,6 +18,9 @@
     <string name="line">Linea</string>
     <string name="map">Mapa Corte</string>
     <string name="tractor">Tractor</string>
+    <string name="select_bluetooth_device">Selc. Printer</string>
+    <string name="bk_database">Exportar BD</string>
+    <string name="up_database">Importar BD</string>
 
     <string name="syncSuccess">Sincronizado</string>
     <string name="sync_name">Sincronizar Tablas</string>
@@ -57,7 +60,7 @@
 
     <!-- ========================= Data Base ============================= -->
     <string name="db_name">production</string>
-    <string name="db_version">1</string>
+    <string name="db_version">2</string>
     <!-- ================================================================= -->
 
     <!-- ========================== Setting ============================== -->
@@ -87,5 +90,9 @@
     <!-- DEFAULT DATE FORMAT-->
     <string name="default_date_format">yyyy-MM-dd</string>
     <string name="mobile_setting_title">Parametros del Dispositivo</string>
+    
+    <!-- Progrees bar message from import and export database-->
+    <string name="updateProgressImportTitle">Realizando el import</string>
+    <string name="updateProgressExportTitle">Realizando el export</string>
 
 </resources>

@@ -105,7 +105,7 @@ public class CutterReportFragment extends Fragment implements MainComponentEdit<
     private List<CutterReportCardHolder> findTransacciones() {
         EntityManager entityManager = ourInstance.context.getEntityManager();
         List<CutterReportCardHolder> informationList = new ArrayList<>();
-        for ( Entity entity :  entityManager.find(Transaccion.class, "*", null, null) ) {
+        for ( Entity entity :  entityManager.find(Transaccion.class, "*", null, null, Transaccion.NO_ENVIO+" desc limit 10") ) {
 
             CutterReportCardHolder data = new CutterReportCardHolder();
             data.setTotalUnada(entity.getColumnValueList().getAsString(Transaccion.UNADA));

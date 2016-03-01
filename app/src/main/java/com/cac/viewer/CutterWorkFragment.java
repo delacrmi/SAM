@@ -142,13 +142,13 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
                 }
             });
             ourInstance.autTractor.setAdapter(findCodigosVehiculos(Vehiculos.class, "A"));
-            /*ourInstance.autTractor.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            ourInstance.autTractor.setOnFocusChangeListener(new View.OnFocusChangeListener() {
                 @Override
                 public void onFocusChange(View v, boolean hasFocus) {
                     if(hasFocus && ((AutoCompleteTextView) v).getText().length() <= 1) addInitValue((TextView)v,"A"+((AutoCompleteTextView) v).getText());
                 }
-            });*/
-            ourInstance.autTractor.setOnKeyListener(new View.OnKeyListener() {
+            });
+            /*ourInstance.autTractor.setOnKeyListener(new View.OnKeyListener() {
                 @Override
                 public boolean onKey(View v, int keyCode, KeyEvent event) {
                     String values;
@@ -174,7 +174,7 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
                     }
                     return false;
                 }
-            });
+            });*/
             ourInstance.autTractor.setThreshold(2);
 
             ourInstance.autCutter = (AutoCompleteTextView)ourInstance.view.findViewById(R.id.aut_cutter_insert);
@@ -213,7 +213,7 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
         }
 
         EMPRESA =  sharedPreferences.getString("EMPRESA","30");
-        PERIODO =  sharedPreferences.getString("PERIODO","30");
+        PERIODO =  sharedPreferences.getString("PERIODO","19");
         APLICACION = sharedPreferences.getString("NOMBRE_APLICACION","SAM");
         TelephonyManager telephonyManager = (TelephonyManager)ourInstance.context.getSystemService(Context.TELEPHONY_SERVICE);
         DISPOSITIVO = telephonyManager.getDeviceId();
@@ -336,6 +336,7 @@ public class CutterWorkFragment extends Fragment implements MainComponentEdit<Vi
                                 .setValue(Integer.parseInt(parameters.getLote()));
 
                         transaccion.getColumn(Transaccion.FECHA_CORTE).setValue(new Date());
+                        transaccion.getColumn(Transaccion.FECHA_ENVIO).setValue(new Date());
 
                         transaccion.getColumn(Transaccion.CORTADOR)
                                 .setValue(Integer.parseInt(ourInstance.autCutter.getText() + ""));

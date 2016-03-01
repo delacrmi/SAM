@@ -252,6 +252,25 @@ public class EntityManager  {
         read().close();
         return list;
     }
+
+    public synchronized List<Entity> find(Class entity,String columns,String conditions,String[] args, String orderBy){
+        Entity ent= initInstance(entity);
+
+        String sql = "select "+columns+" from "+ent.getName();
+        if(conditions != null)
+            sql += " where "+conditions;
+
+        if (orderBy != null)
+            sql += " order by "+orderBy;
+
+        Cursor cursor = read().rawQuery(sql, args);
+        List<Entity> list = new ArrayList<Entity>();
+        setListFromCursor(cursor,list,entity);
+
+        read().close();
+        return list;
+    }
+
     //</editor-fold>
 
     //<editor-fold desc="deleting the Entities class">

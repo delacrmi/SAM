@@ -31,6 +31,7 @@ public class Transaccion extends Entity {
     public static String LINEA = "linea";
     public static String DISPOSITIVO = "dispositivo";
     public static String MAPA_CORTE = "mapa_corte";
+    public static String FECHA_ENVIO = "fecha_envio";
 
     public Transaccion(){}
     public Transaccion(EntityManager manager){
@@ -47,6 +48,7 @@ public class Transaccion extends Entity {
         addColumn(ID_CANIAL, EntityColumn.ColumnType.INTEGER);
         addColumn(ID_LOTE, EntityColumn.ColumnType.INTEGER);
         addColumn(FECHA_CORTE, EntityColumn.ColumnType.DATE);
+        addColumn(FECHA_ENVIO, EntityColumn.ColumnType.DATE);
         addColumn(FRENTE_CORTE, EntityColumn.ColumnType.INTEGER);
         addColumn(FRENTE_ALCE, EntityColumn.ColumnType.INTEGER);
         addColumn(CODIGO_TRACTOR, EntityColumn.ColumnType.TEXT);

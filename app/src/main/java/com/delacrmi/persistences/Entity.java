@@ -37,6 +37,7 @@ public abstract class Entity implements Serializable {
 
     private EntityFilter entityFilter;
     private EntityManager manager = null;
+    private List<EntityColumn> entityColumnList;
 
     public abstract Entity entityConfig();
 
@@ -460,7 +461,7 @@ public abstract class Entity implements Serializable {
         }
     }
 
-    private String getValuesByTypeAsString(EntityColumn content){
+    public String getValuesByTypeAsString(EntityColumn content){
         String value = "";
 
         if (content.getType() == EntityColumn.ColumnType.INTEGER) {
@@ -533,5 +534,9 @@ public abstract class Entity implements Serializable {
             return new EntityColumn<Double>(name,type);
         else
             return new EntityColumn<Date>(name,type);
+    }
+
+    public List<EntityColumn> getEntityColumnList(){
+        return columns;
     }
 }

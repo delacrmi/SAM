@@ -39,6 +39,7 @@
                 android:textStyle="bold"
                 android:hint="User Name"
                 android:textColor="@color/color_accent"
+                android:inputType="textCapCharacters"
                 android:singleLine="true"
                 android:textColorHint="#FFFFFF"
                 android:background="#80000000"
